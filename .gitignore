@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+.DS_Store
+*.lock
+!yarn.lock
+*.log
+*.ai
+out/
+node_modules/
+coverage/
+dist/
+upload/
