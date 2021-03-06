@@ -1,0 +1,26 @@
+{
+  "name": "InfinityScroll",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/A64Danil/InfinityScroll.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/A64Danil/InfinityScroll/issues"
+  },
+  "homepage": "https://github.com/A64Danil/InfinityScroll#readme",
+  "devDependencies": {
+    "html-webpack-plugin": "^5.2.0",
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0"
+  }
+}
