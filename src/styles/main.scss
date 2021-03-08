@@ -1,0 +1,15 @@
+$font-size: 1rem;
+$font-color: lch(53 105 40);
+
+html {
+  font-size: $font-size;
+  color: $font-color;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  //color: green;
+  font-weight: bold;
+  //display: flex;
+}
