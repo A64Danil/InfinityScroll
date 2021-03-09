@@ -14,7 +14,7 @@ const myGame = new Game()
 console.log('12-33')
 
 function bad(a) {
-  console.log('ha щьп огылн здуфы!!!')
+  console.log('ha husk please!!!')
   return a + 2
 }
 
