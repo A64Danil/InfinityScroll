@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start2": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js",
-    "build2": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
+    "startOLD": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js",
+    "buildOLD": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config config/webpack.dev.js",
-    "build": "webpack --config config/webpack.prod.js"
+    "build": "webpack --config config/webpack.prod.js",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix --color"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,34 @@
   },
   "homepage": "https://github.com/A64Danil/InfinityScroll#readme",
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "file-loader": "^6.2.0",
+    "html-loader": "^1.3.2",
+    "html-webpack-plugin": "^5.1.0",
+    "husky": "^3.0.8",
+    "lint-staged": "^9.4.1",
+    "mini-css-extract-plugin": "^1.3.4",
+    "postcss": "^8.2.4",
+    "postcss-loader": "^4.1.0",
+    "postcss-preset-env": "^6.7.0",
+    "prettier": "^2.2.1",
+    "sass": "^1.32.4",
+    "sass-loader": "^10.1.1",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "devDependenciesORIG": {
     "@babel/core": "^7.13.8",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.9",
@@ -29,12 +59,21 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^8.0.0",
     "css-loader": "^5.1.1",
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
     "eslint-webpack-plugin": "^2.5.2",
     "html-webpack-plugin": "^5.2.0",
+    "husky": "^3.0.8",
+    "lint-staged": "^9.5.0",
     "mini-css-extract-plugin": "^1.3.9",
     "node-sass": "^5.0.0",
     "postcss-loader": "^5.1.0",
     "postcss-preset-env": "^6.7.0",
+    "prettier": "^2.2.1",
     "prettier-webpack-plugin": "^1.2.0",
     "sass-loader": "^11.0.1",
     "style-loader": "^2.0.0",
@@ -42,5 +81,16 @@
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css}": [
+      "npm run lint:fix",
+      "git add"
+    ]
   }
 }
