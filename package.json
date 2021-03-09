@@ -10,8 +10,8 @@
     "start": "webpack serve --config config/webpack.dev.js",
     "build": "webpack --config config/webpack.prod.js",
     "lint": "eslint ./src",
-    "lint:fix2": "eslint ./src --fix --color",
-    "lint:fix": "eslint /src --fix --color"
+    "lint:fix": "eslint ./src --fix --color",
+    "lint:fix2": "eslint /src --fix --color"
   },
   "repository": {
     "type": "git",
