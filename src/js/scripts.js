@@ -1,1 +1,1 @@
-console.log('all is right, all is good')
+console.log('all is right, all is good');
