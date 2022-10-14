@@ -1,8 +1,37 @@
 {
-  "extends": ["eslint:recommended", "airbnb-base", "prettier"],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": "error"
+  "plugins": ["prettier", "import", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "project": "**/tsconfig.json",
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "extraFileExtensions": [".json"]
   },
-  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json"]
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "prettier/prettier": "error",
+//    "no-debugger": "off",
+    "no-console": 0
+//    "class-methods-use-this": "off",
+//    "@typescript-eslint/no-explicit-any": 2,
+//    "@typescript-eslint/no-var-requires": "off",
+//    "@typescript-eslint/lines-between-class-members": "off",
+//    "@typescript-eslint/comma-dangle": "off",
+//    "import/no-cycle": "off",
+//    "no-underscore-dangle": "off",
+//    "consistent-return": "off"
+  },
+  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json", "*.json"]
 }

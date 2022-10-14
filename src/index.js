@@ -1,4 +1,6 @@
 import './styles/main.scss';
+import './js/scripts';
+import './js/test';
 
 console.log('entry point');
 
