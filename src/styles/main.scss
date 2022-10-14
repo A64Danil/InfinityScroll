@@ -2,6 +2,7 @@ $font-size: 1rem;
 $font-color: lch(53 105 40);
 
 html {
+  font-family: Arial, Helvetica, sans-serif;
   font-size: $font-size;
   color: $font-color;
 }
@@ -12,4 +13,14 @@ html {
   //color: green;
   font-weight: bold;
   //display: flex;
+}
+
+.infinityScroll {
+  color: #333;
+  max-height: 300px;
+  overflow-y: scroll;
+
+  &__listItem {
+    padding-bottom: 4px;
+  }
 }

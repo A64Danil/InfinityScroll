@@ -11,7 +11,7 @@ const addDataToList = function (list): void {
   if (!InfinityList) return;
 
   list.data.forEach((element) => {
-    const template = `<li>${element.name} ${element.number}</li>`;
+    const template = `<li class="infinityScroll__listItem">${element.name} ${element.number}</li>`;
     // InfinityList?.append(template);
     InfinityList.innerHTML += template;
   });
