@@ -4,5 +4,5 @@
   "rules": {
     "prettier/prettier": "error"
   },
-  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json"]
+  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json", "package.json"]
 }

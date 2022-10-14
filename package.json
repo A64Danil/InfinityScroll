@@ -1,6 +1,6 @@
 {
   "name": "InfinityScroll",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config config/webpack.dev.js",
     "build": "webpack --config config/webpack.prod.js",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint ./src --fix --color"
+    "lint": "eslint ./src --format table",
+    "lint:fix": "eslint ./src --fix --format table --color"
   },
   "repository": {
     "type": "git",
