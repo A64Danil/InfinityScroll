@@ -23,12 +23,13 @@ for (let i = 0; i < MAX; i++) {
 
 console.log(mockJson.data);
 
-// eslint-disable-next-line consistent-return
 fs.writeFile(PATH, JSON.stringify(mockJson), (err) => {
   if (err) {
-    return console.error(err);
+    console.error(err);
+    return false;
   }
 
   console.log('Data written successfully!');
   console.log("Let's read newly written data");
+  return true;
 });

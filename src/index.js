@@ -1,6 +1,6 @@
 import './styles/main.scss';
 import './js/scripts';
-import './js/test';
+import './js/infinityScroll';
 
 console.log('entry point');
 
