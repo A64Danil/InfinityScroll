@@ -3,9 +3,11 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "startOLD": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js",
     "buildOLD": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
+    "datagen": "node mocks/dataGenerator.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config config/webpack.dev.js",
     "build": "webpack --config config/webpack.prod.js",
