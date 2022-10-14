@@ -23,7 +23,7 @@
     "url": "https://github.com/A64Danil/InfinityScroll/issues"
   },
   "homepage": "https://github.com/A64Danil/InfinityScroll#readme",
-  "devDependencies": {
+  "devDependenciesNEW": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "babel-loader": "^8.2.2",
@@ -51,7 +51,7 @@
     "webpack-cli": "^4.3.0",
     "webpack-dev-server": "^3.11.0"
   },
-  "devDependenciesORIG": {
+  "devDependencies": {
     "@babel/core": "^7.13.8",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.9",
