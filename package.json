@@ -1,9 +1,8 @@
 {
   "name": "InfinityScroll",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.0.2",
+  "description": "Endless HTML-list with virtual scroll",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "startOLD": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js",
     "buildOLD": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
