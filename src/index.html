@@ -6,14 +6,15 @@
   </head>
   <body>
     <section class="container">
+      <%= _.template(require('html-loader!./html/includes/header.html'))(data)
+      %>
       <h1>1111SASS TEST</h1>
       <p>oih</p>
       <h3></h3>
-      <img src="img/torin.gif" alt="" />
-      <!--   не работает -->
       <img src="./assets/images/torin.gif" alt="" />
       <!--   работает-->
       <p><%= htmlWebpackPlugin.options.info %></p>
+      <%= _.template(require('html-loader!./html/includes/list.html'))(data) %>
     </section>
   </body>
 </html>
