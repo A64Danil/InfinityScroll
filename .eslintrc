@@ -34,5 +34,5 @@
 //    "no-underscore-dangle": "off",
 //    "consistent-return": "off"
   },
-  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json", "*.json"]
+  "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json", "*.json", "*mocks/*"]
 }

@@ -1,6 +1,6 @@
-import fs from 'fs';
+const fs = require('fs');
 
-const MAX = 100;
+const MAX = 100 * 1000;
 const PATH = `mocks/bigList${MAX}.json`;
 console.log(`Soon you wil have data json with MAX = ${MAX}`);
 
@@ -20,8 +20,6 @@ for (let i = 0; i < MAX; i++) {
   };
   mockJson.data.push(tempData);
 }
-
-console.log(mockJson.data);
 
 fs.writeFile(PATH, JSON.stringify(mockJson), (err) => {
   if (err) {
