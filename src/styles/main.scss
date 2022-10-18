@@ -17,8 +17,11 @@ html {
 
 .infinityScroll {
   color: #333;
-  max-height: 290px;
+  //max-height: 290px;
+  height: 290px;
   overflow-y: scroll;
+  padding: 20px 0 20px 30px;
+  margin: 5px 0;
 
   &__listItem {
     padding: 5px 10px;
