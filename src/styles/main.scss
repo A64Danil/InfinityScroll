@@ -21,6 +21,12 @@ html {
   overflow-y: scroll;
 
   &__listItem {
-    padding-bottom: 4px;
+    padding: 5px 10px;
+    font-weight: normal;
+    //transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background: #eee;
+    }
   }
 }
