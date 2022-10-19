@@ -65,7 +65,9 @@ const getAllSizes = (bigListNode: HTMLElement) => {
 };
 
 const TAG_TPL = function (name: string, number: string | number) {
-  return `<li class="infinityScroll__listItem">${name} ${number}</li>`;
+  return `<li class="infinityScroll__listItem" aria-setsize="${MAX_LENGTH}" aria-posinset="${number}">${name} ${
+    number + 1
+  }</li>`;
 };
 
 let timerId;
@@ -101,12 +103,6 @@ const fillList = function () {
 };
 
 const addItemsToList = function (sequenceNumber: number) {
-  if (sequenceNumber < MAX_LIST_SIZE) {
-    console.log('sequenceNumber = ', sequenceNumber);
-    console.log('Пока рендерить не надо');
-    return;
-  }
-
   let templateFragments = '';
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
@@ -116,6 +112,17 @@ const addItemsToList = function (sequenceNumber: number) {
     // console.log(element);
   }
   InfinityList.innerHTML += templateFragments;
+};
+
+const removeItemsFromList = function (sequenceNumber: number) {
+  console.log(`Нужно найти первые ${chunkAmount} элементов`);
+  for (let i = 0; i < 1000 && i < chunkAmount; i++) {
+    const firstChild = InfinityList?.firstChild;
+    InfinityList.removeChild(firstChild);
+    // const child: ChildNode | undefined = InfinityList?.childNodes[i];
+    // child.classList.add('hidden');
+    // console.log(child);
+  }
 };
 
 const modifyCurrentDOM = function () {
@@ -132,7 +139,13 @@ const modifyCurrentDOM = function () {
       `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
     );
 
-    addItemsToList(renderedRange.end);
+    if (renderedRange.end < MAX_LIST_SIZE) {
+      console.log('renderedRange.end = ', renderedRange.end);
+      console.log('Пока рендерить не надо');
+    } else {
+      addItemsToList(renderedRange.end);
+      removeItemsFromList(renderedRange.start);
+    }
   }
 
   // renderedRange = {
