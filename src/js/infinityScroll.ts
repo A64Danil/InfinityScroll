@@ -112,6 +112,12 @@ const fillList = function () {
   timerId = setTimeout(fillList, delay);
 };
 
+const setOffsetToList = function (): void {
+  const offset = (chunkAmount + renderedRange.start) * listItemHeight;
+  console.log('offset', offset);
+  InfinityList.style.transform = `translate(0,${offset}px)`;
+};
+
 const addItemsToList = function (sequenceNumber: number) {
   let templateFragments = '';
 
@@ -133,6 +139,7 @@ const removeItemsFromList = function (sequenceNumber: number) {
     // child.classList.add('hidden');
     // console.log(child);
   }
+  setOffsetToList();
 };
 
 const modifyCurrentDOM = function () {
