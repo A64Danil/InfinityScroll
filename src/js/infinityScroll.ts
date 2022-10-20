@@ -3,6 +3,10 @@ import BigDataList2 from '../../mocks/bigList100000.json'; // import mock data
 
 console.log('TS file loaded');
 
+const InfinityListWrapper: HTMLOListElement | null = document.querySelector<HTMLElement>(
+  '#infinityScrollWrapper'
+);
+
 const InfinityList: HTMLOListElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollList'
 );
@@ -25,7 +29,7 @@ let MAX_LIST_SIZE = 1;
 
 let currentListScroll = 0;
 let chunkAmount = 1;
-let listHeight = 1;
+let listWrpHeight = 1;
 let listItemHeight = 1;
 
 const renderedRange = {
@@ -40,24 +44,26 @@ const renderedRange = {
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
 
  */
-const getAllSizes = (bigListNode: HTMLElement) => {
+const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
+  const listWrp = bigListWrp;
   const list = bigListNode;
   const listStyles = window.getComputedStyle(list);
   const listItem = list.firstChild as HTMLElement;
 
-  listHeight =
-    parseInt(window.getComputedStyle(list).getPropertyValue('height'), 10) || 1;
+  listWrpHeight =
+    parseInt(window.getComputedStyle(listWrp).getPropertyValue('height'), 10) ||
+    1;
 
-  if (listHeight < 2) {
-    console.error('You must set height to your list!');
+  if (listWrpHeight < 2) {
+    console.error('You must set height to your list-wrapper!');
     return;
   }
 
-  listItemHeight = listItem?.offsetHeight || listHeight;
+  listItemHeight = listItem?.offsetHeight || listWrpHeight;
 
-  chunkAmount = Math.ceil(listHeight / listItemHeight);
+  chunkAmount = Math.ceil(listWrpHeight / listItemHeight);
 
-  console.log(listHeight);
+  console.log(listWrpHeight);
   console.log(listItemHeight);
   console.log(chunkAmount);
 
@@ -65,9 +71,13 @@ const getAllSizes = (bigListNode: HTMLElement) => {
 };
 
 const TAG_TPL = function (name: string, number: string | number) {
-  return `<li class="infinityScroll__listItem" aria-setsize="${MAX_LENGTH}" aria-posinset="${number}">${name} ${
-    number + 1
-  }</li>`;
+  return `<li 
+        class="infinityScroll__listItem" 
+        aria-setsize="${MAX_LENGTH}" 
+        aria-posinset="${number + 1}"
+        >
+            ${name} ${number + 1}
+    </li>`;
 };
 
 let timerId;
@@ -186,9 +196,9 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
 StartBtn?.addEventListener('click', () => {
   fillList();
-  getAllSizes(InfinityList);
+  getAllSizes(InfinityListWrapper, InfinityList);
 });
 
-InfinityList?.addEventListener('scroll', calcCurrentDOMRender);
+InfinityListWrapper?.addEventListener('scroll', calcCurrentDOMRender);
 
-getAllSizes(InfinityList);
+getAllSizes(InfinityListWrapper, InfinityList);
