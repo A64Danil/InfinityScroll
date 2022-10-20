@@ -114,21 +114,29 @@ const fillList = function () {
 };
 
 const setOffsetToList = function (): void {
-  const offset = (chunkAmount + renderedRange.start) * listItemHeight;
+  console.log('renderedRange.start', renderedRange.start);
+  const offset = renderedRange.start * listItemHeight;
   console.log('offset', offset);
   InfinityList.style.transform = `translate(0,${offset}px)`;
 };
 
-const addItemsToList = function (sequenceNumber: number) {
+const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   let templateFragments = '';
+  console.log('sequenceNumber', sequenceNumber);
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     const elemNum = i + sequenceNumber;
+    // console.log('elemNum', elemNum);
     const element = CurrentBigList[elemNum];
     templateFragments += TAG_TPL(element.name, element.number);
-    // console.log(element);
   }
-  InfinityList.innerHTML += templateFragments;
+
+  if (direction === 'down') {
+    InfinityList.innerHTML += templateFragments;
+  } else {
+    console.log('Добавляем ВВЕРХ!!');
+    InfinityList.innerHTML = templateFragments + InfinityList.innerHTML;
+  }
 };
 
 const removeItemsFromList = function (sequenceNumber: number) {
@@ -140,15 +148,15 @@ const removeItemsFromList = function (sequenceNumber: number) {
     // child.classList.add('hidden');
     // console.log(child);
   }
-  setOffsetToList();
 };
 
-const modifyCurrentDOM = function () {
+const modifyCurrentDOM = function (scrollDirection: string) {
   // имеется
-  const newStart = currentListScroll - chunkAmount * 2;
+  const newStart = currentListScroll - chunkAmount;
   const newEnd = currentListScroll + chunkAmount * 2;
 
   if (renderedRange.end !== newEnd) {
+    console.log('Будущий старт:', newStart);
     renderedRange.start = newStart < 0 ? 0 : newStart;
     renderedRange.end = newEnd;
 
@@ -157,13 +165,27 @@ const modifyCurrentDOM = function () {
       `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
     );
 
-    if (renderedRange.end < MAX_LIST_SIZE) {
+    if (scrollDirection === 'down' && renderedRange.end < MAX_LIST_SIZE) {
       console.log('renderedRange.end = ', renderedRange.end);
       console.log('Пока рендерить не надо');
-    } else {
-      if (currentListScroll) addItemsToList(renderedRange.end);
-      removeItemsFromList(renderedRange.start);
+      return;
     }
+
+    if (scrollDirection === 'up' && newStart < 0) {
+      console.log('renderedRange.start = ', renderedRange.start);
+      console.log('Мы в начале списка. Пока рендерить не надо');
+      return;
+    }
+
+    if (scrollDirection === 'down') {
+      addItemsToList(renderedRange.end, scrollDirection);
+      removeItemsFromList(renderedRange.start);
+    } else {
+      addItemsToList(renderedRange.start, scrollDirection);
+      // removeItemsFromList(renderedRange.start);
+    }
+
+    setOffsetToList();
   }
 
   // renderedRange = {
@@ -196,8 +218,11 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   chunkSize = chunkAmount * listItemHeight; // TODO: убрать отсюда в место где вычислится 1 раз
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkSize);
 
+  let scrollDirection = 'down';
+
   const newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
   if (currentListScroll !== newCurrentListScroll) {
+    // TODO: снести лишние логи
     console.log('currentListScroll поменялся');
     if (newCurrentListScroll > currentListScroll) {
       console.log('Ты скроллишь вниз');
@@ -205,11 +230,12 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       console.log('Ты скроллишь вверх');
     }
 
+    scrollDirection = newCurrentListScroll > currentListScroll ? 'down' : 'up';
     currentListScroll = newCurrentListScroll;
   }
 
   // DOM Manipulation
-  modifyCurrentDOM();
+  modifyCurrentDOM(scrollDirection);
 };
 
 StartBtn?.addEventListener('click', () => {
