@@ -19,19 +19,19 @@ let GLOBAL_ITEM_COUNTER = 0;
 
 const delay = 0;
 
-const CurrentBigList = BigDataList1.data;
+const CurrentBigList = BigDataList2.data;
 
-const MAX_LENGTH = CurrentBigList.length;
+const MAX_LIST_LENGTH = CurrentBigList.length;
 
-console.log('MAX_LENGTH', MAX_LENGTH);
+console.log('MAX_LIST_LENGTH', MAX_LIST_LENGTH);
 
-let MAX_LIST_SIZE = 1;
+let MAX_LIST_VISIBLE_SIZE = 1;
 
 let currentListScroll = 0;
 let chunkAmount = 1;
 let listWrpHeight = 1;
 let listItemHeight = 1;
-let chunkSize = 1;
+let chunkHeight = 1;
 
 const renderedRange = {
   start: 1,
@@ -45,6 +45,24 @@ const renderedRange = {
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
 
  */
+
+const setPaddingToList = function (offset = 0): void {
+  console.log('== setPaddingToList == chunkHeight', chunkHeight);
+  let paddingBottom =
+    MAX_LIST_LENGTH * listItemHeight - chunkHeight * 3 - offset;
+  console.log('paddingBottom', paddingBottom);
+  if (paddingBottom < 0) paddingBottom = 0;
+  InfinityList.style.paddingBottom = `${paddingBottom}px`;
+};
+
+const setOffsetToList = function (): void {
+  // console.log('renderedRange.start', renderedRange.start);
+  const offset = renderedRange.start * listItemHeight;
+  console.log('offset', offset);
+  InfinityList.style.transform = `translate(0,${offset}px)`;
+  setPaddingToList(offset);
+};
+
 const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
   const listWrp = bigListWrp;
   const list = bigListNode;
@@ -68,13 +86,17 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
   console.log(listItemHeight);
   console.log(chunkAmount);
 
-  MAX_LIST_SIZE = chunkAmount * 4;
+  MAX_LIST_VISIBLE_SIZE = chunkAmount * 4;
+
+  chunkHeight = chunkAmount * listItemHeight;
+
+  setPaddingToList();
 };
 
 const TAG_TPL = function (name: string, number: string | number) {
   return `<li 
         class="infinityScroll__listItem" 
-        aria-setsize="${MAX_LENGTH}" 
+        aria-setsize="${MAX_LIST_LENGTH}" 
         aria-posinset="${number + 1}"
         >
             ${name} ${number + 1}
@@ -86,11 +108,11 @@ let timerId;
 const fillList = function () {
   console.log('AGAIN!');
   console.log('GLOBAL_ITEM_COUNTER', GLOBAL_ITEM_COUNTER);
-  console.log('MAX_LIST_SIZE', MAX_LIST_SIZE);
+  console.log('MAX_LIST_VISIBLE_SIZE', MAX_LIST_VISIBLE_SIZE);
   if (
     GLOBAL_ITEM_COUNTER > 49999 ||
-    GLOBAL_ITEM_COUNTER >= MAX_LENGTH ||
-    GLOBAL_ITEM_COUNTER >= MAX_LIST_SIZE
+    GLOBAL_ITEM_COUNTER >= MAX_LIST_LENGTH ||
+    GLOBAL_ITEM_COUNTER >= MAX_LIST_VISIBLE_SIZE
   )
     return;
 
@@ -98,9 +120,9 @@ const fillList = function () {
   for (
     let i = 0;
     i < 1000 &&
-    i < MAX_LENGTH - 1 &&
-    GLOBAL_ITEM_COUNTER < MAX_LENGTH &&
-    GLOBAL_ITEM_COUNTER < MAX_LIST_SIZE;
+    i < MAX_LIST_LENGTH - 1 &&
+    GLOBAL_ITEM_COUNTER < MAX_LIST_LENGTH &&
+    GLOBAL_ITEM_COUNTER < MAX_LIST_VISIBLE_SIZE;
     i++
   ) {
     const element = CurrentBigList[GLOBAL_ITEM_COUNTER];
@@ -113,19 +135,13 @@ const fillList = function () {
   timerId = setTimeout(fillList, delay);
 };
 
-const setOffsetToList = function (): void {
-  console.log('renderedRange.start', renderedRange.start);
-  const offset = renderedRange.start * listItemHeight;
-  console.log('offset', offset);
-  InfinityList.style.transform = `translate(0,${offset}px)`;
-};
-
 const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   let templateFragments = '';
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     const elemNum = i + sequenceNumber;
-    // console.log('elemNum', elemNum);
+    console.log('elemNum', elemNum);
+    console.log('sequenceNumber', sequenceNumber);
     const element = CurrentBigList[elemNum];
     templateFragments += TAG_TPL(element.name, element.number);
   }
@@ -142,7 +158,7 @@ const removeItemsFromList = function (
   sequenceNumber: number,
   direction = 'down'
 ) {
-  console.log('sequenceNumber', sequenceNumber);
+  console.log('sequenceNumber', sequenceNumber, direction);
   if (direction === 'down') {
     console.log(`Нужно найти первые ${chunkAmount} элементов`);
   } else {
@@ -162,15 +178,26 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
   if (renderedRange.end !== newEnd) {
     console.log('Будущий старт:', newStart);
-    renderedRange.start = newStart < 0 ? 0 : newStart;
-    renderedRange.end = newEnd;
+    renderedRange.start =
+      // TODO: убрать теранрку
+      // eslint-disable-next-line no-nested-ternary
+      newStart < 0
+        ? 0
+        : newStart < MAX_LIST_LENGTH
+        ? newStart
+        : MAX_LIST_LENGTH - chunkAmount;
+    renderedRange.end =
+      newEnd < MAX_LIST_LENGTH ? newEnd : MAX_LIST_LENGTH - chunkAmount;
 
     console.log('Диапазон поменялся');
     console.log(
       `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
     );
 
-    if (scrollDirection === 'down' && renderedRange.end < MAX_LIST_SIZE) {
+    if (
+      scrollDirection === 'down' &&
+      renderedRange.end < MAX_LIST_VISIBLE_SIZE
+    ) {
       console.log('renderedRange.end = ', renderedRange.end);
       console.log('Пока рендерить не надо');
       return;
@@ -192,36 +219,11 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
     setOffsetToList();
   }
-
-  // renderedRange = {
-  //   start: currentListScroll - chunkAmount * 2,
-  //   end: currentListScroll + chunkAmount * 2,
-  // };
-
-  // // вариант 1
-  // const renderedRange = {
-  //   start:
-  //     currentListScroll - chunkAmount < 0 ? 0 : currentListScroll - chunkAmount,
-  //   end: currentListScroll + chunkAmount * 2,
-  // };
-
-  // 01 - 11 - удалить
-  // 12 - 22
-  // 23 - 33 --- смотрим сюда
-  // 34 - 44 --- и сюда
-  // 45 - 55 - отрендерить
-
-  // addItemsToList(renderedRange.start);
-  //
-  // console.log(
-  //   `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
-  // );
 };
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const { scrollTop } = e.target;
-  chunkSize = chunkAmount * listItemHeight; // TODO: убрать отсюда в место где вычислится 1 раз
-  const orderedNumberOfChunk = Math.floor(scrollTop / chunkSize);
+  const orderedNumberOfChunk = Math.floor(scrollTop / chunkHeight);
 
   let scrollDirection = 'down';
 
