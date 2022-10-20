@@ -122,7 +122,6 @@ const setOffsetToList = function (): void {
 
 const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   let templateFragments = '';
-  console.log('sequenceNumber', sequenceNumber);
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     const elemNum = i + sequenceNumber;
@@ -139,14 +138,20 @@ const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   }
 };
 
-const removeItemsFromList = function (sequenceNumber: number) {
-  console.log(`Нужно найти первые ${chunkAmount} элементов`);
+const removeItemsFromList = function (
+  sequenceNumber: number,
+  direction = 'down'
+) {
+  console.log('sequenceNumber', sequenceNumber);
+  if (direction === 'down') {
+    console.log(`Нужно найти первые ${chunkAmount} элементов`);
+  } else {
+    console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
+  }
+  const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    const firstChild = InfinityList?.firstChild;
-    InfinityList.removeChild(firstChild);
-    // const child: ChildNode | undefined = InfinityList?.childNodes[i];
-    // child.classList.add('hidden');
-    // console.log(child);
+    const child = InfinityList?.[childPosition];
+    InfinityList.removeChild(child);
   }
 };
 
@@ -179,10 +184,10 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
     if (scrollDirection === 'down') {
       addItemsToList(renderedRange.end, scrollDirection);
-      removeItemsFromList(renderedRange.start);
+      removeItemsFromList(renderedRange.start, scrollDirection);
     } else {
       addItemsToList(renderedRange.start, scrollDirection);
-      // removeItemsFromList(renderedRange.start);
+      removeItemsFromList(renderedRange.end, scrollDirection);
     }
 
     setOffsetToList();
