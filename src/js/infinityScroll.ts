@@ -31,6 +31,7 @@ let currentListScroll = 0;
 let chunkAmount = 1;
 let listWrpHeight = 1;
 let listItemHeight = 1;
+let chunkSize = 1;
 
 const renderedRange = {
   start: 1,
@@ -160,7 +161,7 @@ const modifyCurrentDOM = function () {
       console.log('renderedRange.end = ', renderedRange.end);
       console.log('Пока рендерить не надо');
     } else {
-      addItemsToList(renderedRange.end);
+      if (currentListScroll) addItemsToList(renderedRange.end);
       removeItemsFromList(renderedRange.start);
     }
   }
@@ -192,10 +193,20 @@ const modifyCurrentDOM = function () {
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const { scrollTop } = e.target;
-  const chunkSize = chunkAmount * listItemHeight;
+  chunkSize = chunkAmount * listItemHeight; // TODO: убрать отсюда в место где вычислится 1 раз
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkSize);
 
-  currentListScroll = orderedNumberOfChunk * chunkAmount;
+  const newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
+  if (currentListScroll !== newCurrentListScroll) {
+    console.log('currentListScroll поменялся');
+    if (newCurrentListScroll > currentListScroll) {
+      console.log('Ты скроллишь вниз');
+    } else {
+      console.log('Ты скроллишь вверх');
+    }
+
+    currentListScroll = newCurrentListScroll;
+  }
 
   // DOM Manipulation
   modifyCurrentDOM();
