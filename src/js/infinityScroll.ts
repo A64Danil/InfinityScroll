@@ -19,7 +19,7 @@ let GLOBAL_ITEM_COUNTER = 0;
 
 const delay = 0;
 
-const CurrentBigList = BigDataList2.data;
+const CurrentBigList = BigDataList1.data;
 
 const MAX_LIST_LENGTH = CurrentBigList.length;
 
@@ -47,10 +47,10 @@ const renderedRange = {
  */
 
 const setPaddingToList = function (offset = 0): void {
-  console.log('== setPaddingToList == chunkHeight', chunkHeight);
+  // console.log('== setPaddingToList == chunkHeight', chunkHeight);
   let paddingBottom =
     MAX_LIST_LENGTH * listItemHeight - chunkHeight * 3 - offset;
-  console.log('paddingBottom', paddingBottom);
+  // console.log('paddingBottom', paddingBottom);
   if (paddingBottom < 0) paddingBottom = 0;
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
 };
@@ -58,7 +58,7 @@ const setPaddingToList = function (offset = 0): void {
 const setOffsetToList = function (): void {
   // console.log('renderedRange.start', renderedRange.start);
   const offset = renderedRange.start * listItemHeight;
-  console.log('offset', offset);
+  // console.log('offset', offset);
   InfinityList.style.transform = `translate(0,${offset}px)`;
   setPaddingToList(offset);
 };
@@ -139,11 +139,16 @@ const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   let templateFragments = '';
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    const elemNum = i + sequenceNumber;
-    console.log('elemNum', elemNum);
-    console.log('sequenceNumber', sequenceNumber);
-    const element = CurrentBigList[elemNum];
-    templateFragments += TAG_TPL(element.name, element.number);
+    // TODO: убрать после тестов
+    if (i + sequenceNumber > MAX_LIST_LENGTH) {
+      console.warn('Вызходим за пределы списка');
+    } else {
+      const elemNum = i + sequenceNumber;
+      // console.log('elemNum', elemNum);
+      // console.log('sequenceNumber', sequenceNumber);
+      const element = CurrentBigList[elemNum];
+      templateFragments += TAG_TPL(element.name, element.number);
+    }
   }
 
   if (direction === 'down') {
@@ -158,12 +163,12 @@ const removeItemsFromList = function (
   sequenceNumber: number,
   direction = 'down'
 ) {
-  console.log('sequenceNumber', sequenceNumber, direction);
-  if (direction === 'down') {
-    console.log(`Нужно найти первые ${chunkAmount} элементов`);
-  } else {
-    console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
-  }
+  // console.log('sequenceNumber', sequenceNumber, direction);
+  // if (direction === 'down') {
+  //   console.log(`Нужно найти первые ${chunkAmount} элементов`);
+  // } else {
+  //   console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
+  // }
   const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     const child = InfinityList?.[childPosition];
@@ -176,49 +181,53 @@ const modifyCurrentDOM = function (scrollDirection: string) {
   const newStart = currentListScroll - chunkAmount;
   const newEnd = currentListScroll + chunkAmount * 2;
 
-  if (renderedRange.end !== newEnd) {
-    console.log('Будущий старт:', newStart);
-    renderedRange.start =
-      // TODO: убрать теранрку
-      // eslint-disable-next-line no-nested-ternary
-      newStart < 0
-        ? 0
-        : newStart < MAX_LIST_LENGTH
-        ? newStart
-        : MAX_LIST_LENGTH - chunkAmount;
-    renderedRange.end =
-      newEnd < MAX_LIST_LENGTH ? newEnd : MAX_LIST_LENGTH - chunkAmount;
+  console.log('Будущий старт:', newStart);
 
-    console.log('Диапазон поменялся');
-    console.log(
-      `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
-    );
-
-    if (
-      scrollDirection === 'down' &&
-      renderedRange.end < MAX_LIST_VISIBLE_SIZE
-    ) {
-      console.log('renderedRange.end = ', renderedRange.end);
-      console.log('Пока рендерить не надо');
-      return;
-    }
-
-    if (scrollDirection === 'up' && newStart < 0) {
-      console.log('renderedRange.start = ', renderedRange.start);
-      console.log('Мы в начале списка. Пока рендерить не надо');
-      return;
-    }
-
-    if (scrollDirection === 'down') {
-      addItemsToList(renderedRange.end, scrollDirection);
-      removeItemsFromList(renderedRange.start, scrollDirection);
-    } else {
-      addItemsToList(renderedRange.start, scrollDirection);
-      removeItemsFromList(renderedRange.end, scrollDirection);
-    }
-
-    setOffsetToList();
+  if (newStart < 0) {
+    console.log('newStart < 0');
+    renderedRange.start = 0;
+  } else if (newStart < MAX_LIST_LENGTH - chunkAmount) {
+    renderedRange.start = newStart;
+  } else {
+    console.log('newStart > 0');
+    renderedRange.start = MAX_LIST_LENGTH - chunkAmount;
   }
+
+  renderedRange.end =
+    newEnd < MAX_LIST_LENGTH - chunkAmount
+      ? newEnd
+      : MAX_LIST_LENGTH - chunkAmount;
+
+  console.log('Диапазон поменялся');
+  console.log(
+    `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
+  );
+
+  if (scrollDirection === 'down' && renderedRange.end < MAX_LIST_VISIBLE_SIZE) {
+    console.log('renderedRange.end = ', renderedRange.end);
+    console.log('Пока рендерить не надо');
+    return;
+  }
+
+  if (
+    scrollDirection === 'down' &&
+    renderedRange.end === MAX_LIST_LENGTH - chunkAmount
+  ) {
+    console.log('renderedRange.end = ', renderedRange.end);
+    console.log('УЖЕ рендерить не надо');
+    setOffsetToList();
+    return;
+  }
+  console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
+  if (scrollDirection === 'down') {
+    addItemsToList(renderedRange.end, scrollDirection);
+    removeItemsFromList(renderedRange.start, scrollDirection);
+  } else {
+    addItemsToList(renderedRange.start, scrollDirection);
+    removeItemsFromList(renderedRange.end, scrollDirection);
+  }
+
+  setOffsetToList();
 };
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
