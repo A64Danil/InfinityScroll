@@ -135,12 +135,42 @@ const fillList = function () {
   timerId = setTimeout(fillList, delay);
 };
 
-const addItemsToList = function (sequenceNumber: number, direction = 'down') {
+// TODO: убрать ненужную функцию
+// const addItemsToListOLD = function (sequenceNumber: number, direction = 'down') {
+//   let templateFragments = '';
+//
+//   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
+//     if (i + sequenceNumber > MAX_LIST_LENGTH) {
+//       console.warn('Вызходим за пределы списка');
+//     } else {
+//       const elemNum = i + sequenceNumber;
+//       // console.log('elemNum', elemNum);
+//       // console.log('sequenceNumber', sequenceNumber);
+//       const element = CurrentBigList[elemNum];
+//       templateFragments += TAG_TPL(element.name, element.number);
+//     }
+//   }
+//
+//   if (direction === 'down') {
+//     InfinityList.innerHTML += templateFragments;
+//   } else {
+//     console.log('Добавляем ВВЕРХ!!');
+//     InfinityList.innerHTML = templateFragments + InfinityList.innerHTML;
+//   }
+// };
+
+const addItemsToList = function (direction = 'down') {
   let templateFragments = '';
+
+  const sequenceNumber = currentListScroll + chunkAmount * 2;
+
+  // console.log('Add-TO-LIST sequenceNumber: ', sequenceNumber);
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     // TODO: убрать после тестов
-    if (i + sequenceNumber > MAX_LIST_LENGTH) {
+
+    // console.log('i + sequenceNumber ', i + sequenceNumber);
+    if (i + sequenceNumber > MAX_LIST_LENGTH - 1) {
       console.warn('Вызходим за пределы списка');
     } else {
       const elemNum = i + sequenceNumber;
@@ -159,20 +189,24 @@ const addItemsToList = function (sequenceNumber: number, direction = 'down') {
   }
 };
 
-const removeItemsFromList = function (
-  sequenceNumber: number,
-  direction = 'down'
-) {
+const removeItemsFromList = function (direction = 'down') {
+  const sequenceNumber = currentListScroll + chunkAmount * 2;
+
   // console.log('sequenceNumber', sequenceNumber, direction);
   // if (direction === 'down') {
   //   console.log(`Нужно найти первые ${chunkAmount} элементов`);
   // } else {
   //   console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
   // }
+
   const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    const child = InfinityList?.[childPosition];
-    InfinityList.removeChild(child);
+    if (i + sequenceNumber > MAX_LIST_LENGTH - 1) {
+      console.warn('removeItemsFromList Выходим за пределы списка');
+    } else {
+      const child = InfinityList?.[childPosition];
+      InfinityList.removeChild(child);
+    }
   }
 };
 
@@ -211,21 +245,22 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
   if (
     scrollDirection === 'down' &&
-    renderedRange.end === MAX_LIST_LENGTH - chunkAmount
+    // это хорошая проверка
+    currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
   ) {
-    console.log('renderedRange.end = ', renderedRange.end);
+    console.log(
+      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount*2 ',
+      currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
+    );
     console.log('УЖЕ рендерить не надо');
     setOffsetToList();
     return;
   }
+
   console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
-  if (scrollDirection === 'down') {
-    addItemsToList(renderedRange.end, scrollDirection);
-    removeItemsFromList(renderedRange.start, scrollDirection);
-  } else {
-    addItemsToList(renderedRange.start, scrollDirection);
-    removeItemsFromList(renderedRange.end, scrollDirection);
-  }
+
+  addItemsToList(scrollDirection);
+  removeItemsFromList(scrollDirection);
 
   setOffsetToList();
 };
@@ -248,10 +283,10 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
     scrollDirection = newCurrentListScroll > currentListScroll ? 'down' : 'up';
     currentListScroll = newCurrentListScroll;
-  }
 
-  // DOM Manipulation
-  modifyCurrentDOM(scrollDirection);
+    // DOM Manipulation
+    modifyCurrentDOM(scrollDirection);
+  }
 };
 
 StartBtn?.addEventListener('click', () => {
