@@ -32,6 +32,7 @@ let chunkAmount = 1;
 let listWrpHeight = 1;
 let listItemHeight = 1;
 let chunkHeight = 1;
+let scrollDirection = 'down';
 
 const renderedRange = {
   start: 1,
@@ -57,23 +58,14 @@ const setPaddingToList = function (offset = 0): void {
 };
 
 const setOffsetToList = function (): void {
-  // console.log('renderedRange.start', renderedRange.start);
-  // let start = currentListScroll - chunkAmount;
-  //
-  // if (start < 0) {
-  //   // console.log('newStart < 0');
-  //   start = 0;
-  // } else if (start < MAX_LIST_LENGTH - chunkAmount) {
-  //   start = start;
-  // } else {
-  //   console.log('newStart > 0');
-  //   renderedRange.start = MAX_LIST_LENGTH - chunkAmount;
-  // }
   console.log('currentListScroll', currentListScroll);
   console.log('renderedRange.start', renderedRange.start);
   let start = currentListScroll - chunkAmount;
   console.log('start', start);
-  if (start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH) {
+  if (
+    scrollDirection === 'down' &&
+    start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH
+  ) {
     console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
     start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 3;
     console.log('refreshed start', start);
@@ -159,7 +151,7 @@ const fillList = function () {
 };
 
 // TODO: убрать ненужную функцию
-// const addItemsToListOLD = function (sequenceNumber: number, direction = 'down') {
+// const addItemsToListOLD = function (sequenceNumber: number, scrollDirection = 'down') {
 //   let templateFragments = '';
 //
 //   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
@@ -174,7 +166,7 @@ const fillList = function () {
 //     }
 //   }
 //
-//   if (direction === 'down') {
+//   if (scrollDirection === 'down') {
 //     InfinityList.innerHTML += templateFragments;
 //   } else {
 //     console.log('Добавляем ВВЕРХ!!');
@@ -182,12 +174,12 @@ const fillList = function () {
 //   }
 // };
 
-const addItemsToList = function (direction = 'down') {
+const addItemsToList = function () {
   let templateFragments = '';
 
   // Это работает праивльно (в начале списка)
   let newSequence =
-    direction === 'down'
+    scrollDirection === 'down'
       ? currentListScroll + chunkAmount * 2
       : currentListScroll - chunkAmount * 1;
 
@@ -202,8 +194,11 @@ const addItemsToList = function (direction = 'down') {
     // TODO: убрать после тестов
 
     // console.log('i + sequenceNumber ', i + sequenceNumber);
-    if (i + sequenceNumber > MAX_LIST_LENGTH - 1) {
-      console.warn('Вызходим за пределы списка');
+    if (
+      scrollDirection === 'down' &&
+      i + sequenceNumber > MAX_LIST_LENGTH - 1
+    ) {
+      console.warn('Выходим за пределы списка в его нижней части');
     } else {
       const elemNum = i + sequenceNumber;
       console.log('elemNum', elemNum);
@@ -213,7 +208,7 @@ const addItemsToList = function (direction = 'down') {
     }
   }
 
-  if (direction === 'down') {
+  if (scrollDirection === 'down') {
     InfinityList.innerHTML += templateFragments;
   } else {
     console.log('Добавляем ВВЕРХ!!');
@@ -221,20 +216,25 @@ const addItemsToList = function (direction = 'down') {
   }
 };
 
-const removeItemsFromList = function (direction = 'down') {
+const removeItemsFromList = function () {
   const sequenceNumber = currentListScroll + chunkAmount * 2;
 
-  // console.log('sequenceNumber', sequenceNumber, direction);
-  // if (direction === 'down') {
+  // console.log('sequenceNumber', sequenceNumber, scrollDirection);
+  // if (scrollDirection === 'down') {
   //   console.log(`Нужно найти первые ${chunkAmount} элементов`);
   // } else {
   //   console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
   // }
 
-  const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
+  const childPosition = scrollDirection === 'down' ? 'firstChild' : 'lastChild';
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    if (i + sequenceNumber > MAX_LIST_LENGTH - 1) {
-      console.warn('removeItemsFromList Выходим за пределы списка');
+    if (
+      scrollDirection === 'down' &&
+      i + sequenceNumber > MAX_LIST_LENGTH - 1
+    ) {
+      console.warn(
+        'removeItemsFromList Выходим за пределы списка в его нижней части'
+      );
     } else {
       const child = InfinityList?.[childPosition];
       InfinityList.removeChild(child);
@@ -242,7 +242,7 @@ const removeItemsFromList = function (direction = 'down') {
   }
 };
 
-const modifyCurrentDOM = function (scrollDirection: string) {
+const modifyCurrentDOM = function () {
   // имеется
   const newStart = currentListScroll - chunkAmount;
   const newEnd = currentListScroll + chunkAmount * 2;
@@ -324,17 +324,25 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
   console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
 
-  addItemsToList(scrollDirection);
-  removeItemsFromList(scrollDirection);
+  addItemsToList();
+  removeItemsFromList();
 
   setOffsetToList();
+
+  if (InfinityList.childNodes.length !== chunkAmount * 4) {
+    console.log(
+      '%cКоличесвто деток: ',
+      'color: tomato',
+      InfinityList.childNodes.length
+    );
+  }
 };
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const { scrollTop } = e.target;
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkHeight);
 
-  let scrollDirection = 'down';
+  // let scrollDirection = 'down';
 
   const newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
   if (currentListScroll !== newCurrentListScroll) {
@@ -350,7 +358,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
     currentListScroll = newCurrentListScroll;
 
     // DOM Manipulation
-    modifyCurrentDOM(scrollDirection);
+    modifyCurrentDOM();
   }
 };
 
