@@ -49,16 +49,39 @@ const renderedRange = {
 const setPaddingToList = function (offset = 0): void {
   // console.log('== setPaddingToList == chunkHeight', chunkHeight);
   let paddingBottom =
-    MAX_LIST_LENGTH * listItemHeight - chunkHeight * 3 - offset;
+    MAX_LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset;
   // console.log('paddingBottom', paddingBottom);
+  // console.log('chunkHeight * 4', chunkHeight * 4);
   if (paddingBottom < 0) paddingBottom = 0;
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
 };
 
 const setOffsetToList = function (): void {
   // console.log('renderedRange.start', renderedRange.start);
-  const offset = renderedRange.start * listItemHeight;
-  // console.log('offset', offset);
+  // let start = currentListScroll - chunkAmount;
+  //
+  // if (start < 0) {
+  //   // console.log('newStart < 0');
+  //   start = 0;
+  // } else if (start < MAX_LIST_LENGTH - chunkAmount) {
+  //   start = start;
+  // } else {
+  //   console.log('newStart > 0');
+  //   renderedRange.start = MAX_LIST_LENGTH - chunkAmount;
+  // }
+  console.log('currentListScroll', currentListScroll);
+  console.log('renderedRange.start', renderedRange.start);
+  let start = currentListScroll - chunkAmount;
+  console.log('start', start);
+  if (start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH) {
+    console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
+    start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 3;
+    console.log('refreshed start', start);
+  }
+
+  const offset = start * listItemHeight;
+  console.log('offset', offset);
+  // if (offset < 0) offset = 0;
   InfinityList.style.transform = `translate(0,${offset}px)`;
   setPaddingToList(offset);
 };
@@ -162,9 +185,18 @@ const fillList = function () {
 const addItemsToList = function (direction = 'down') {
   let templateFragments = '';
 
-  const sequenceNumber = currentListScroll + chunkAmount * 2;
+  // Это работает праивльно (в начале списка)
+  let newSequence =
+    direction === 'down'
+      ? currentListScroll + chunkAmount * 2
+      : currentListScroll - chunkAmount * 1;
 
-  // console.log('Add-TO-LIST sequenceNumber: ', sequenceNumber);
+  if (newSequence < 0) newSequence = 0;
+
+  const sequenceNumber = newSequence;
+  console.log('Add-TO-LIST sequenceNumber: ', sequenceNumber);
+
+  // TODO: проблема - при обратном скролле у нас выпадает 11 - 2 = 9 лишних элементов
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     // TODO: убрать после тестов
@@ -174,7 +206,7 @@ const addItemsToList = function (direction = 'down') {
       console.warn('Вызходим за пределы списка');
     } else {
       const elemNum = i + sequenceNumber;
-      // console.log('elemNum', elemNum);
+      console.log('elemNum', elemNum);
       // console.log('sequenceNumber', sequenceNumber);
       const element = CurrentBigList[elemNum];
       templateFragments += TAG_TPL(element.name, element.number);
@@ -215,10 +247,10 @@ const modifyCurrentDOM = function (scrollDirection: string) {
   const newStart = currentListScroll - chunkAmount;
   const newEnd = currentListScroll + chunkAmount * 2;
 
-  console.log('Будущий старт:', newStart);
+  // console.log('Будущий старт:', newStart);
 
   if (newStart < 0) {
-    console.log('newStart < 0');
+    // console.log('newStart < 0');
     renderedRange.start = 0;
   } else if (newStart < MAX_LIST_LENGTH - chunkAmount) {
     renderedRange.start = newStart;
@@ -234,12 +266,33 @@ const modifyCurrentDOM = function (scrollDirection: string) {
 
   console.log('Диапазон поменялся');
   console.log(
-    `currentListScroll: ${currentListScroll}, Range: ${renderedRange.start} - ${renderedRange.end}`
+    `currentListScroll: %c${currentListScroll}`,
+    'color: red; font-weight: bold;',
+    `, Range: ${renderedRange.start} - ${renderedRange.end}`
   );
 
-  if (scrollDirection === 'down' && renderedRange.end < MAX_LIST_VISIBLE_SIZE) {
-    console.log('renderedRange.end = ', renderedRange.end);
-    console.log('Пока рендерить не надо');
+  if (
+    scrollDirection === 'down' &&
+    currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE
+  ) {
+    console.log(
+      'currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE',
+      currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE
+    );
+    console.log('Пока рендерить не надо. Вы в самом верху списка.');
+    return;
+  }
+
+  if (
+    scrollDirection === 'up' &&
+    // это хорошая проверка
+    currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+  ) {
+    console.log(
+      'currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE',
+      currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+    );
+    console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
     return;
   }
 
@@ -249,11 +302,23 @@ const modifyCurrentDOM = function (scrollDirection: string) {
     currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
   ) {
     console.log(
-      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount*2 ',
+      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2 ',
       currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
     );
-    console.log('УЖЕ рендерить не надо');
-    setOffsetToList();
+    console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+    return;
+  }
+
+  if (
+    scrollDirection === 'up' &&
+    // это хорошая проверка
+    currentListScroll >= MAX_LIST_LENGTH - chunkAmount
+  ) {
+    console.log(
+      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount',
+      currentListScroll >= MAX_LIST_LENGTH - chunkAmount
+    );
+    console.log('Пока рендерить не надо (up). Вы в самом низу списка.');
     return;
   }
 
@@ -274,7 +339,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
   if (currentListScroll !== newCurrentListScroll) {
     // TODO: снести лишние логи
-    console.log('currentListScroll поменялся');
+    console.log('====== currentListScroll поменялся ======');
     if (newCurrentListScroll > currentListScroll) {
       console.log('Ты скроллишь вниз');
     } else {
