@@ -38,10 +38,6 @@ let isBorderOfList = true;
 let tailingElementsAmount = 0;
 let lastScrollTopPosition = 0;
 
-const renderedRange = {
-  start: 1,
-  end: chunkAmount * 4,
-};
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
 2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
@@ -49,28 +45,27 @@ const renderedRange = {
 4) Держим в памяти число, указывающее на начальный пункт списка в чанке - currentListScroll
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
 
+--- до рефакторинга было 450 строк кода
+
  */
 
 const setPaddingToList = function (offset = 0): void {
-  // console.log('== setPaddingToList == chunkHeight', chunkHeight);
-
-  // TODO: Проблема - при скролле на верх пэддинг становится 0 вместо 308
-  // let paddingBottom =
-  //   scrollDirection === 'down'
-  //     ? MAX_LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset
-  //     : MAX_LIST_LENGTH * listItemHeight - chunkHeight * 3 - offset;
-  //
   let paddingBottom =
     MAX_LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset;
+
   console.log('paddingBottom', paddingBottom);
-  // console.log('chunkHeight * 4', chunkHeight * 4)
-  if (paddingBottom < 0) paddingBottom = 0;
+
+  // TODO: проверить, попадаем ли мы туда
+  // Кажется нет, значит это скоро можно удалить
+  if (paddingBottom < 0) {
+    console.warn('==============Мы попали в if paddingBottom < 0 ==========');
+    paddingBottom = 0;
+  }
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
 };
 
 const setOffsetToList = function (): void {
   console.log('currentListScroll', currentListScroll);
-  console.log('renderedRange.start', renderedRange.start);
   let start = currentListScroll - chunkAmount;
   if (start < 0) {
     console.log('start меньше нуля, исправляем на 0. До этого был: ', start);
@@ -88,29 +83,28 @@ const setOffsetToList = function (): void {
 
   console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
 
-  // TODO: кажется это уже не нужно
-  if (
-    scrollDirection === 'up' &&
-    // MAX_LIST_VISIBLE_SIZE < MAX_LIST_LENGTH - start
-    MAX_LIST_LENGTH - start === 46
-    // 44 < 46
-    // 44 < 101 - 55 = 46    // 2
-    // 44 < 101 - 44 = 57 // 2
-    // 44 < 101 - 33 = 68 // 2
-  ) {
-    // TODO: проверить, попадаем ли мы в эту часть кода
-    console.log(
-      '%cВы скроллите вверх? Посчитаем оффсет иначе!',
-      'background-color: tomato'
-    );
-    console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
-    start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
-    console.log('refreshed start', start);
-  }
+  // TODO: кажется это уже не нужно - удалить, если все работает нормально при скролле наверх
+  // if (
+  //   scrollDirection === 'up' &&
+  //   // MAX_LIST_VISIBLE_SIZE < MAX_LIST_LENGTH - start
+  //   MAX_LIST_LENGTH - start === 46
+  //   // 44 < 46
+  //   // 44 < 101 - 55 = 46    // 2
+  //   // 44 < 101 - 44 = 57 // 2
+  //   // 44 < 101 - 33 = 68 // 2
+  // ) {
+  //   console.log(
+  //     '%cВы скроллите вверх? Посчитаем оффсет иначе!',
+  //     'background-color: tomato'
+  //   );
+  //   console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
+  //   start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
+  //   console.log('refreshed start', start);
+  // }
 
   const offset = start * listItemHeight;
   console.log('offset', offset);
-  // if (offset < 0) offset = 0;
+
   InfinityList.style.transform = `translate(0,${offset}px)`;
   setPaddingToList(offset);
 };
@@ -229,7 +223,7 @@ const addItemsToList = function () {
     }
 
     const elemNum = i + sequenceNumber;
-    console.log('elemNum', elemNum);
+    // console.log('elemNum', elemNum);
     // console.log('sequenceNumber', sequenceNumber);
     const element = CurrentBigList[elemNum];
     templateFragments += TAG_TPL(element.name, element.number);
@@ -292,26 +286,11 @@ const modifyCurrentDOM = function () {
   // console.log('Будущий старт:', newStart);
   console.log('Мы на границе списка?', isBorderOfList);
 
-  if (newStart < 0) {
-    // console.log('newStart < 0');
-    renderedRange.start = 0;
-  } else if (newStart < MAX_LIST_LENGTH - chunkAmount) {
-    renderedRange.start = newStart;
-  } else {
-    console.log('newStart > 0');
-    renderedRange.start = MAX_LIST_LENGTH - chunkAmount;
-  }
-
-  renderedRange.end =
-    newEnd < MAX_LIST_LENGTH - chunkAmount
-      ? newEnd
-      : MAX_LIST_LENGTH - chunkAmount;
-
   console.log('Диапазон поменялся');
   console.log(
     `currentListScroll: %c${currentListScroll}`,
     'color: red; font-weight: bold;',
-    `, Range: ${renderedRange.start} - ${renderedRange.end}`
+    `, Range: ${newStart} - ${newEnd}`
   );
 
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
