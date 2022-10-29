@@ -35,6 +35,9 @@ let chunkHeight = 1;
 let scrollDirection = 'down';
 let isBorderOfList = true;
 
+let tailingElementsAmount = 0;
+let lastScrollTopPosition = 0;
+
 const renderedRange = {
   start: 1,
   end: chunkAmount * 4,
@@ -78,11 +81,23 @@ const setOffsetToList = function (): void {
     start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 3;
     console.log('refreshed start', start);
   }
-  // else {
-  //   console.warn('Вы скроллите вверх? Посчитаем оффсет иначе!');
-  //   start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
-  //   console.log('refreshed start', start);
-  // }
+
+  console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
+  if (
+    scrollDirection === 'up' &&
+    // MAX_LIST_VISIBLE_SIZE < MAX_LIST_LENGTH - start
+    MAX_LIST_LENGTH - start === 46
+    // 44 < 46
+    // 44 < 101 - 55 = 46    // 2
+    // 44 < 101 - 44 = 57 // 2
+    // 44 < 101 - 33 = 68 // 2
+  ) {
+    // TODO: проверить, попадаем ли мы в эту часть кода
+    console.warn('Вы скроллите вверх? Посчитаем оффсет иначе!');
+    console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
+    start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
+    console.log('refreshed start', start);
+  }
 
   const offset = start * listItemHeight;
   console.log('offset', offset);
@@ -117,6 +132,10 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
   MAX_LIST_VISIBLE_SIZE = chunkAmount * 4;
 
   chunkHeight = chunkAmount * listItemHeight;
+
+  tailingElementsAmount = MAX_LIST_LENGTH % chunkAmount;
+
+  console.log('Остаток - ', tailingElementsAmount);
 
   setPaddingToList();
 };
@@ -163,30 +182,6 @@ const fillList = function () {
   timerId = setTimeout(fillList, delay);
 };
 
-// TODO: убрать ненужную функцию
-// const addItemsToListOLD = function (sequenceNumber: number, scrollDirection = 'down') {
-//   let templateFragments = '';
-//
-//   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-//     if (i + sequenceNumber > MAX_LIST_LENGTH) {
-//       console.warn('Вызходим за пределы списка');
-//     } else {
-//       const elemNum = i + sequenceNumber;
-//       // console.log('elemNum', elemNum);
-//       // console.log('sequenceNumber', sequenceNumber);
-//       const element = CurrentBigList[elemNum];
-//       templateFragments += TAG_TPL(element.name, element.number);
-//     }
-//   }
-//
-//   if (scrollDirection === 'down') {
-//     InfinityList.innerHTML += templateFragments;
-//   } else {
-//     console.log('Добавляем ВВЕРХ!!');
-//     InfinityList.innerHTML = templateFragments + InfinityList.innerHTML;
-//   }
-// };
-
 const addItemsToList = function () {
   let templateFragments = '';
 
@@ -200,8 +195,6 @@ const addItemsToList = function () {
 
   const sequenceNumber = newSequence;
   console.log('Add-TO-LIST sequenceNumber: ', sequenceNumber);
-
-  // TODO: проблема - при обратном скролле у нас выпадает 11 - 2 = 9 лишних элементов
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     // TODO: убрать после тестов
@@ -373,17 +366,29 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
     );
   }
 
-  const newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
-  if (currentListScroll !== newCurrentListScroll) {
-    // TODO: снести лишние логи
-    console.log('====== currentListScroll поменялся ======');
-    if (newCurrentListScroll > currentListScroll) {
-      console.log('Ты скроллишь вниз');
-    } else {
-      console.log('Ты скроллишь вверх');
-    }
+  let newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
 
-    scrollDirection = newCurrentListScroll > currentListScroll ? 'down' : 'up';
+  // TODO: снести лишние логи
+  if (scrollTop > lastScrollTopPosition) {
+    // console.log('Ты скроллишь вниз');
+    scrollDirection = 'down';
+  } else {
+    // console.log('Ты скроллишь вверх');
+    scrollDirection = 'up';
+    newCurrentListScroll += tailingElementsAmount;
+    // console.log(newCurrentListScroll);
+  }
+
+  lastScrollTopPosition = scrollTop;
+
+  const scrollDiff = Math.abs(currentListScroll - newCurrentListScroll);
+
+  if (scrollDiff <= tailingElementsAmount) {
+    return;
+  }
+
+  if (currentListScroll !== newCurrentListScroll) {
+    console.warn('====== currentListScroll поменялся ======');
     currentListScroll = newCurrentListScroll;
 
     // DOM Manipulation
