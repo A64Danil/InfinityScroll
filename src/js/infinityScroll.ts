@@ -72,6 +72,10 @@ const setOffsetToList = function (): void {
   console.log('currentListScroll', currentListScroll);
   console.log('renderedRange.start', renderedRange.start);
   let start = currentListScroll - chunkAmount;
+  if (start < 0) {
+    console.log('start меньше нуля, исправляем на 0. До этого был: ', start);
+    start = 0;
+  }
   console.log('start', start);
   if (
     scrollDirection === 'down' &&
@@ -83,6 +87,8 @@ const setOffsetToList = function (): void {
   }
 
   console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
+
+  // TODO: кажется это уже не нужно
   if (
     scrollDirection === 'up' &&
     // MAX_LIST_VISIBLE_SIZE < MAX_LIST_LENGTH - start
@@ -93,7 +99,10 @@ const setOffsetToList = function (): void {
     // 44 < 101 - 33 = 68 // 2
   ) {
     // TODO: проверить, попадаем ли мы в эту часть кода
-    console.warn('Вы скроллите вверх? Посчитаем оффсет иначе!');
+    console.log(
+      '%cВы скроллите вверх? Посчитаем оффсет иначе!',
+      'background-color: tomato'
+    );
     console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
     start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
     console.log('refreshed start', start);
@@ -205,13 +214,25 @@ const addItemsToList = function () {
       i + sequenceNumber > MAX_LIST_LENGTH - 1
     ) {
       console.warn('Выходим за пределы списка в его нижней части');
-    } else {
-      const elemNum = i + sequenceNumber;
-      console.log('elemNum', elemNum);
-      // console.log('sequenceNumber', sequenceNumber);
-      const element = CurrentBigList[elemNum];
-      templateFragments += TAG_TPL(element.name, element.number);
+      // eslint-disable-next-line no-continue
+      continue;
     }
+    // 0 ==>  1 2 --- 3 4 5 6 7 8 9 10 11 12
+    if (
+      scrollDirection === 'up' &&
+      sequenceNumber === 0 &&
+      i + sequenceNumber >= 2
+    ) {
+      console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    const elemNum = i + sequenceNumber;
+    console.log('elemNum', elemNum);
+    // console.log('sequenceNumber', sequenceNumber);
+    const element = CurrentBigList[elemNum];
+    templateFragments += TAG_TPL(element.name, element.number);
   }
 
   if (scrollDirection === 'down') {
@@ -223,14 +244,15 @@ const addItemsToList = function () {
 };
 
 const removeItemsFromList = function () {
-  const sequenceNumber = currentListScroll + chunkAmount * 2;
+  // Это работает праивльно (в начале списка)
+  let newSequence =
+    scrollDirection === 'down'
+      ? currentListScroll + chunkAmount * 2
+      : currentListScroll - chunkAmount * 1;
 
-  // console.log('sequenceNumber', sequenceNumber, scrollDirection);
-  // if (scrollDirection === 'down') {
-  //   console.log(`Нужно найти первые ${chunkAmount} элементов`);
-  // } else {
-  //   console.log(`Нужно найти ПОСЛЕДНИЕ ${chunkAmount} элементов`);
-  // }
+  if (newSequence < 0) newSequence = 0;
+
+  const sequenceNumber = newSequence;
 
   const childPosition = scrollDirection === 'down' ? 'firstChild' : 'lastChild';
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
@@ -241,10 +263,24 @@ const removeItemsFromList = function () {
       console.warn(
         'removeItemsFromList Выходим за пределы списка в его нижней части'
       );
-    } else {
-      const child = InfinityList?.[childPosition];
-      InfinityList.removeChild(child);
+      // eslint-disable-next-line no-continue
+      continue;
     }
+
+    if (
+      scrollDirection === 'up' &&
+      sequenceNumber === 0 &&
+      i + sequenceNumber >= 2
+    ) {
+      console.warn(
+        'removeItemsFromList  Выходим за пределы списка в его ВЕРХНЕЙ части'
+      );
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    const child = InfinityList?.[childPosition];
+    InfinityList.removeChild(child);
   }
 };
 
@@ -292,19 +328,19 @@ const modifyCurrentDOM = function () {
     return;
   }
 
-  if (
-    scrollDirection === 'up' &&
-    // это хорошая проверка
-    currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
-  ) {
-    console.log(
-      'currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE',
-      currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
-    );
-    console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-    isBorderOfList = true;
-    return;
-  }
+  // if (
+  //   scrollDirection === 'up' &&
+  //   // это хорошая проверка
+  //   currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+  // ) {
+  //   console.log(
+  //     'currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE',
+  //     currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+  //   );
+  //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+  //   isBorderOfList = true;
+  //   return;
+  // }
 
   if (
     scrollDirection === 'down' &&
