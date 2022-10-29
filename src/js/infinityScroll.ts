@@ -72,6 +72,8 @@ const setOffsetToList = function (): void {
     start = 0;
   }
   console.log('start', start);
+
+  // TODO: проверить будет ли работь без этого
   if (
     scrollDirection === 'down' &&
     start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH
@@ -215,7 +217,7 @@ const addItemsToList = function () {
     if (
       scrollDirection === 'up' &&
       sequenceNumber === 0 &&
-      i + sequenceNumber >= 2
+      i + sequenceNumber >= tailingElementsAmount
     ) {
       console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
       // eslint-disable-next-line no-continue
@@ -264,7 +266,7 @@ const removeItemsFromList = function () {
     if (
       scrollDirection === 'up' &&
       sequenceNumber === 0 &&
-      i + sequenceNumber >= 2
+      i + sequenceNumber >= tailingElementsAmount
     ) {
       console.warn(
         'removeItemsFromList  Выходим за пределы списка в его ВЕРХНЕЙ части'
@@ -321,6 +323,7 @@ const modifyCurrentDOM = function () {
   //   return;
   // }
 
+  // TODO: без этого работает, но лучше улучшить проверку в функция add и remove
   if (
     scrollDirection === 'down' &&
     // это хорошая проверка
@@ -353,6 +356,7 @@ const modifyCurrentDOM = function () {
 
   console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
 
+  // TODO: соеденить две функции, т.к. проверки в них одинаковые
   addItemsToList();
   removeItemsFromList();
 
@@ -383,15 +387,11 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   let newCurrentListScroll = orderedNumberOfChunk * chunkAmount;
 
-  // TODO: снести лишние логи
   if (scrollTop > lastScrollTopPosition) {
-    // console.log('Ты скроллишь вниз');
     scrollDirection = 'down';
   } else {
-    // console.log('Ты скроллишь вверх');
     scrollDirection = 'up';
     newCurrentListScroll += tailingElementsAmount;
-    // console.log(newCurrentListScroll);
   }
 
   lastScrollTopPosition = scrollTop;
@@ -405,7 +405,6 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   if (currentListScroll !== newCurrentListScroll) {
     console.warn('====== currentListScroll поменялся ======');
     currentListScroll = newCurrentListScroll;
-
     // DOM Manipulation
     modifyCurrentDOM();
   }
