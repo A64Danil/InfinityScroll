@@ -27,6 +27,7 @@ console.log('LIST_LENGTH', LIST_LENGTH);
 
 let LIST_FULL_VISIBLE_SIZE = 2;
 let LIST_HALF_VISIBLE_SIZE = 1;
+let LIST_START_OF_LAST_VISIBLE_SIZE = LIST_LENGTH - LIST_HALF_VISIBLE_SIZE;
 
 let currentListScroll = 0;
 let chunkAmount = 1;
@@ -136,6 +137,7 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
 
   LIST_FULL_VISIBLE_SIZE = chunkAmount * 4;
   LIST_HALF_VISIBLE_SIZE = LIST_FULL_VISIBLE_SIZE / 2;
+  LIST_START_OF_LAST_VISIBLE_SIZE = LIST_LENGTH - LIST_HALF_VISIBLE_SIZE;
 
   chunkHeight = chunkAmount * listItemHeight;
 
@@ -269,14 +271,18 @@ const modifyCurrentDOM = function () {
     `, Range: ${newStart} - ${newEnd}`
   );
 
-  const isBeginOfList = currentListScroll < LIST_HALF_VISIBLE_SIZE;
+  const isBeginOfListFromTop = currentListScroll < LIST_HALF_VISIBLE_SIZE;
+
+  const isEndOfListFromTop =
+    currentListScroll > LIST_START_OF_LAST_VISIBLE_SIZE;
 
   // TODO: уточнить - больше или большеИЛИравно
-  const isEndOfList = currentListScroll >= LIST_LENGTH - chunkAmount * 3;
+  const isBeginOfListFromBottom =
+    currentListScroll >= LIST_LENGTH - chunkAmount * 3;
 
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
-  if (scrollDirection === 'down' && isBeginOfList) {
-    console.log('isBeginOfList', isBeginOfList);
+  if (scrollDirection === 'down' && isBeginOfListFromTop) {
+    console.log('isBeginOfList', isBeginOfListFromTop);
     console.log('Пока рендерить не надо. Вы в самом верху списка.');
     isBorderOfList = true;
     return;
@@ -297,22 +303,15 @@ const modifyCurrentDOM = function () {
   // }
 
   // TODO: без этого работает, но лучше улучшить проверку в функция add и remove
-  if (
-    scrollDirection === 'down' &&
-    // это хорошая проверка
-    currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE
-  ) {
-    console.log(
-      'currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE ',
-      currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE
-    );
+  if (scrollDirection === 'down' && isEndOfListFromTop) {
+    console.log('isEndOfListFromTop', isEndOfListFromTop);
     console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
     isBorderOfList = true;
     return;
   }
 
-  if (scrollDirection === 'up' && isEndOfList) {
-    console.log('isEndOfList', isEndOfList);
+  if (scrollDirection === 'up' && isBeginOfListFromBottom) {
+    console.log('isEndOfList', isBeginOfListFromBottom);
     console.log('Пока рендерить не надо (up). Вы в самом низу списка.');
     isBorderOfList = true;
     return;
