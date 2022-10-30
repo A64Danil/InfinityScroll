@@ -1,6 +1,6 @@
 {
   "name": "InfinityScroll",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Endless HTML-list with virtual scroll",
   "main": "index.js",
   "scripts": {

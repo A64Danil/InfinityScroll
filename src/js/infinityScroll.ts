@@ -73,7 +73,7 @@ const setOffsetToList = function (): void {
   }
   console.log('start', start);
 
-  // TODO: проверить будет ли работь без этого
+  // TODO: проверить будет ли работь без этого - если этого нет, то попадаем в padding 0!
   if (
     scrollDirection === 'down' &&
     start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH
@@ -187,8 +187,24 @@ const fillList = function () {
   timerId = setTimeout(fillList, delay);
 };
 
-const addItemsToList = function () {
+const createItem = function (elemNum: number) {
+  // console.log('elemNum', elemNum);
+  // console.log('sequenceNumber', sequenceNumber);
+  const element = CurrentBigList[elemNum];
+  return TAG_TPL(element.name, element.number);
+};
+
+const removeItem = function (childPosition: string) {
+  const child = InfinityList?.[childPosition];
+  InfinityList.removeChild(child);
+};
+
+const changeItemsInList = function () {
+  // for addItems
   let templateFragments = '';
+
+  // for removeItems
+  const childPosition = scrollDirection === 'down' ? 'firstChild' : 'lastChild';
 
   // Это работает праивльно (в начале списка)
   let newSequence =
@@ -199,7 +215,7 @@ const addItemsToList = function () {
   if (newSequence < 0) newSequence = 0;
 
   const sequenceNumber = newSequence;
-  console.log('Add-TO-LIST sequenceNumber: ', sequenceNumber);
+  console.log('CHANGE-ITEMS-IN-LIST sequenceNumber: ', sequenceNumber);
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     // TODO: убрать после тестов
@@ -224,11 +240,12 @@ const addItemsToList = function () {
       continue;
     }
 
+    // add items
     const elemNum = i + sequenceNumber;
-    // console.log('elemNum', elemNum);
-    // console.log('sequenceNumber', sequenceNumber);
-    const element = CurrentBigList[elemNum];
-    templateFragments += TAG_TPL(element.name, element.number);
+    templateFragments += createItem(elemNum);
+
+    // remove items
+    removeItem(childPosition);
   }
 
   if (scrollDirection === 'down') {
@@ -236,47 +253,6 @@ const addItemsToList = function () {
   } else {
     console.log('Добавляем ВВЕРХ!!');
     InfinityList.innerHTML = templateFragments + InfinityList.innerHTML;
-  }
-};
-
-const removeItemsFromList = function () {
-  // Это работает праивльно (в начале списка)
-  let newSequence =
-    scrollDirection === 'down'
-      ? currentListScroll + chunkAmount * 2
-      : currentListScroll - chunkAmount * 1;
-
-  if (newSequence < 0) newSequence = 0;
-
-  const sequenceNumber = newSequence;
-
-  const childPosition = scrollDirection === 'down' ? 'firstChild' : 'lastChild';
-  for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    if (
-      scrollDirection === 'down' &&
-      i + sequenceNumber > MAX_LIST_LENGTH - 1
-    ) {
-      console.warn(
-        'removeItemsFromList Выходим за пределы списка в его нижней части'
-      );
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    if (
-      scrollDirection === 'up' &&
-      sequenceNumber === 0 &&
-      i + sequenceNumber >= tailingElementsAmount
-    ) {
-      console.warn(
-        'removeItemsFromList  Выходим за пределы списка в его ВЕРХНЕЙ части'
-      );
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    const child = InfinityList?.[childPosition];
-    InfinityList.removeChild(child);
   }
 };
 
@@ -356,9 +332,7 @@ const modifyCurrentDOM = function () {
 
   console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
 
-  // TODO: соеденить две функции, т.к. проверки в них одинаковые
-  addItemsToList();
-  removeItemsFromList();
+  changeItemsInList();
 
   setOffsetToList();
 
