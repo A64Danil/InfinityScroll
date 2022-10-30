@@ -280,6 +280,9 @@ const modifyCurrentDOM = function () {
   const isBeginOfListFromBottom =
     currentListScroll >= LIST_LENGTH - chunkAmount * 3;
 
+  const isEndOfListFromBottom =
+    currentListScroll < LIST_FULL_VISIBLE_SIZE - chunkAmount * 3;
+
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
   if (scrollDirection === 'down' && isBeginOfListFromTop) {
     console.log('isBeginOfList', isBeginOfListFromTop);
@@ -287,20 +290,6 @@ const modifyCurrentDOM = function () {
     isBorderOfList = true;
     return;
   }
-
-  // if (
-  //   scrollDirection === 'up' &&
-  //   // это хорошая проверка
-  //   currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE
-  // ) {
-  //   console.log(
-  //     'currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE',
-  //     currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE
-  //   );
-  //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-  //   isBorderOfList = true;
-  //   return;
-  // }
 
   // TODO: без этого работает, но лучше улучшить проверку в функция add и remove
   if (scrollDirection === 'down' && isEndOfListFromTop) {
@@ -316,6 +305,14 @@ const modifyCurrentDOM = function () {
     isBorderOfList = true;
     return;
   }
+
+  // TODO: пока временно отключаем, пока не разберемся с tailingsElements
+  // if (scrollDirection === 'up' && isEndOfListFromBottom) {
+  //   console.log('isEndOfListFromBottom', isEndOfListFromBottom);
+  //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+  //   isBorderOfList = true;
+  //   return;
+  // }
 
   isBorderOfList = false;
 
