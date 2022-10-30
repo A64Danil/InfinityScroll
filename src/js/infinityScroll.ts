@@ -155,6 +155,18 @@ const TAG_TPL = function (name: string, number: string | number) {
     </li>`;
 };
 
+const createItem = function (elemNum: number) {
+  // console.log('elemNum', elemNum);
+  // console.log('sequenceNumber', sequenceNumber);
+  const element = CurrentBigList[elemNum];
+  return TAG_TPL(element.name, element.number);
+};
+
+const removeItem = function (childPosition: string) {
+  const child = InfinityList?.[childPosition];
+  InfinityList.removeChild(child);
+};
+
 let timerId;
 
 const fillList = function () {
@@ -177,26 +189,13 @@ const fillList = function () {
     GLOBAL_ITEM_COUNTER < MAX_LIST_VISIBLE_SIZE;
     i++
   ) {
-    const element = CurrentBigList[GLOBAL_ITEM_COUNTER];
-    templateFragments += TAG_TPL(element.name, element.number);
+    templateFragments += createItem(GLOBAL_ITEM_COUNTER);
     GLOBAL_ITEM_COUNTER++;
   }
 
   InfinityList.innerHTML += templateFragments;
 
   timerId = setTimeout(fillList, delay);
-};
-
-const createItem = function (elemNum: number) {
-  // console.log('elemNum', elemNum);
-  // console.log('sequenceNumber', sequenceNumber);
-  const element = CurrentBigList[elemNum];
-  return TAG_TPL(element.name, element.number);
-};
-
-const removeItem = function (childPosition: string) {
-  const child = InfinityList?.[childPosition];
-  InfinityList.removeChild(child);
 };
 
 const changeItemsInList = function () {
