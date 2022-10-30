@@ -21,11 +21,12 @@ const delay = 0;
 
 const CurrentBigList = BigDataList1.data;
 
-const MAX_LIST_LENGTH = CurrentBigList.length;
+const LIST_LENGTH = CurrentBigList.length;
 
-console.log('MAX_LIST_LENGTH', MAX_LIST_LENGTH);
+console.log('LIST_LENGTH', LIST_LENGTH);
 
-let MAX_LIST_VISIBLE_SIZE = 1;
+let LIST_FULL_VISIBLE_SIZE = 2;
+let LIST_HALF_VISIBLE_SIZE = 1;
 
 let currentListScroll = 0;
 let chunkAmount = 1;
@@ -50,8 +51,7 @@ let lastScrollTopPosition = 0;
  */
 
 const setPaddingToList = function (offset = 0): void {
-  let paddingBottom =
-    MAX_LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset;
+  let paddingBottom = LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset;
 
   console.log('paddingBottom', paddingBottom);
 
@@ -73,23 +73,23 @@ const setOffsetToList = function (): void {
   }
   console.log('start', start);
 
-  // TODO: проверить будет ли работь без этого - если этого нет, то попадаем в padding 0!
+  // Если этого нет, то попадаем в padding 0!
   if (
     scrollDirection === 'down' &&
-    start + MAX_LIST_VISIBLE_SIZE > MAX_LIST_LENGTH
+    start + LIST_FULL_VISIBLE_SIZE > LIST_LENGTH
   ) {
     console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
-    start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 3;
+    start = start + LIST_LENGTH - currentListScroll - chunkAmount * 3;
     console.log('refreshed start', start);
   }
 
-  console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
+  console.log('LIST_LENGTH - start', LIST_LENGTH - start);
 
   // TODO: кажется это уже не нужно - удалить, если все работает нормально при скролле наверх
   // if (
   //   scrollDirection === 'up' &&
-  //   // MAX_LIST_VISIBLE_SIZE < MAX_LIST_LENGTH - start
-  //   MAX_LIST_LENGTH - start === 46
+  //   // LIST_FULL_VISIBLE_SIZE < LIST_LENGTH - start
+  //   LIST_LENGTH - start === 46
   //   // 44 < 46
   //   // 44 < 101 - 55 = 46    // 2
   //   // 44 < 101 - 44 = 57 // 2
@@ -99,8 +99,8 @@ const setOffsetToList = function (): void {
   //     '%cВы скроллите вверх? Посчитаем оффсет иначе!',
   //     'background-color: tomato'
   //   );
-  //   console.log('MAX_LIST_LENGTH - start', MAX_LIST_LENGTH - start);
-  //   start = start + MAX_LIST_LENGTH - currentListScroll - chunkAmount * 4;
+  //   console.log('LIST_LENGTH - start', LIST_LENGTH - start);
+  //   start = start + LIST_LENGTH - currentListScroll - chunkAmount * 4;
   //   console.log('refreshed start', start);
   // }
 
@@ -134,11 +134,12 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
   console.log(listItemHeight);
   console.log(chunkAmount);
 
-  MAX_LIST_VISIBLE_SIZE = chunkAmount * 4;
+  LIST_FULL_VISIBLE_SIZE = chunkAmount * 4;
+  LIST_HALF_VISIBLE_SIZE = LIST_FULL_VISIBLE_SIZE / 2;
 
   chunkHeight = chunkAmount * listItemHeight;
 
-  tailingElementsAmount = MAX_LIST_LENGTH % chunkAmount;
+  tailingElementsAmount = LIST_LENGTH % chunkAmount;
 
   console.log('Остаток - ', tailingElementsAmount);
 
@@ -148,7 +149,7 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
 const TAG_TPL = function (name: string, number: string | number) {
   return `<li 
         class="infinityScroll__listItem" 
-        aria-setsize="${MAX_LIST_LENGTH}" 
+        aria-setsize="${LIST_LENGTH}" 
         aria-posinset="${number + 1}"
         >
             ${name} ${number + 1}
@@ -172,11 +173,11 @@ let timerId;
 const fillList = function () {
   console.log('AGAIN!');
   console.log('GLOBAL_ITEM_COUNTER', GLOBAL_ITEM_COUNTER);
-  console.log('MAX_LIST_VISIBLE_SIZE', MAX_LIST_VISIBLE_SIZE);
+  console.log('LIST_FULL_VISIBLE_SIZE', LIST_FULL_VISIBLE_SIZE);
   if (
     GLOBAL_ITEM_COUNTER > 49999 ||
-    GLOBAL_ITEM_COUNTER >= MAX_LIST_LENGTH ||
-    GLOBAL_ITEM_COUNTER >= MAX_LIST_VISIBLE_SIZE
+    GLOBAL_ITEM_COUNTER >= LIST_LENGTH ||
+    GLOBAL_ITEM_COUNTER >= LIST_FULL_VISIBLE_SIZE
   )
     return;
 
@@ -184,9 +185,9 @@ const fillList = function () {
   for (
     let i = 0;
     i < 1000 &&
-    i < MAX_LIST_LENGTH - 1 &&
-    GLOBAL_ITEM_COUNTER < MAX_LIST_LENGTH &&
-    GLOBAL_ITEM_COUNTER < MAX_LIST_VISIBLE_SIZE;
+    i < LIST_LENGTH - 1 &&
+    GLOBAL_ITEM_COUNTER < LIST_LENGTH &&
+    GLOBAL_ITEM_COUNTER < LIST_FULL_VISIBLE_SIZE;
     i++
   ) {
     templateFragments += createItem(GLOBAL_ITEM_COUNTER);
@@ -208,7 +209,7 @@ const changeItemsInList = function () {
   // Это работает праивльно (в начале списка)
   let newSequence =
     scrollDirection === 'down'
-      ? currentListScroll + chunkAmount * 2
+      ? currentListScroll + LIST_HALF_VISIBLE_SIZE
       : currentListScroll - chunkAmount * 1;
 
   if (newSequence < 0) newSequence = 0;
@@ -220,10 +221,7 @@ const changeItemsInList = function () {
     // TODO: убрать после тестов
 
     // console.log('i + sequenceNumber ', i + sequenceNumber);
-    if (
-      scrollDirection === 'down' &&
-      i + sequenceNumber > MAX_LIST_LENGTH - 1
-    ) {
+    if (scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1) {
       console.warn('Выходим за пределы списка в его нижней части');
       // eslint-disable-next-line no-continue
       continue;
@@ -256,9 +254,10 @@ const changeItemsInList = function () {
 };
 
 const modifyCurrentDOM = function () {
-  // имеется
+  // TODO: удалить после отладки
+  // временные переменные
   const newStart = currentListScroll - chunkAmount;
-  const newEnd = currentListScroll + chunkAmount * 2;
+  const newEnd = currentListScroll + LIST_HALF_VISIBLE_SIZE;
 
   // console.log('Будущий старт:', newStart);
   console.log('Мы на границе списка?', isBorderOfList);
@@ -270,15 +269,14 @@ const modifyCurrentDOM = function () {
     `, Range: ${newStart} - ${newEnd}`
   );
 
+  const isBeginOfList = currentListScroll < LIST_HALF_VISIBLE_SIZE;
+
+  // TODO: уточнить - больше или большеИЛИравно
+  const isEndOfList = currentListScroll >= LIST_LENGTH - chunkAmount * 3;
+
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
-  if (
-    scrollDirection === 'down' &&
-    currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE
-  ) {
-    console.log(
-      'currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE',
-      currentListScroll + chunkAmount * 2 < MAX_LIST_VISIBLE_SIZE
-    );
+  if (scrollDirection === 'down' && isBeginOfList) {
+    console.log('isBeginOfList', isBeginOfList);
     console.log('Пока рендерить не надо. Вы в самом верху списка.');
     isBorderOfList = true;
     return;
@@ -287,11 +285,11 @@ const modifyCurrentDOM = function () {
   // if (
   //   scrollDirection === 'up' &&
   //   // это хорошая проверка
-  //   currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+  //   currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE
   // ) {
   //   console.log(
-  //     'currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE',
-  //     currentListScroll + chunkAmount * 3 < MAX_LIST_VISIBLE_SIZE
+  //     'currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE',
+  //     currentListScroll + chunkAmount * 3 < LIST_FULL_VISIBLE_SIZE
   //   );
   //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
   //   isBorderOfList = true;
@@ -302,26 +300,19 @@ const modifyCurrentDOM = function () {
   if (
     scrollDirection === 'down' &&
     // это хорошая проверка
-    currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
+    currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE
   ) {
     console.log(
-      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2 ',
-      currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 2
+      'currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE ',
+      currentListScroll > LIST_LENGTH - LIST_HALF_VISIBLE_SIZE
     );
     console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
     isBorderOfList = true;
     return;
   }
 
-  if (
-    scrollDirection === 'up' &&
-    // это хорошая проверка
-    currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 3
-  ) {
-    console.log(
-      'currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 3',
-      currentListScroll >= MAX_LIST_LENGTH - chunkAmount * 3
-    );
+  if (scrollDirection === 'up' && isEndOfList) {
+    console.log('isEndOfList', isEndOfList);
     console.log('Пока рендерить не надо (up). Вы в самом низу списка.');
     isBorderOfList = true;
     return;
