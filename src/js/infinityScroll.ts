@@ -96,7 +96,7 @@ const setOffsetToList = function (): void {
     console.log('refreshed start', start);
   }
 
-  console.log('LIST_LENGTH - start', LIST_LENGTH - start);
+  // console.log('LIST_LENGTH - start', LIST_LENGTH - start);
 
   // TODO: кажется это уже не нужно - удалить, если все работает нормально при скролле наверх
   // if (
@@ -283,7 +283,7 @@ const modifyCurrentDOM = function () {
   const newEnd = calculatedEnd > LIST_LENGTH ? LIST_LENGTH : calculatedEnd;
 
   // console.log('Будущий старт:', newStart);
-  console.log('Мы на границе списка?', isBorderOfList);
+  // console.log('Мы на границе списка?', isBorderOfList);
 
   console.log('Диапазон поменялся');
   console.log(
@@ -299,14 +299,12 @@ const modifyCurrentDOM = function () {
   const isEndOfListFromTop =
     currentListScroll > LIST_START_OF_LAST_VISIBLE_SIZE;
 
-  // TODO: уточнить - больше или большеИЛИравно - это должно сработать 2 раза
   const isBeginOfListFromBottom =
-    // currentListScroll >= LIST_LENGTH - LIST_FULL_VISIBLE_SIZE;
     currentListScroll >= LIST_LENGTH - chunkAmount * 3;
   console.log('LIST_LENGTH - chunkAmount * 3', LIST_LENGTH - chunkAmount * 3);
 
-  const isEndOfListFromBottom =
-    currentListScroll < LIST_FULL_VISIBLE_SIZE - chunkAmount * 3;
+  // TODO: тут надо проверять и скорее всего рендерить дополнительно с учетом tailing
+  const isEndOfListFromBottom = currentListScroll < tailingElementsAmount;
 
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
   if (scrollDirection === 'down' && isBeginOfListFromTop) {
@@ -333,17 +331,22 @@ const modifyCurrentDOM = function () {
     return;
   }
 
-  // TODO: пока временно отключаем, пока не разберемся с tailingsElements
-  // if (scrollDirection === 'up' && isEndOfListFromBottom) {
-  //   console.log('isEndOfListFromBottom', isEndOfListFromBottom);
-  //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-  //   isBorderOfList = true;
-  //   return;
-  // }
+  // без этой части у нас рендерятся 2 лишних элемента
+  if (scrollDirection === 'up' && isEndOfListFromBottom) {
+    console.log('isEndOfListFromBottom', isEndOfListFromBottom);
+    console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+    isBorderOfList = true;
+    // TODO: проверить, нужен ли доп оффсет
+    if (isGoingFromBottom) {
+      console.warn('Дополнительный оффсет?');
+      setOffsetToList();
+    }
+    return;
+  }
 
-  isBorderOfList = false;
+  // isBorderOfList = false;
 
-  console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
+  // console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
 
   changeItemsInList();
 
@@ -374,7 +377,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   if (scrollTop > lastScrollTopPosition) {
     scrollDirection = 'down';
-    if (orderedNumberOfChunk <= 1) {
+    if (orderedNumberOfChunk <= tailingElementsAmount) {
       console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
       isGoingFromBottom = false;
     }
@@ -391,6 +394,17 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const scrollDiff = Math.abs(currentListScroll - newCurrentListScroll);
 
   if (scrollDiff <= tailingElementsAmount) {
+    return;
+  }
+
+  if (
+    (isGoingFromBottom && scrollDiff > chunkAmount - tailingElementsAmount) ||
+    (!isGoingFromBottom && scrollDiff > chunkAmount)
+  ) {
+    console.log(
+      `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
+      'background-color: red;'
+    );
     return;
   }
 
