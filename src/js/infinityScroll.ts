@@ -69,7 +69,7 @@ const setPaddingToList = function (offset = 0): void {
   // TODO: проверить, попадаем ли мы туда
   // Кажется нет, значит это скоро можно удалить
   if (paddingBottom < 0) {
-    console.warn('==============Мы попали в if paddingBottom < 0 ==========');
+    console.error('==============Мы попали в if paddingBottom < 0 ==========');
     paddingBottom = 0;
   }
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
@@ -277,8 +277,8 @@ const changeItemsInList = function () {
   // Это работает праивльно (в начале списка)
   let newSequence =
     scrollDirection === 'down'
-      ? currentListScroll + LIST_HALF_VISIBLE_SIZE
-      : currentListScroll - chunkAmount * 1;
+      ? currentListScroll + chunkAmount
+      : currentListScroll - chunkAmount;
 
   if (newSequence < 0) newSequence = 0;
 
@@ -286,31 +286,38 @@ const changeItemsInList = function () {
   console.log('CHANGE-ITEMS-IN-LIST sequenceNumber: ', sequenceNumber);
 
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
-    // TODO: убрать после тестов
+    const isStartOfList = scrollDirection === 'up' && sequenceNumber === 0;
+
+    // const isReachTopLimit = !isGoingFromBottom
+    //   ? isStartOfList
+    //   : isStartOfList && i + sequenceNumber >= tailingElementsAmount;
+
+    const isReachTopLimit =
+      isGoingFromBottom &&
+      isStartOfList &&
+      i + sequenceNumber >= tailingElementsAmount;
+
+    const isReachBottomLimit =
+      scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1;
+
+    const allowToChange = !isReachTopLimit && !isReachBottomLimit;
 
     // console.log('i + sequenceNumber ', i + sequenceNumber);
-    if (scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1) {
+
+    // TODO: убрать после тестов
+    if (isReachBottomLimit) {
       console.warn('Выходим за пределы списка в его нижней части');
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    // 0 ==>  1 2 --- 3 4 5 6 7 8 9 10 11 12
-    if (
-      scrollDirection === 'up' &&
-      sequenceNumber === 0 &&
-      i + sequenceNumber >= tailingElementsAmount
-    ) {
+    } else if (isReachTopLimit) {
       console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
-      // eslint-disable-next-line no-continue
-      continue;
     }
 
-    // add items
-    const elemNum = i + sequenceNumber;
-    templateFragments += createItem(elemNum);
-
-    // remove items
-    removeItem(childPosition);
+    if (allowToChange) {
+      // add items
+      const elemNum = i + sequenceNumber;
+      templateFragments += createItem(elemNum);
+      // remove items
+      removeItem(childPosition);
+    }
   }
 
   if (scrollDirection === 'down') {
@@ -429,16 +436,8 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   if (scrollTop > lastScrollTopPosition) {
     scrollDirection = 'down';
-    if (orderedNumberOfChunk <= tailingElementsAmount) {
-      console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
-      isGoingFromBottom = false;
-    }
   } else {
     scrollDirection = 'up';
-    if (orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1) {
-      isGoingFromBottom = true;
-    }
-    console.log('isGoingFromBottom', isGoingFromBottom);
   }
 
   lastScrollTopPosition = scrollTop;
@@ -447,6 +446,18 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   if (scrollDiff <= tailingElementsAmount) {
     return;
+  }
+
+  if (scrollDirection === 'down') {
+    if (orderedNumberOfChunk <= tailingElementsAmount) {
+      console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
+      isGoingFromBottom = false;
+    }
+  } else {
+    if (orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1) {
+      isGoingFromBottom = true;
+    }
+    console.log('isGoingFromBottom', isGoingFromBottom);
   }
 
   if (
