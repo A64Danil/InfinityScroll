@@ -43,6 +43,8 @@ let lastScrollTopPosition = 0;
 let LAST_CHUNK_ORDER_NUMBER = 1;
 
 let isGoingFromBottom = false;
+let isNeedFullNewRender = false;
+let isAlreadyRendered = false;
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -50,6 +52,10 @@ let isGoingFromBottom = false;
 3) Используем высоту чанка чтобы регулировать отступы
 4) Держим в памяти число, указывающее на начальный пункт списка в чанке - currentListScroll
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
+
+// если дифф слишком большой, то делаем фуллРендер
+// для того чтобы подчитать дифф, нужно понять, когда скролл остановился
+
 
 --- до рефакторинга было 450 строк кода
 
@@ -213,6 +219,52 @@ const fillList = function () {
   InfinityList.innerHTML += templateFragments;
 
   timerId = setTimeout(fillList, delay);
+};
+
+const resetAllList = function () {
+  console.log(
+    'Будем перерисовывать весь список заново с учетом позиции',
+    currentListScroll
+  );
+  let templateFragments = '';
+
+  let newSequence =
+    scrollDirection === 'down'
+      ? currentListScroll + LIST_HALF_VISIBLE_SIZE
+      : currentListScroll - chunkAmount * 1;
+
+  if (newSequence < 0) newSequence = 0;
+
+  const sequenceNumber = newSequence;
+  console.log('resetAllList sequenceNumber: ', sequenceNumber);
+
+  for (let i = 0; i < 1000 && i < LIST_FULL_VISIBLE_SIZE; i++) {
+    // TODO: убрать после тестов
+
+    // console.log('i + sequenceNumber ', i + sequenceNumber);
+    if (scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1) {
+      console.warn('Выходим за пределы списка в его нижней части');
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    if (
+      scrollDirection === 'up' &&
+      sequenceNumber === 0 &&
+      i + sequenceNumber >= tailingElementsAmount
+    ) {
+      console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    // add items
+    const elemNum = i + sequenceNumber;
+    templateFragments += createItem(elemNum);
+  }
+
+  InfinityList.innerHTML = templateFragments;
+  // setOffsetToList();
+  isNeedFullNewRender = false;
+  isAlreadyRendered = true;
 };
 
 const changeItemsInList = function () {
@@ -398,14 +450,18 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   }
 
   if (
-    (isGoingFromBottom && scrollDiff > chunkAmount - tailingElementsAmount) ||
+    // !isAlreadyRendered &&
+    // !isNeedFullNewRender &&
+    (isGoingFromBottom && scrollDiff > chunkAmount + tailingElementsAmount) ||
+    //! isAlreadyRendered &&
+    // !isNeedFullNewRender &&
     (!isGoingFromBottom && scrollDiff > chunkAmount)
   ) {
-    console.log(
+    console.warn(
       `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
       'background-color: red;'
     );
-    return;
+    // isNeedFullNewRender = true;
   }
 
   if (currentListScroll !== newCurrentListScroll) {
@@ -420,8 +476,14 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       newCurrentListScroll += tailingElementsAmount;
     }
     currentListScroll = newCurrentListScroll;
+
     // DOM Manipulation
     modifyCurrentDOM();
+    // if (isNeedFullNewRender && !isAlreadyRendered) {
+    //   resetAllList();
+    // } else {
+    //   modifyCurrentDOM();
+    // }
   }
 };
 
