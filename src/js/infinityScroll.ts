@@ -277,7 +277,7 @@ const changeItemsInList = function () {
   // Это работает праивльно (в начале списка)
   let newSequence =
     scrollDirection === 'down'
-      ? currentListScroll + chunkAmount
+      ? currentListScroll + LIST_HALF_VISIBLE_SIZE
       : currentListScroll - chunkAmount;
 
   if (newSequence < 0) newSequence = 0;
