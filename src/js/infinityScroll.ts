@@ -29,6 +29,8 @@ let LIST_FULL_VISIBLE_SIZE = 2;
 let LIST_HALF_VISIBLE_SIZE = 1;
 let LIST_START_OF_LAST_VISIBLE_SIZE = LIST_LENGTH - LIST_HALF_VISIBLE_SIZE;
 
+let LIST_LAST_SCROLL_POSITION = LIST_LENGTH - LIST_FULL_VISIBLE_SIZE;
+
 let currentListScroll = 0;
 let chunkAmount = 1;
 let listWrpHeight = 1;
@@ -43,8 +45,10 @@ let lastScrollTopPosition = 0;
 let LAST_CHUNK_ORDER_NUMBER = 1;
 
 let isGoingFromBottom = false;
-let isNeedFullNewRender = false;
-let isAlreadyRendered = false;
+const isNeedFullNewRender = false;
+const isAlreadyRendered = false;
+
+let timer = null;
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -78,13 +82,6 @@ const setPaddingToList = function (offset = 0): void {
 const setOffsetToList = function (): void {
   console.log('currentListScroll', currentListScroll);
 
-  // TODO: скролл теперь правильный, но хочется чтобы он был с 10 по 20й элемент, а не с 20 по 30й
-
-  // let start =
-  //   scrollDirection === 'down'
-  //     ? currentListScroll - chunkAmount
-  //     : currentListScroll - chunkAmount + tailingElementsAmount;
-
   let start = currentListScroll - chunkAmount;
   if (start < 0) {
     console.log('start меньше нуля, исправляем на 0. До этого был: ', start);
@@ -95,33 +92,16 @@ const setOffsetToList = function (): void {
   // Если этого нет, то попадаем в padding 0!
   if (
     scrollDirection === 'down' &&
-    start + LIST_FULL_VISIBLE_SIZE > LIST_LENGTH
+    start > LIST_LAST_SCROLL_POSITION
+    // start + LIST_FULL_VISIBLE_SIZE > LIST_LENGTH
   ) {
-    console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
-    start = start + LIST_LENGTH - currentListScroll - chunkAmount * 3;
+    // console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
+    console.warn('Start выходит за возможные пределы');
+    start = LIST_LAST_SCROLL_POSITION;
     console.log('refreshed start', start);
   }
 
   // console.log('LIST_LENGTH - start', LIST_LENGTH - start);
-
-  // TODO: кажется это уже не нужно - удалить, если все работает нормально при скролле наверх
-  // if (
-  //   scrollDirection === 'up' &&
-  //   // LIST_FULL_VISIBLE_SIZE < LIST_LENGTH - start
-  //   LIST_LENGTH - start === 46
-  //   // 44 < 46
-  //   // 44 < 101 - 55 = 46    // 2
-  //   // 44 < 101 - 44 = 57 // 2
-  //   // 44 < 101 - 33 = 68 // 2
-  // ) {
-  //   console.log(
-  //     '%cВы скроллите вверх? Посчитаем оффсет иначе!',
-  //     'background-color: tomato'
-  //   );
-  //   console.log('LIST_LENGTH - start', LIST_LENGTH - start);
-  //   start = start + LIST_LENGTH - currentListScroll - chunkAmount * 4;
-  //   console.log('refreshed start', start);
-  // }
 
   const offset = start * listItemHeight;
   console.log('offset', offset);
@@ -150,12 +130,13 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
   chunkAmount = Math.ceil(listWrpHeight / listItemHeight);
 
   console.log(listWrpHeight);
-  console.log(listItemHeight);
+  console.log('listItemHeight', listItemHeight);
   console.log(chunkAmount);
 
   LIST_FULL_VISIBLE_SIZE = chunkAmount * 4;
   LIST_HALF_VISIBLE_SIZE = LIST_FULL_VISIBLE_SIZE / 2;
   LIST_START_OF_LAST_VISIBLE_SIZE = LIST_LENGTH - LIST_HALF_VISIBLE_SIZE;
+  LIST_LAST_SCROLL_POSITION = LIST_LENGTH - LIST_FULL_VISIBLE_SIZE;
 
   LAST_CHUNK_ORDER_NUMBER = Math.floor(LIST_LENGTH / chunkAmount);
 
@@ -228,10 +209,11 @@ const resetAllList = function () {
   );
   let templateFragments = '';
 
-  let newSequence =
-    scrollDirection === 'down'
-      ? currentListScroll + LIST_HALF_VISIBLE_SIZE
-      : currentListScroll - chunkAmount * 1;
+  let newSequence = currentListScroll;
+  // let newSequence =
+  //   scrollDirection === 'down'
+  //     ? currentListScroll + LIST_HALF_VISIBLE_SIZE
+  //     : currentListScroll - chunkAmount * 1;
 
   if (newSequence < 0) newSequence = 0;
 
@@ -247,11 +229,7 @@ const resetAllList = function () {
       // eslint-disable-next-line no-continue
       continue;
     }
-    if (
-      scrollDirection === 'up' &&
-      sequenceNumber === 0 &&
-      i + sequenceNumber >= tailingElementsAmount
-    ) {
+    if (scrollDirection === 'up' && sequenceNumber === 0) {
       console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
       // eslint-disable-next-line no-continue
       continue;
@@ -262,9 +240,9 @@ const resetAllList = function () {
   }
 
   InfinityList.innerHTML = templateFragments;
-  // setOffsetToList();
-  isNeedFullNewRender = false;
-  isAlreadyRendered = true;
+  setOffsetToList();
+  // isNeedFullNewRender = false;
+  // isAlreadyRendered = true;
 };
 
 const changeItemsInList = function () {
@@ -333,8 +311,8 @@ const modifyCurrentDOM = function () {
   // временные переменные
   const calculatedStart = currentListScroll - chunkAmount;
   const newStart =
-    calculatedStart > LIST_LENGTH - LIST_FULL_VISIBLE_SIZE
-      ? LIST_LENGTH - LIST_FULL_VISIBLE_SIZE
+    calculatedStart > LIST_LAST_SCROLL_POSITION
+      ? LIST_LAST_SCROLL_POSITION
       : calculatedStart;
 
   const calculatedEnd =
@@ -421,6 +399,10 @@ const modifyCurrentDOM = function () {
 };
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
+  if (timer !== null) {
+    clearTimeout(timer);
+  }
+
   const { scrollTop } = e.target;
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkHeight);
 
@@ -461,17 +443,28 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   }
 
   if (
-    // !isAlreadyRendered &&
-    // !isNeedFullNewRender &&
     (isGoingFromBottom && scrollDiff > chunkAmount + tailingElementsAmount) ||
-    //! isAlreadyRendered &&
-    // !isNeedFullNewRender &&
     (!isGoingFromBottom && scrollDiff > chunkAmount)
   ) {
     console.warn(
       `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
       'background-color: red;'
     );
+    timer = setTimeout(() => {
+      // do something
+      console.log('========== Очевидно, что вы закончили скроллить ========');
+      // TODO: удалить после отладки
+      if (isGoingFromBottom) {
+        console.log(
+          '%c====> Прибавляем хвостик к скроллу',
+          'background-color: green;'
+        );
+        newCurrentListScroll += tailingElementsAmount;
+      }
+      currentListScroll = newCurrentListScroll;
+      resetAllList();
+    }, 1100);
+    return;
     // isNeedFullNewRender = true;
   }
 
