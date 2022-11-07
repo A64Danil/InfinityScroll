@@ -79,8 +79,15 @@ const setPaddingToList = function (offset = 0): void {
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
 };
 
-const setOffsetToList = function (): void {
+const setOffsetToList = function (forcedOffset: number): void {
   console.log('currentListScroll', currentListScroll);
+
+  if (forcedOffset !== undefined) {
+    console.log('Вы задаёте start для оффсета вручную!');
+    InfinityList.style.transform = `translate(0,${forcedOffset}px)`;
+    setPaddingToList(forcedOffset);
+    return;
+  }
 
   let start = currentListScroll - chunkAmount;
   if (start < 0) {
@@ -100,8 +107,6 @@ const setOffsetToList = function (): void {
     start = LIST_LAST_SCROLL_POSITION;
     console.log('refreshed start', start);
   }
-
-  // console.log('LIST_LENGTH - start', LIST_LENGTH - start);
 
   const offset = start * listItemHeight;
   console.log('offset', offset);
@@ -207,40 +212,33 @@ const resetAllList = function () {
     'Будем перерисовывать весь список заново с учетом позиции',
     currentListScroll
   );
-  let templateFragments = '';
+  const calculatedStart = currentListScroll - chunkAmount;
+  const newStart =
+    calculatedStart > LIST_LAST_SCROLL_POSITION
+      ? LIST_LAST_SCROLL_POSITION
+      : calculatedStart;
 
-  let newSequence = currentListScroll;
-  // let newSequence =
-  //   scrollDirection === 'down'
-  //     ? currentListScroll + LIST_HALF_VISIBLE_SIZE
-  //     : currentListScroll - chunkAmount * 1;
+  let newSequence = newStart;
 
   if (newSequence < 0) newSequence = 0;
 
   const sequenceNumber = newSequence;
   console.log('resetAllList sequenceNumber: ', sequenceNumber);
 
+  let templateFragments = '';
   for (let i = 0; i < 1000 && i < LIST_FULL_VISIBLE_SIZE; i++) {
     // TODO: убрать после тестов
-
     // console.log('i + sequenceNumber ', i + sequenceNumber);
-    if (scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1) {
-      console.warn('Выходим за пределы списка в его нижней части');
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    if (scrollDirection === 'up' && sequenceNumber === 0) {
-      console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
-      // eslint-disable-next-line no-continue
-      continue;
-    }
     // add items
     const elemNum = i + sequenceNumber;
     templateFragments += createItem(elemNum);
   }
 
+  const newOffset = newSequence * listItemHeight;
+  console.log('newOffset', newOffset);
+
   InfinityList.innerHTML = templateFragments;
-  setOffsetToList();
+  setOffsetToList(newOffset);
   // isNeedFullNewRender = false;
   // isAlreadyRendered = true;
 };
@@ -483,11 +481,6 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
     // DOM Manipulation
     modifyCurrentDOM();
-    // if (isNeedFullNewRender && !isAlreadyRendered) {
-    //   resetAllList();
-    // } else {
-    //   modifyCurrentDOM();
-    // }
   }
 };
 
