@@ -42,6 +42,13 @@ module.exports = {
             template: paths.src + '/index.html', // шаблон
             filename: 'index.html', // название выходного файла
         }),
+        new HtmlWebpackPlugin({
+            title: 'Demo',
+            info: 'some test data',
+            // favicon: paths.src + '/images/favicon.png',
+            template: paths.src + '/demo.html', // шаблон
+            filename: 'demo.html', // название выходного файла
+        }),
 
         // ESLint configuration
         new ESLintPlugin({

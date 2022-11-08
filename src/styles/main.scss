@@ -1,10 +1,15 @@
 $font-size: 1rem;
-$font-color: lch(53 105 40);
+//$font-color: lch(53 105 40);
+$font-color: #333;
 
 html {
   font-family: Arial, Helvetica, sans-serif;
   font-size: $font-size;
   color: $font-color;
+}
+
+header h1 {
+  font-size: 40px;
 }
 
 .container {
@@ -15,13 +20,16 @@ html {
   //display: flex;
 }
 
+.infinityScroll {
+  position: relative;
+}
 .infinityScrollWrp {
   height: 290px;
   //height: 310px;
   overflow-y: scroll;
 }
 
-.infinityScroll {
+.infinityScrollList {
   color: #333;
   //max-height: 290px;
   //padding: 20px 0 20px 30px;
@@ -34,6 +42,69 @@ html {
 
     &:hover {
       background: #eee;
+    }
+    &:before {
+      content: attr(aria-posinset) ')';
+    }
+  }
+}
+
+.CurrentScrollPosition {
+  position: absolute;
+  width: calc(100% - 20px);
+  font-size: 40px;
+  text-align: center;
+  top: 0;
+  left: 0;
+  background-color: #ff00003b;
+  color: #444;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+
+  &.active {
+    display: flex;
+  }
+}
+
+/* Demo styles */
+.Demo_infinityScroll_btn {
+  padding: 8px 30px;
+  font-size: 20px;
+  background-color: #fad513;
+  font-weight: bold;
+  color: #585858;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.Demo_infinityScroll {
+  position: relative;
+  padding: 10px 0;
+  border: 2px solid #444;
+  border-radius: 8px;
+}
+.Demo_infinityScrollWrp {
+  height: 350px;
+  //height: 310px;
+  overflow-y: scroll;
+}
+
+.Demo_infinityScrollList {
+  color: #555;
+  //max-height: 290px;
+  //padding: 20px 0 20px 30px;
+  margin: 0;
+
+  .infinityScrollList__listItem {
+    padding: 8px 10px;
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px;
+    //transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background: #efefef;
     }
     &:before {
       content: attr(aria-posinset) ')';

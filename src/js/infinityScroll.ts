@@ -15,6 +15,10 @@ const StartBtn: HTMLButtonElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollListStartBtn'
 );
 
+const InfinityScrollCurrentScrollPosition: HTMLDivElement | null = document.querySelector<HTMLElement>(
+  '#infinityScrollCurrentScrollPosition'
+);
+
 let GLOBAL_ITEM_COUNTER = 0;
 
 const delay = 0;
@@ -49,6 +53,9 @@ const isNeedFullNewRender = false;
 const isAlreadyRendered = false;
 
 let timer = null;
+
+let currentPositionRelative = 0;
+const avrTimeArr = [];
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -129,6 +136,9 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
     console.error('You must set height to your list-wrapper!');
     return;
   }
+  if (InfinityScrollCurrentScrollPosition) {
+    InfinityScrollCurrentScrollPosition.style.height = `${listWrpHeight}px`;
+  }
 
   listItemHeight = listItem?.offsetHeight || listWrpHeight;
 
@@ -156,7 +166,7 @@ const getAllSizes = (bigListWrp: HTMLElement, bigListNode: HTMLElement) => {
 
 const TAG_TPL = function (name: string, number: string | number) {
   return `<li 
-        class="infinityScroll__listItem" 
+        class="infinityScrollList__listItem" 
         aria-setsize="${LIST_LENGTH}" 
         aria-posinset="${number + 1}"
         >
@@ -241,6 +251,17 @@ const resetAllList = function () {
   setOffsetToList(newOffset);
   // isNeedFullNewRender = false;
   // isAlreadyRendered = true;
+
+  console.log('Считаем среднее время рендера');
+  const allTime = avrTimeArr.reduce((acc, el) => acc + el);
+  console.log(avrTimeArr);
+  console.log('элементов:', avrTimeArr.length);
+  console.log('summ:', allTime);
+  console.log('avg:', allTime / avrTimeArr.length);
+
+  if (InfinityScrollCurrentScrollPosition) {
+    InfinityScrollCurrentScrollPosition.classList.remove('active');
+  }
 };
 
 const changeItemsInList = function () {
@@ -448,6 +469,16 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
       'background-color: red;'
     );
+    console.log('scrollTop');
+    currentPositionRelative = Math.round(
+      (scrollTop / (LIST_LENGTH * listItemHeight)) * 100
+    );
+
+    // console.log('currentPositionRelative', `${currentPositionRelative}%`);
+    // if (InfinityScrollCurrentScrollPosition) {
+    //   InfinityScrollCurrentScrollPosition.textContent = `${currentPositionRelative}%`;
+    //   InfinityScrollCurrentScrollPosition.classList.add('active');
+    // }
     timer = setTimeout(() => {
       // do something
       console.log('========== Очевидно, что вы закончили скроллить ========');
@@ -461,8 +492,8 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       }
       currentListScroll = newCurrentListScroll;
       resetAllList();
-    }, 1100);
-    return;
+    }, 30);
+    // return;
     // isNeedFullNewRender = true;
   }
 
@@ -488,7 +519,17 @@ StartBtn?.addEventListener('click', () => {
   fillList();
   getAllSizes(InfinityListWrapper, InfinityList);
 });
+let startDate = Date.now();
 
-InfinityListWrapper?.addEventListener('scroll', calcCurrentDOMRender);
+// InfinityListWrapper?.addEventListener('scroll', calcCurrentDOMRender);
+InfinityListWrapper?.addEventListener('scroll', (e) => {
+  const diffTime = Date.now() - startDate;
+  console.info(parseInt(diffTime, 10));
+  if (diffTime < 100) {
+    avrTimeArr.push(diffTime);
+  }
+  calcCurrentDOMRender(e);
+  startDate = Date.now();
+});
 
 getAllSizes(InfinityListWrapper, InfinityList);
