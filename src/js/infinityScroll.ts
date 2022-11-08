@@ -445,7 +445,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   const scrollDiff = Math.abs(currentListScroll - newCurrentListScroll);
 
-  if (scrollDiff <= tailingElementsAmount) {
+  if (scrollDiff !== 0 && scrollDiff <= tailingElementsAmount) {
     return;
   }
 
@@ -469,7 +469,6 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
       'background-color: red;'
     );
-    console.log('scrollTop');
     currentPositionRelative = Math.round(
       (scrollTop / (LIST_LENGTH * listItemHeight)) * 100
     );
@@ -483,14 +482,14 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       // do something
       console.log('========== Очевидно, что вы закончили скроллить ========');
       // TODO: удалить после отладки
-      if (isGoingFromBottom) {
-        console.log(
-          '%c====> Прибавляем хвостик к скроллу',
-          'background-color: green;'
-        );
-        newCurrentListScroll += tailingElementsAmount;
-      }
-      currentListScroll = newCurrentListScroll;
+      // if (isGoingFromBottom) {
+      //   console.log(
+      //     '%c====> Прибавляем хвостик к скроллу',
+      //     'background-color: green;'
+      //   );
+      //   newCurrentListScroll += tailingElementsAmount;
+      // }
+      // currentListScroll = newCurrentListScroll;
       resetAllList();
     }, 30);
     // return;
