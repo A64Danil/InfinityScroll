@@ -254,9 +254,9 @@ const resetAllList = function () {
 
   console.log('Считаем среднее время рендера');
   const allTime = avrTimeArr.reduce((acc, el) => acc + el);
-  console.log(avrTimeArr);
-  console.log('элементов:', avrTimeArr.length);
-  console.log('summ:', allTime);
+  // console.log(avrTimeArr);
+  // console.log('элементов:', avrTimeArr.length);
+  // console.log('summ:', allTime);
   console.log('avg:', allTime / avrTimeArr.length);
 
   if (InfinityScrollCurrentScrollPosition) {
@@ -520,10 +520,11 @@ StartBtn?.addEventListener('click', () => {
 });
 let startDate = Date.now();
 
+// TODO: Убрать лишние логи
 // InfinityListWrapper?.addEventListener('scroll', calcCurrentDOMRender);
 InfinityListWrapper?.addEventListener('scroll', (e) => {
   const diffTime = Date.now() - startDate;
-  console.info(parseInt(diffTime, 10));
+  // console.info(parseInt(diffTime, 10));
   if (diffTime < 100) {
     avrTimeArr.push(diffTime);
   }
