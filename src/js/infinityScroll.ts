@@ -3,6 +3,8 @@ import BigDataList2 from '../../mocks/bigList100000.json'; // import mock data
 
 console.log('TS file loaded');
 
+// TODO: придумать нормальные имена для элементов
+
 const InfinityListWrapper: HTMLOListElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollWrapper'
 );
@@ -41,7 +43,6 @@ let listWrpHeight = 1;
 let listItemHeight = 1;
 let chunkHeight = 1;
 let scrollDirection = 'down';
-let isBorderOfList = true;
 
 let tailingElementsAmount = 0;
 let lastScrollTopPosition = 0;
@@ -49,9 +50,6 @@ let lastScrollTopPosition = 0;
 let LAST_CHUNK_ORDER_NUMBER = 1;
 
 let isGoingFromBottom = false;
-const isNeedFullNewRender = false;
-const isAlreadyRendered = false;
-
 let timer = null;
 
 let currentPositionRelative = 0;
@@ -75,10 +73,7 @@ const avrTimeArr = [];
 const setPaddingToList = function (offset = 0): void {
   let paddingBottom = LIST_LENGTH * listItemHeight - chunkHeight * 4 - offset;
 
-  console.log('paddingBottom', paddingBottom);
-
   // TODO: проверить, попадаем ли мы туда
-  // Кажется нет, значит это скоро можно удалить
   if (paddingBottom < 0) {
     console.error('==============Мы попали в if paddingBottom < 0 ==========');
     paddingBottom = 0;
@@ -97,26 +92,19 @@ const setOffsetToList = function (forcedOffset: number): void {
   }
 
   let start = currentListScroll - chunkAmount;
+
+  // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
   if (start < 0) {
-    console.log('start меньше нуля, исправляем на 0. До этого был: ', start);
     start = 0;
   }
   console.log('start', start);
 
   // Если этого нет, то попадаем в padding 0!
-  if (
-    scrollDirection === 'down' &&
-    start > LIST_LAST_SCROLL_POSITION
-    // start + LIST_FULL_VISIBLE_SIZE > LIST_LENGTH
-  ) {
-    // console.warn('Здесь у вас будут проблемы с оффсетом. Надо считать иначе');
-    console.warn('Start выходит за возможные пределы');
+  if (scrollDirection === 'down' && start > LIST_LAST_SCROLL_POSITION) {
     start = LIST_LAST_SCROLL_POSITION;
-    console.log('refreshed start', start);
   }
 
   const offset = start * listItemHeight;
-  console.log('offset', offset);
 
   InfinityList.style.transform = `translate(0,${offset}px)`;
   setPaddingToList(offset);
@@ -175,8 +163,6 @@ const TAG_TPL = function (name: string, number: string | number) {
 };
 
 const createItem = function (elemNum: number) {
-  // console.log('elemNum', elemNum);
-  // console.log('sequenceNumber', sequenceNumber);
   const element = CurrentBigList[elemNum];
   return TAG_TPL(element.name, element.number);
 };
@@ -249,8 +235,6 @@ const resetAllList = function () {
 
   InfinityList.innerHTML = templateFragments;
   setOffsetToList(newOffset);
-  // isNeedFullNewRender = false;
-  // isAlreadyRendered = true;
 
   console.log('Считаем среднее время рендера');
   const allTime = avrTimeArr.reduce((acc, el) => acc + el);
@@ -285,10 +269,6 @@ const changeItemsInList = function () {
   for (let i = 0; i < 1000 && i < chunkAmount; i++) {
     const isStartOfList = scrollDirection === 'up' && sequenceNumber === 0;
 
-    // const isReachTopLimit = !isGoingFromBottom
-    //   ? isStartOfList
-    //   : isStartOfList && i + sequenceNumber >= tailingElementsAmount;
-
     const isReachTopLimit =
       isGoingFromBottom &&
       isStartOfList &&
@@ -298,8 +278,6 @@ const changeItemsInList = function () {
       scrollDirection === 'down' && i + sequenceNumber > LIST_LENGTH - 1;
 
     const allowToChange = !isReachTopLimit && !isReachBottomLimit;
-
-    // console.log('i + sequenceNumber ', i + sequenceNumber);
 
     // TODO: убрать после тестов
     if (isReachBottomLimit) {
@@ -317,38 +295,36 @@ const changeItemsInList = function () {
     }
   }
 
+  // TODO: вынести в отдельную функцию?
   if (scrollDirection === 'down') {
     InfinityList.innerHTML += templateFragments;
   } else {
-    console.log('Добавляем ВВЕРХ!!');
     InfinityList.innerHTML = templateFragments + InfinityList.innerHTML;
   }
 };
 
 const modifyCurrentDOM = function () {
   // TODO: удалить после отладки
-  // временные переменные
-  const calculatedStart = currentListScroll - chunkAmount;
-  const newStart =
-    calculatedStart > LIST_LAST_SCROLL_POSITION
-      ? LIST_LAST_SCROLL_POSITION
-      : calculatedStart;
+  if (true) {
+    //  ===== временные переменные =====
+    const calculatedStart = currentListScroll - chunkAmount;
+    const newStart =
+      calculatedStart > LIST_LAST_SCROLL_POSITION
+        ? LIST_LAST_SCROLL_POSITION
+        : calculatedStart;
 
-  const calculatedEnd =
-    currentListScroll + LIST_HALF_VISIBLE_SIZE + chunkAmount;
-  const newEnd = calculatedEnd > LIST_LENGTH ? LIST_LENGTH : calculatedEnd;
+    const calculatedEnd =
+      currentListScroll + LIST_HALF_VISIBLE_SIZE + chunkAmount;
+    const newEnd = calculatedEnd > LIST_LENGTH ? LIST_LENGTH : calculatedEnd;
 
-  // console.log('Будущий старт:', newStart);
-  // console.log('Мы на границе списка?', isBorderOfList);
-
-  console.log('Диапазон поменялся');
-  console.log(
-    `currentListScroll: %c${currentListScroll}`,
-    'color: red; font-weight: bold;',
-    `, Range - от ${newStart + 1} до ${newEnd}`
-  );
-
-  // TODO: наверное всё это надо перенести в функицю calcCurrentDOMRender
+    console.log('Диапазон поменялся');
+    console.log(
+      `currentListScroll: %c${currentListScroll}`,
+      'color: red; font-weight: bold;',
+      `, Range - от ${newStart + 1} до ${newEnd}`
+    );
+    //  ===== END временные переменные END=====
+  }
 
   const isBeginOfListFromTop = currentListScroll < LIST_HALF_VISIBLE_SIZE;
 
@@ -357,59 +333,37 @@ const modifyCurrentDOM = function () {
 
   const isBeginOfListFromBottom =
     currentListScroll >= LIST_LENGTH - chunkAmount * 3;
-  console.log('LIST_LENGTH - chunkAmount * 3', LIST_LENGTH - chunkAmount * 3);
 
-  // TODO: тут надо проверять и скорее всего рендерить дополнительно с учетом tailing
   const isEndOfListFromBottom = currentListScroll < tailingElementsAmount;
 
   // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
   if (scrollDirection === 'down' && isBeginOfListFromTop) {
-    console.log('isBeginOfListFromTop', isBeginOfListFromTop);
     console.log('Пока рендерить не надо. Вы в самом верху списка.');
-    isBorderOfList = true;
     return;
   }
 
-  // TODO: без этого работает, но лучше улучшить проверку в функция add и remove
   if (scrollDirection === 'down' && isEndOfListFromTop) {
-    console.log('isEndOfListFromTop', isEndOfListFromTop);
     console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-    isBorderOfList = true;
     return;
   }
 
   if (scrollDirection === 'up' && isBeginOfListFromBottom) {
-    console.log('isBeginOfListFromBottom', isBeginOfListFromBottom);
     console.log(
       'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
     );
-    isBorderOfList = true;
     return;
   }
 
-  // без этой части у нас рендерятся 2 лишних элемента
   if (scrollDirection === 'up' && isEndOfListFromBottom) {
-    console.log('isEndOfListFromBottom', isEndOfListFromBottom);
     console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-    isBorderOfList = true;
-    // TODO: проверить, нужен ли доп оффсет
-    if (isGoingFromBottom) {
-      console.warn('Дополнительный оффсет?');
-      setOffsetToList();
-    }
     return;
   }
-
-  // isBorderOfList = false;
-
-  // console.log('ПОСЛЕ ПРОВЕРОК РЕНДЕРА');
 
   changeItemsInList();
-
   setOffsetToList();
 
-  if (InfinityList.childNodes.length !== chunkAmount * 4) {
-    console.log(
+  if (InfinityList.childNodes.length !== LIST_FULL_VISIBLE_SIZE) {
+    console.error(
       '%cКоличесвто деток: ',
       'color: tomato',
       InfinityList.childNodes.length
@@ -425,8 +379,8 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
   const { scrollTop } = e.target;
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkHeight);
 
-  if (InfinityList.childNodes.length !== chunkAmount * 4) {
-    console.log(
+  if (InfinityList.childNodes.length !== LIST_FULL_VISIBLE_SIZE) {
+    console.error(
       '%cКоличесвто деток: ',
       'color: tomato',
       InfinityList.childNodes.length
@@ -451,7 +405,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
   if (scrollDirection === 'down') {
     if (orderedNumberOfChunk <= tailingElementsAmount) {
-      console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
+      // console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
       isGoingFromBottom = false;
     }
   } else {
@@ -473,32 +427,14 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       (scrollTop / (LIST_LENGTH * listItemHeight)) * 100
     );
 
-    // console.log('currentPositionRelative', `${currentPositionRelative}%`);
-    // if (InfinityScrollCurrentScrollPosition) {
-    //   InfinityScrollCurrentScrollPosition.textContent = `${currentPositionRelative}%`;
-    //   InfinityScrollCurrentScrollPosition.classList.add('active');
-    // }
     timer = setTimeout(() => {
-      // do something
       console.log('========== Очевидно, что вы закончили скроллить ========');
-      // TODO: удалить после отладки
-      // if (isGoingFromBottom) {
-      //   console.log(
-      //     '%c====> Прибавляем хвостик к скроллу',
-      //     'background-color: green;'
-      //   );
-      //   newCurrentListScroll += tailingElementsAmount;
-      // }
-      // currentListScroll = newCurrentListScroll;
       resetAllList();
     }, 30);
-    // return;
-    // isNeedFullNewRender = true;
   }
 
   if (currentListScroll !== newCurrentListScroll) {
     console.warn('====== currentListScroll поменялся ======');
-    // это нужно прибавить только когда мы находимся в нижней части списка и скроллим на верх
     // TODO: удалить после отладки
     if (isGoingFromBottom) {
       console.log(
@@ -524,7 +460,6 @@ let startDate = Date.now();
 // InfinityListWrapper?.addEventListener('scroll', calcCurrentDOMRender);
 InfinityListWrapper?.addEventListener('scroll', (e) => {
   const diffTime = Date.now() - startDate;
-  // console.info(parseInt(diffTime, 10));
   if (diffTime < 100) {
     avrTimeArr.push(diffTime);
   }
