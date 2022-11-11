@@ -5,19 +5,19 @@ console.log('TS file loaded');
 
 // TODO: придумать нормальные имена для элементов
 
-const InfinityListWrapper: HTMLOListElement | null = document.querySelector<HTMLElement>(
+const InfinityListWrapper: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollWrapper'
 );
 
-const InfinityList: HTMLOListElement | null = document.querySelector<HTMLElement>(
+const InfinityList: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollList'
 );
 
-const StartBtn: HTMLButtonElement | null = document.querySelector<HTMLElement>(
+const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollListStartBtn'
 );
 
-const InfinityScrollCurrentScrollPosition: HTMLDivElement | null = document.querySelector<HTMLElement>(
+const InfinityScrollCurrentScrollPosition: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollCurrentScrollPosition'
 );
 
@@ -50,10 +50,10 @@ let lastScrollTopPosition = 0;
 let LAST_CHUNK_ORDER_NUMBER = 1;
 
 let isGoingFromBottom = false;
-let timer = null;
+let timer: number;
 
 let currentPositionRelative = 0;
-const avrTimeArr = [];
+const avrTimeArr: Array<number> = [];
 
 let isWaitRender = false;
 
@@ -83,7 +83,9 @@ const setPaddingToList = function (offset = 0): void {
   InfinityList.style.paddingBottom = `${paddingBottom}px`;
 };
 
-const setOffsetToList = function (forcedOffset: number): void {
+const setOffsetToList = function (
+  forcedOffset: number | undefined = undefined
+): void {
   console.log('currentListScroll', currentListScroll);
 
   if (forcedOffset !== undefined) {
@@ -240,9 +242,6 @@ const resetAllList = function () {
 
   console.log('Считаем среднее время рендера');
   const allTime = avrTimeArr.reduce((acc, el) => acc + el);
-  // console.log(avrTimeArr);
-  // console.log('элементов:', avrTimeArr.length);
-  // console.log('summ:', allTime);
   console.log('avg:', allTime / avrTimeArr.length);
 
   isWaitRender = false;
@@ -433,7 +432,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
     );
 
     isWaitRender = true;
-    timer = setTimeout(() => {
+    timer = window.setTimeout(() => {
       console.log('========== Очевидно, что вы закончили скроллить ========');
       resetAllList();
     }, 30);
