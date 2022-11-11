@@ -25,7 +25,7 @@ let GLOBAL_ITEM_COUNTER = 0;
 
 const delay = 0;
 
-const CurrentBigList = BigDataList1.data;
+const CurrentBigList = BigDataList2.data;
 
 const LIST_LENGTH = CurrentBigList.length;
 
@@ -54,6 +54,8 @@ let timer = null;
 
 let currentPositionRelative = 0;
 const avrTimeArr = [];
+
+let isWaitRender = false;
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -243,6 +245,8 @@ const resetAllList = function () {
   // console.log('summ:', allTime);
   console.log('avg:', allTime / avrTimeArr.length);
 
+  isWaitRender = false;
+
   if (InfinityScrollCurrentScrollPosition) {
     InfinityScrollCurrentScrollPosition.classList.remove('active');
   }
@@ -399,35 +403,27 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
     return;
   }
 
-  if (timer !== null && scrollDiff !== 0) {
+  if (timer !== null && isWaitRender === false) {
     clearTimeout(timer);
   }
 
-  if (scrollDirection === 'down') {
-    if (orderedNumberOfChunk <= tailingElementsAmount) {
-      isGoingFromBottom = false;
-    }
-  } else if (orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1) {
+  if (
+    scrollDirection === 'down' &&
+    orderedNumberOfChunk <= tailingElementsAmount
+  ) {
+    isGoingFromBottom = false;
+  } else if (
+    scrollDirection === 'up' &&
+    orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1
+  ) {
     isGoingFromBottom = true;
   }
 
-  // if (
-  //   scrollDirection === 'down' &&
-  //   orderedNumberOfChunk <= tailingElementsAmount
-  // ) {
-  //   isGoingFromBottom = false;
-  // } else if (
-  //   // scrollDirection === 'up' &&
-  //   orderedNumberOfChunk >=
-  //   LAST_CHUNK_ORDER_NUMBER - 1
-  // ) {
-  //   isGoingFromBottom = true;
-  // }
-
-  if (
+  const isBigDiff =
     (isGoingFromBottom && scrollDiff > chunkAmount + tailingElementsAmount) ||
-    (!isGoingFromBottom && scrollDiff > chunkAmount)
-  ) {
+    (!isGoingFromBottom && scrollDiff > chunkAmount);
+
+  if (isBigDiff && isWaitRender === false) {
     console.warn(
       `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
       'background-color: red;'
@@ -436,6 +432,7 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
       (scrollTop / (LIST_LENGTH * listItemHeight)) * 100
     );
 
+    isWaitRender = true;
     timer = setTimeout(() => {
       console.log('========== Очевидно, что вы закончили скроллить ========');
       resetAllList();
@@ -456,12 +453,6 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
     // DOM Manipulation
     modifyCurrentDOM();
-  } else {
-    // TODO: убрать после тестов
-    console.log(
-      'Если вы видите эту надпись последней в логах, то мы попали в баг'
-    );
-    console.log(currentListScroll, newCurrentListScroll);
   }
 };
 
