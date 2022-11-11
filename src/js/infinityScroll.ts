@@ -372,10 +372,6 @@ const modifyCurrentDOM = function () {
 };
 
 const calcCurrentDOMRender = function (e: Event & { target: Element }) {
-  if (timer !== null) {
-    clearTimeout(timer);
-  }
-
   const { scrollTop } = e.target;
   const orderedNumberOfChunk = Math.floor(scrollTop / chunkHeight);
 
@@ -403,17 +399,30 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
     return;
   }
 
+  if (timer !== null && scrollDiff !== 0) {
+    clearTimeout(timer);
+  }
+
   if (scrollDirection === 'down') {
     if (orderedNumberOfChunk <= tailingElementsAmount) {
-      // console.log(`%cisGoingFromBottom ${isGoingFromBottom}`, 'color: red;');
       isGoingFromBottom = false;
     }
-  } else {
-    if (orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1) {
-      isGoingFromBottom = true;
-    }
-    console.log('isGoingFromBottom', isGoingFromBottom);
+  } else if (orderedNumberOfChunk >= LAST_CHUNK_ORDER_NUMBER - 1) {
+    isGoingFromBottom = true;
   }
+
+  // if (
+  //   scrollDirection === 'down' &&
+  //   orderedNumberOfChunk <= tailingElementsAmount
+  // ) {
+  //   isGoingFromBottom = false;
+  // } else if (
+  //   // scrollDirection === 'up' &&
+  //   orderedNumberOfChunk >=
+  //   LAST_CHUNK_ORDER_NUMBER - 1
+  // ) {
+  //   isGoingFromBottom = true;
+  // }
 
   if (
     (isGoingFromBottom && scrollDiff > chunkAmount + tailingElementsAmount) ||
@@ -447,6 +456,12 @@ const calcCurrentDOMRender = function (e: Event & { target: Element }) {
 
     // DOM Manipulation
     modifyCurrentDOM();
+  } else {
+    // TODO: убрать после тестов
+    console.log(
+      'Если вы видите эту надпись последней в логах, то мы попали в баг'
+    );
+    console.log(currentListScroll, newCurrentListScroll);
   }
 };
 
