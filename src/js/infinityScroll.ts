@@ -25,7 +25,7 @@ let GLOBAL_ITEM_COUNTER = 0;
 
 const delay = 0;
 
-const CurrentBigList = BigDataList2.data;
+const CurrentBigList = BigDataList1.data;
 
 const LIST_LENGTH = CurrentBigList.length;
 
@@ -473,3 +473,34 @@ InfinityListWrapper?.addEventListener('scroll', (e) => {
 });
 
 getAllSizes(InfinityListWrapper, InfinityList);
+
+// START OF CLASS REALIZATION OF SCROLL
+
+interface InfinityScrollPropTypes {
+  name: string;
+  selectorId: string;
+  wrapperEl: HTMLElement;
+}
+
+class InfinityScroll {
+  private name: string;
+
+  private selectorId: string;
+
+  private wrapperEl: HTMLElement | null;
+
+  constructor(props: InfinityScrollPropTypes) {
+    this.name = props.name;
+    this.selectorId = props.selectorId;
+    this.wrapperEl = document.getElementById(props.selectorId);
+  }
+}
+
+const myProps: InfinityScrollPropTypes = {
+  name: 'my scroll list name',
+  selectorId: 'myInfinityScroll',
+};
+
+const myScroll = new InfinityScroll(myProps);
+
+console.log(myScroll);
