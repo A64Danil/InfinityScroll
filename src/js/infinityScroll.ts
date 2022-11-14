@@ -475,32 +475,189 @@ InfinityListWrapper?.addEventListener('scroll', (e) => {
 getAllSizes(InfinityListWrapper, InfinityList);
 
 // START OF CLASS REALIZATION OF SCROLL
+interface ListData {
+  name: string;
+  number: number;
+}
 
 interface InfinityScrollPropTypes {
+  data: Array<ListData>;
   name: string;
   selectorId: string;
   wrapperEl: HTMLElement;
+  listType: 'list' | 'table';
 }
 
+const myProps: InfinityScrollPropTypes = {
+  data: CurrentBigList,
+  name: 'my scroll list name',
+  selectorId: 'myInfinityScroll',
+  listType: 'list',
+};
+
+const nameToTag = {
+  list: 'UL',
+  table: 'TABLE',
+};
+
 class InfinityScroll {
+  private delay: number;
+
+  private timerId: number;
+
   private name: string;
 
   private selectorId: string;
 
   private wrapperEl: HTMLElement | null;
 
+  private listType: string;
+
+  private listEl: HTMLElement;
+
+  private GLOBAL_ITEM_COUNTER: number;
+
+  private LIST_LENGTH: number;
+
+  private LIST_FULL_VISIBLE_SIZE: number;
+
+  private LIST_HALF_VISIBLE_SIZE: number;
+
+  private LIST_START_OF_LAST_VISIBLE_SIZE: number;
+
+  private LIST_LAST_SCROLL_POSITION: number;
+
+  private chunkAmount: number;
+
+  private listWrpHeight: number;
+
+  private listItemHeight: number;
+
+  private chunkHeight: number;
+
+  private LAST_CHUNK_ORDER_NUMBER: number;
+
+  private tailingElementsAmount: number;
+
   constructor(props: InfinityScrollPropTypes) {
+    this.delay = 0;
+    this.GLOBAL_ITEM_COUNTER = 0;
+    console.log(props);
+    this.LIST_LENGTH = props.data.length;
+
     this.name = props.name;
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
+    this.listType = props.listType;
+  }
+
+  start() {
+    console.log('Здесь будем создавать список');
+    this.listEl = this.createInnerList();
+    console.log(this);
+    // this.setMainVars();
+    this.getAllSizes();
+    this.fillList(this);
+    this.getAllSizes();
+  }
+
+  createInnerList(): HTMLElement {
+    const newEl = document.createElement(nameToTag[this.listType]);
+    // ID-то наверное и не нужен вообще, если есть доступ к списку итак?
+    const newElID =
+      this.selectorId +
+      this.listType.charAt(0).toUpperCase() +
+      this.listType.slice(1);
+    newEl.setAttribute('id', newElID);
+    newEl.setAttribute('class', 'Demo_infinityScrollList');
+    return this.wrapperEl?.appendChild(newEl);
+  }
+
+  // createItem(elemNum: number): string {
+  //   const element = CurrentBigList[elemNum];
+  //   return TAG_TPL(element.name, element.number);
+  // }
+
+  fillList(that: this): void {
+    console.log('AGAIN!');
+    console.log('this.GLOBAL_ITEM_COUNTER', this.GLOBAL_ITEM_COUNTER);
+    console.log('this.LIST_FULL_VISIBLE_SIZE', this.LIST_FULL_VISIBLE_SIZE);
+    if (
+      this.GLOBAL_ITEM_COUNTER > 49999 ||
+      this.GLOBAL_ITEM_COUNTER >= this.LIST_LENGTH ||
+      this.GLOBAL_ITEM_COUNTER >= this.LIST_FULL_VISIBLE_SIZE
+    )
+      return;
+
+    let templateFragments = '';
+    for (
+      let i = 0;
+      i < 1000 &&
+      i < this.LIST_LENGTH - 1 &&
+      this.GLOBAL_ITEM_COUNTER < this.LIST_LENGTH &&
+      this.GLOBAL_ITEM_COUNTER < this.LIST_FULL_VISIBLE_SIZE;
+      i++
+    ) {
+      templateFragments += createItem(this.GLOBAL_ITEM_COUNTER);
+      this.GLOBAL_ITEM_COUNTER++;
+    }
+
+    console.log(this);
+    console.log(this.listEl);
+    this.listEl.innerHTML += templateFragments;
+
+    this.timerId = window.setTimeout(() => this.fillList(this), this.delay);
+  }
+
+  getAllSizes(): void {
+    const listWrp = this.wrapperEl;
+    const list = this.listEl;
+    const listStyles = window.getComputedStyle(list);
+    const listItem = list.firstChild as HTMLElement;
+    console.log(listItem);
+    this.listWrpHeight =
+      parseInt(
+        window.getComputedStyle(listWrp).getPropertyValue('height'),
+        10
+      ) || 1;
+
+    if (this.listWrpHeight < 2) {
+      console.error('You must set height to your list-wrapper!');
+      return;
+    }
+    if (InfinityScrollCurrentScrollPosition) {
+      InfinityScrollCurrentScrollPosition.style.height = `${this.listWrpHeight}px`;
+    }
+
+    this.listItemHeight = listItem?.offsetHeight || this.listWrpHeight;
+
+    this.chunkAmount = Math.ceil(this.listWrpHeight / this.listItemHeight);
+
+    console.log(this.listWrpHeight);
+    console.log('this.listItemHeight', this.listItemHeight);
+    console.log(this.chunkAmount);
+
+    this.LIST_FULL_VISIBLE_SIZE = this.chunkAmount * 4;
+    this.LIST_HALF_VISIBLE_SIZE = this.LIST_FULL_VISIBLE_SIZE / 2;
+    this.LIST_START_OF_LAST_VISIBLE_SIZE =
+      this.LIST_LENGTH - this.LIST_HALF_VISIBLE_SIZE;
+    this.LIST_LAST_SCROLL_POSITION =
+      this.LIST_LENGTH - this.LIST_FULL_VISIBLE_SIZE;
+
+    this.LAST_CHUNK_ORDER_NUMBER = Math.floor(
+      this.LIST_LENGTH / this.chunkAmount
+    );
+
+    this.chunkHeight = this.chunkAmount * this.listItemHeight;
+
+    this.tailingElementsAmount = this.LIST_LENGTH % this.chunkAmount;
+
+    console.log('Остаток - ', this.tailingElementsAmount);
+
+    // this.setPaddingToList();
   }
 }
 
-const myProps: InfinityScrollPropTypes = {
-  name: 'my scroll list name',
-  selectorId: 'myInfinityScroll',
-};
-
 const myScroll = new InfinityScroll(myProps);
 
-console.log(myScroll);
+myScroll.start();
