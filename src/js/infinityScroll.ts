@@ -49,7 +49,7 @@ interface ListData {
 }
 
 interface InfinityScrollPropTypes {
-  data: Array<ListData>;
+  data?: Array<ListData>;
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: string;
   name: string;
@@ -80,10 +80,10 @@ const instantListProps: InfinityScrollPropTypes = {
 
 const lazyListProps: InfinityScrollPropTypes = {
   data: BigJson1,
-  dataLoadType: 'instant',
-  dataUrl: '???',
+  dataLoadType: 'lazy',
+  dataUrl: 'https://jsonplaceholder.typicode.com/comments',
   name: 'my scroll list name',
-  selectorId: 'myInfinityScroll',
+  selectorId: 'lazyInfinityScrollWrapper',
   listType: 'list',
   templateString: (
     element: unknown,
@@ -113,9 +113,13 @@ class InfinityScroll {
 
   private wrapperEl: HTMLElement | null;
 
-  private listData: Array<ListData>;
+  private listData: Array<ListData> | Promise<unknown>;
 
   private listType: string;
+
+  private dataUrl: string | undefined;
+
+  private dataLoadType: 'instant' | 'lazy';
 
   private templateString: TplStringFn;
 
@@ -123,7 +127,7 @@ class InfinityScroll {
 
   private GLOBAL_ITEM_COUNTER = 0;
 
-  private LIST_LENGTH: number;
+  private LIST_LENGTH: number | undefined;
 
   private LIST_FULL_VISIBLE_SIZE = 4;
 
@@ -158,8 +162,15 @@ class InfinityScroll {
   private isWaitRender = false;
 
   constructor(props: InfinityScrollPropTypes) {
-    this.listData = props.data;
-    this.LIST_LENGTH = this.listData.length;
+    this.dataLoadType = props.dataLoadType;
+    if (this.dataLoadType === 'instant') {
+      this.listData = props.data;
+      this.LIST_LENGTH = this.listData && this.listData.length;
+      console.log(this.LIST_LENGTH);
+    } else {
+      this.dataUrl = props.dataUrl;
+      this.listData = this.getRemoteData().then((data) => data);
+    }
 
     this.templateString = props.templateString;
 
@@ -171,8 +182,13 @@ class InfinityScroll {
     this.listEl = this.createInnerList();
   }
 
-  start() {
+  async start() {
     console.log(this);
+    if (this.dataLoadType === 'lazy') {
+      const data = await this.listData;
+      console.log(data);
+      return;
+    }
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
     this.getAllSizes();
@@ -521,8 +537,35 @@ class InfinityScroll {
       this.modifyCurrentDOM();
     }
   }
+
+  async getRemoteData(): Promise<unknown> {
+    console.log('try to get data from', this.dataUrl);
+
+    await fetch(this.dataUrl).then((response) =>
+      response
+        .json()
+        .then((data) => {
+          console.log(data);
+          return data;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    );
+  }
 }
 
-const myScroll = new InfinityScroll(instantListProps);
+const instantList = document.getElementById(instantListProps.selectorId);
+if (instantList !== null) {
+  console.log('Instant list Started');
+  const myInstantScroll = new InfinityScroll(instantListProps);
+  myInstantScroll.start();
+}
 
-myScroll.start();
+const lazyList = document.getElementById(lazyListProps.selectorId);
+
+if (lazyList !== null) {
+  console.log('Lazy list Started');
+  const myLazyScroll = new InfinityScroll(lazyListProps);
+  myLazyScroll.start();
+}
