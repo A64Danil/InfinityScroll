@@ -4,19 +4,17 @@ import BigDataList100k from '../../mocks/bigList100000.json'; // import mock dat
 
 console.log('TS file loaded');
 
+const checkChildrenAmount = (length: number, fullSize: number): void => {
+  if (length !== fullSize) {
+    console.error('%cКоличесвто деток: ', 'color: tomato', length);
+  }
+};
+
 // TODO: придумать нормальные имена для элементов
 
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollListStartBtn'
 );
-
-// const InfinityScrollCurrentScrollPosition: HTMLElement | null = document.querySelector<HTMLElement>(
-//   '#infinityScrollCurrentScrollPosition'
-// );
-
-interface JsonDataList {
-  data: Array<any>;
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BigJson1 = BigDataList100.data;
@@ -62,7 +60,7 @@ interface InfinityScrollPropTypes {
 type TplStringFn = (el: unknown, context: InfinityScroll) => string;
 
 const myProps: InfinityScrollPropTypes = {
-  data: BigJson2,
+  data: BigJson1,
   name: 'my scroll list name',
   selectorId: 'myInfinityScroll',
   listType: 'list',
@@ -141,7 +139,6 @@ class InfinityScroll {
   constructor(props: InfinityScrollPropTypes) {
     this.delay = 0;
     this.GLOBAL_ITEM_COUNTER = 0;
-    console.log(props);
     this.listData = props.data;
     this.LIST_LENGTH = this.listData.length;
 
@@ -160,7 +157,6 @@ class InfinityScroll {
   }
 
   start() {
-    console.log('Здесь будем создавать список');
     this.listEl = this.createInnerList();
     console.log(this);
     // this.setMainVars();
@@ -209,7 +205,6 @@ class InfinityScroll {
     console.log('currentListScroll', this.currentListScroll);
 
     if (forcedOffset !== undefined) {
-      console.log('Вы задаёте start для оффсета вручную!');
       this.listEl.style.transform = `translate(0,${forcedOffset}px)`;
       this.setPaddingToList(forcedOffset);
       return;
@@ -221,7 +216,6 @@ class InfinityScroll {
     if (start < 0) {
       start = 0;
     }
-    console.log('start', start);
 
     // Если этого нет, то попадаем в padding 0!
     if (
@@ -237,10 +231,7 @@ class InfinityScroll {
     this.setPaddingToList(offset);
   }
 
-  fillList(that: this): void {
-    console.log('AGAIN!');
-    console.log('this.GLOBAL_ITEM_COUNTER', this.GLOBAL_ITEM_COUNTER);
-    console.log('this.LIST_FULL_VISIBLE_SIZE', this.LIST_FULL_VISIBLE_SIZE);
+  fillList(): void {
     if (
       this.GLOBAL_ITEM_COUNTER > 49999 ||
       this.GLOBAL_ITEM_COUNTER >= this.LIST_LENGTH ||
@@ -261,40 +252,28 @@ class InfinityScroll {
       this.GLOBAL_ITEM_COUNTER++;
     }
 
-    console.log(this);
-    console.log(this.listEl);
     this.listEl.innerHTML += templateFragments;
 
-    this.timerId = window.setTimeout(() => this.fillList(this), this.delay);
+    this.timerId = window.setTimeout(() => this.fillList(), this.delay);
   }
 
   getAllSizes(): void {
     const listWrp = this.wrapperEl;
     const list = this.listEl;
-    const listStyles = window.getComputedStyle(list);
+    const listWrpStyles = window.getComputedStyle(listWrp);
     const listItem = list.firstChild as HTMLElement;
-    console.log(listItem);
+
     this.listWrpHeight =
-      parseInt(
-        window.getComputedStyle(listWrp).getPropertyValue('height'),
-        10
-      ) || 1;
+      parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
 
     if (this.listWrpHeight < 2) {
       console.error('You must set height to your list-wrapper!');
       return;
     }
-    // if (InfinityScrollCurrentScrollPosition) {
-    //   InfinityScrollCurrentScrollPosition.style.height = `${this.listWrpHeight}px`;
-    // }
 
     this.listItemHeight = listItem?.offsetHeight || this.listWrpHeight;
 
     this.chunkAmount = Math.ceil(this.listWrpHeight / this.listItemHeight);
-
-    console.log(this.listWrpHeight);
-    console.log('this.listItemHeight', this.listItemHeight);
-    console.log(this.chunkAmount);
 
     this.LIST_FULL_VISIBLE_SIZE = this.chunkAmount * 4;
     this.LIST_HALF_VISIBLE_SIZE = this.LIST_FULL_VISIBLE_SIZE / 2;
@@ -310,8 +289,6 @@ class InfinityScroll {
     this.chunkHeight = this.chunkAmount * this.listItemHeight;
 
     this.tailingElementsAmount = this.LIST_LENGTH % this.chunkAmount;
-
-    console.log('Остаток - ', this.tailingElementsAmount);
 
     this.setPaddingToList();
   }
@@ -331,10 +308,6 @@ class InfinityScroll {
   }
 
   resetAllList(): void {
-    console.log(
-      'Будем перерисовывать весь список заново с учетом позиции',
-      this.currentListScroll
-    );
     const calculatedStart = this.currentListScroll - this.chunkAmount;
     const newStart =
       calculatedStart > this.LIST_LAST_SCROLL_POSITION
@@ -346,32 +319,27 @@ class InfinityScroll {
     if (newSequence < 0) newSequence = 0;
 
     const sequenceNumber = newSequence;
-    console.log('resetAllList sequenceNumber: ', sequenceNumber);
 
     let templateFragments = '';
     for (let i = 0; i < 1000 && i < this.LIST_FULL_VISIBLE_SIZE; i++) {
-      // TODO: убрать после тестов
-      // console.log('i + sequenceNumber ', i + sequenceNumber);
       // add items
       const elemNum = i + sequenceNumber;
       templateFragments += this.createItem(elemNum);
     }
 
     const newOffset = newSequence * this.listItemHeight;
-    console.log('newOffset', newOffset);
 
     this.listEl.innerHTML = templateFragments;
     this.setOffsetToList(newOffset);
 
-    console.log('Считаем среднее время рендера');
+    // TODO: убрать после тестов
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
-    console.log('avg:', allTime / this.avrTimeArr.length);
+    console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
     this.isWaitRender = false;
   }
 
   changeItemsInList(): void {
-    console.log('Change items in list');
     // for addItems
     let templateFragments = '';
 
@@ -388,7 +356,6 @@ class InfinityScroll {
     if (newSequence < 0) newSequence = 0;
 
     const sequenceNumber = newSequence;
-    console.log('CHANGE-ITEMS-IN-LIST sequenceNumber: ', sequenceNumber);
 
     for (let i = 0; i < 1000 && i < this.chunkAmount; i++) {
       const isStartOfList =
@@ -430,29 +397,6 @@ class InfinityScroll {
   }
 
   modifyCurrentDOM(): void {
-    // TODO: удалить после отладки
-    if (true) {
-      //  ===== временные переменные =====
-      const calculatedStart = this.currentListScroll - this.chunkAmount;
-      const newStart =
-        calculatedStart > this.LIST_LAST_SCROLL_POSITION
-          ? this.LIST_LAST_SCROLL_POSITION
-          : calculatedStart;
-
-      const calculatedEnd =
-        this.currentListScroll + this.LIST_HALF_VISIBLE_SIZE + this.chunkAmount;
-      const newEnd =
-        calculatedEnd > this.LIST_LENGTH ? this.LIST_LENGTH : calculatedEnd;
-
-      console.log('Диапазон поменялся');
-      console.log(
-        `currentListScroll: %c${this.currentListScroll}`,
-        'color: red; font-weight: bold;',
-        `, Range - от ${newStart + 1} до ${newEnd}`
-      );
-      //  ===== END временные переменные END=====
-    }
-
     const isBeginOfListFromTop =
       this.currentListScroll < this.LIST_HALF_VISIBLE_SIZE;
 
@@ -466,6 +410,7 @@ class InfinityScroll {
       this.currentListScroll < this.tailingElementsAmount;
 
     // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
+    // TODO: сделать рефакторинг 4х условий
     if (this.scrollDirection === 'down' && isBeginOfListFromTop) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return;
@@ -488,31 +433,23 @@ class InfinityScroll {
       return;
     }
 
-    console.log('После всех проверов');
-
     this.changeItemsInList();
     this.setOffsetToList();
 
-    if (this.listEl.childNodes.length !== this.LIST_FULL_VISIBLE_SIZE) {
-      console.error(
-        '%cКоличесвто деток: ',
-        'color: tomato',
-        this.listEl.childNodes.length
-      );
-    }
+    checkChildrenAmount(
+      this.listEl.childNodes.length,
+      this.LIST_FULL_VISIBLE_SIZE
+    );
   }
 
   calcCurrentDOMRender(e: Event & { target: Element }) {
     const { scrollTop } = e.target;
     const orderedNumberOfChunk = Math.floor(scrollTop / this.chunkHeight);
 
-    if (this.listEl.childNodes.length !== this.LIST_FULL_VISIBLE_SIZE) {
-      console.error(
-        '%cКоличесвто деток: ',
-        'color: tomato',
-        this.listEl.childNodes.length
-      );
-    }
+    checkChildrenAmount(
+      this.listEl.childNodes.length,
+      this.LIST_FULL_VISIBLE_SIZE
+    );
 
     let newCurrentListScroll = orderedNumberOfChunk * this.chunkAmount;
 
@@ -552,14 +489,8 @@ class InfinityScroll {
       (!this.isGoingFromBottom && scrollDiff > this.chunkAmount);
 
     if (isBigDiff && this.isWaitRender === false) {
-      console.warn(
-        `%cСлишком большой дифф, надо рендерить все заново. Дифф ${scrollDiff}`,
-        'background-color: red;'
-      );
-
       this.isWaitRender = true;
       this.timerId = window.setTimeout(() => {
-        console.log('========== Очевидно, что вы закончили скроллить ========');
         this.resetAllList();
       }, 30);
     }
@@ -568,10 +499,6 @@ class InfinityScroll {
       console.warn('====== currentListScroll поменялся ======');
       // TODO: удалить после отладки
       if (this.isGoingFromBottom) {
-        console.log(
-          '%c====> Прибавляем хвостик к скроллу',
-          'background-color: green;'
-        );
         newCurrentListScroll += this.tailingElementsAmount;
       }
       this.currentListScroll = newCurrentListScroll;
