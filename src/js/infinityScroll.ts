@@ -56,13 +56,26 @@ interface InfinityScrollPropTypes {
   selectorId: string;
   wrapperEl: HTMLElement;
   listType: 'list' | 'table';
+  templateString: TplStringFn;
 }
+
+type TplStringFn = (el: unknown, context: InfinityScroll) => string;
 
 const myProps: InfinityScrollPropTypes = {
   data: BigJson2,
   name: 'my scroll list name',
   selectorId: 'myInfinityScroll',
   listType: 'list',
+  templateString: (
+    element: unknown,
+    parentList?: InfinityScroll
+  ): string => `<li 
+        class="infinityScrollList__listItem" 
+        aria-setsize="${parentList.LIST_LENGTH}" 
+        aria-posinset="${element.number + 1}"
+        >
+            ${element.name} ${element.number + 1}
+    </li>`,
 };
 
 const nameToTag = {
@@ -84,6 +97,8 @@ class InfinityScroll {
   private listData: Array<ListData>;
 
   private listType: string;
+
+  private templateString: TplStringFn;
 
   private listEl: HTMLElement;
 
@@ -129,6 +144,8 @@ class InfinityScroll {
     console.log(props);
     this.listData = props.data;
     this.LIST_LENGTH = this.listData.length;
+
+    this.templateString = props.templateString;
 
     this.name = props.name;
     this.selectorId = props.selectorId;
@@ -299,19 +316,13 @@ class InfinityScroll {
     this.setPaddingToList();
   }
 
-  TAG_TPL(name: string, number: string | number) {
-    return `<li 
-        class="infinityScrollList__listItem" 
-        aria-setsize="${this.LIST_LENGTH}" 
-        aria-posinset="${number + 1}"
-        >
-            ${name} ${number + 1}
-    </li>`;
+  TAG_TPL(element: unknown) {
+    return this.templateString(element, this);
   }
 
   createItem(elemNum: number): string {
     const element = this.listData[elemNum];
-    return this.TAG_TPL(element.name, element.number);
+    return this.TAG_TPL(element);
   }
 
   removeItem(childPosition: string) {
