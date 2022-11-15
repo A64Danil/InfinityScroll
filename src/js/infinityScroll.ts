@@ -82,9 +82,9 @@ const nameToTag = {
 };
 
 class InfinityScroll {
-  private delay: number;
+  private delay = 0;
 
-  private timerId: number;
+  private timerId: number | undefined;
 
   private name: string;
 
@@ -98,47 +98,45 @@ class InfinityScroll {
 
   private templateString: TplStringFn;
 
-  private listEl: HTMLElement;
+  private listEl: HTMLElement | null = null;
 
-  private GLOBAL_ITEM_COUNTER: number;
+  private GLOBAL_ITEM_COUNTER = 0;
 
   private LIST_LENGTH: number;
 
-  private LIST_FULL_VISIBLE_SIZE: number;
+  private LIST_FULL_VISIBLE_SIZE = 4;
 
-  private LIST_HALF_VISIBLE_SIZE: number;
+  private LIST_HALF_VISIBLE_SIZE = 2;
 
-  private LIST_START_OF_LAST_VISIBLE_SIZE: number;
+  private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
 
-  private LIST_LAST_SCROLL_POSITION: number;
+  private LIST_LAST_SCROLL_POSITION = 0;
 
-  private currentListScroll: number;
+  private currentListScroll = 0;
 
-  private chunkAmount: number;
+  private chunkAmount = 2;
 
-  private listWrpHeight: number;
+  private listWrpHeight = 0;
 
-  private listItemHeight: number;
+  private listItemHeight = 0;
 
-  private chunkHeight: number;
+  private chunkHeight = 0;
 
-  private scrollDirection: string;
+  private scrollDirection = 'down';
 
-  private tailingElementsAmount: number;
+  private tailingElementsAmount = 0;
 
-  private lastScrollTopPosition: number;
+  private lastScrollTopPosition = 0;
 
-  private LAST_CHUNK_ORDER_NUMBER: number;
+  private LAST_CHUNK_ORDER_NUMBER = 0;
 
-  private isGoingFromBottom: boolean;
+  private isGoingFromBottom = false;
 
-  private avrTimeArr: Array<number>;
+  private avrTimeArr: Array<number> = [];
 
-  private isWaitRender: boolean;
+  private isWaitRender = false;
 
   constructor(props: InfinityScrollPropTypes) {
-    this.delay = 0;
-    this.GLOBAL_ITEM_COUNTER = 0;
     this.listData = props.data;
     this.LIST_LENGTH = this.listData.length;
 
@@ -148,12 +146,6 @@ class InfinityScroll {
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
     this.listType = props.listType;
-
-    this.scrollDirection = 'down';
-
-    this.isGoingFromBottom = false;
-    this.avrTimeArr = [];
-    this.isWaitRender = false;
   }
 
   start() {
@@ -162,7 +154,7 @@ class InfinityScroll {
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
     this.getAllSizes();
-    this.fillList(this);
+    this.fillList();
     this.getAllSizes();
 
     let startDate = Date.now();
