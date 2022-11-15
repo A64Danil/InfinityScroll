@@ -24,6 +24,8 @@ header h1 {
 .infinityScroll {
   position: relative;
 }
+
+// TODO:   overflow-y (и возможно высоту) надо вынести в параметеры старта списка
 .infinityScrollWrp {
   height: 290px;
   //height: 310px;
