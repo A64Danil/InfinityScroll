@@ -19,9 +19,9 @@ const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BigJson1 = BigDataList100.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BigJson2 = BigDataList10k.data;
+// const BigJson2 = BigDataList10k.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BigJson3 = BigDataList100k.data;
+// const BigJson3 = BigDataList100k.data;
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -50,17 +50,38 @@ interface ListData {
 
 interface InfinityScrollPropTypes {
   data: Array<ListData>;
+  dataLoadType: 'instant' | 'lazy';
+  dataUrl?: string;
   name: string;
   selectorId: string;
-  wrapperEl: HTMLElement;
   listType: 'list' | 'table';
   templateString: TplStringFn;
 }
 
 type TplStringFn = (el: unknown, context: InfinityScroll) => string;
 
-const myProps: InfinityScrollPropTypes = {
+const instantListProps: InfinityScrollPropTypes = {
   data: BigJson1,
+  dataLoadType: 'instant',
+  name: 'my scroll list name',
+  selectorId: 'instantInfinityScrollWrapper',
+  listType: 'list',
+  templateString: (
+    element: unknown,
+    parentList?: InfinityScroll
+  ): string => `<li 
+        class="Demo_infinityScrollList__listItem" 
+        aria-setsize="${parentList.LIST_LENGTH}" 
+        aria-posinset="${element.number + 1}"
+        >
+            ${element.name} ${element.number + 1}
+    </li>`,
+};
+
+const lazyListProps: InfinityScrollPropTypes = {
+  data: BigJson1,
+  dataLoadType: 'instant',
+  dataUrl: '???',
   name: 'my scroll list name',
   selectorId: 'myInfinityScroll',
   listType: 'list',
@@ -98,7 +119,7 @@ class InfinityScroll {
 
   private templateString: TplStringFn;
 
-  private listEl: HTMLElement | null = null;
+  private listEl: HTMLElement | null;
 
   private GLOBAL_ITEM_COUNTER = 0;
 
@@ -146,10 +167,11 @@ class InfinityScroll {
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
     this.listType = props.listType;
+
+    this.listEl = this.createInnerList();
   }
 
   start() {
-    this.listEl = this.createInnerList();
     console.log(this);
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
@@ -177,7 +199,7 @@ class InfinityScroll {
       this.listType.charAt(0).toUpperCase() +
       this.listType.slice(1);
     newEl.setAttribute('id', newElID);
-    // newEl.setAttribute('class', 'Demo_infinityScrollList');
+    newEl.setAttribute('class', 'Demo_infinityScrollList');
     return this.wrapperEl?.appendChild(newEl);
   }
 
@@ -501,6 +523,6 @@ class InfinityScroll {
   }
 }
 
-const myScroll = new InfinityScroll(myProps);
+const myScroll = new InfinityScroll(instantListProps);
 
 myScroll.start();
