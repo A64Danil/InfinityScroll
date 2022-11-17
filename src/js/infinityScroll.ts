@@ -76,7 +76,30 @@ class ChunkController {
 
 class ListController {
   // Содержит генерируемый элемент внутри корневого
-  private listEl: HTMLElement | null;
+  el: HTMLElement | null;
+
+  // Длина списка
+  length: number | undefined;
+
+  // Видимая часть списка (вычисляется по цсс-свойствам)
+  FULL_VISIBLE_SIZE = 0;
+
+  // Видимая часть списка (половина от полной)
+  HALF_VISIBLE_SIZE = 0;
+
+  // Номер позиции, с которой начинается последяя видимая часть списка
+  START_OF_LAST_VISIBLE_SIZE = 0;
+
+  // Высота обертки у списка
+  wrapperHeight = 0;
+
+  // Высота пункта списка
+  itemHeight = 0;
+
+  constructor(props) {
+    this.el = props.el;
+    console.log('Start List Controller', this);
+  }
 }
 
 class DomManager {
@@ -84,6 +107,7 @@ class DomManager {
 
   private targetElem;
 
+  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private template;
 
   private scroll: ScrollDetector;
@@ -195,8 +219,8 @@ class InfinityScroll {
   // Тип загрузки (список доступен сразу или надо качать с интернета)
   private dataLoadType: 'instant' | 'lazy';
 
-  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
-  private templateString: TplStringFn;
+  // (можно удалять) Содержит в себе хтмл-шаблон, в который мы положим данные из БД
+  // private templateString: TplStringFn;
 
   // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
@@ -205,16 +229,16 @@ class InfinityScroll {
   private GLOBAL_ITEM_COUNTER = 0;
 
   // Длина списка
-  private LIST_LENGTH: number | undefined;
+  // private LIST_LENGTH: number | undefined;
 
   // Видимая часть списка (вычисляется по цсс-свойствам)
-  private LIST_FULL_VISIBLE_SIZE = 4;
+  // private LIST_FULL_VISIBLE_SIZE = 4;
 
   // Видимая часть списка (половина от полной)
-  private LIST_HALF_VISIBLE_SIZE = 2;
+  // private LIST_HALF_VISIBLE_SIZE = 2;
 
   // Номер позиции, с которой начинается последяя видимая часть списка
-  private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
+  // private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
 
   // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
   // private LIST_LAST_SCROLL_POSITION = 0;
@@ -226,9 +250,9 @@ class InfinityScroll {
   // Размер чанка (чанк - видимая часть элементов в спике)
   // private chunkAmount = 2;
 
-  private listWrpHeight = 0;
+  // private listWrpHeight = 0;
 
-  private listItemHeight = 0;
+  // private listItemHeight = 0;
 
   // private chunkHeight = 0;
 
@@ -254,8 +278,10 @@ class InfinityScroll {
 
   private listChunk: ChunkController;
 
+  private list: ListController;
+
   constructor(props: InfinityScrollPropTypes) {
-    this.templateString = props.templateString;
+    // this.templateString = props.templateString;
     this.name = props.name;
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
@@ -267,10 +293,16 @@ class InfinityScroll {
 
     this.listChunk = new ChunkController();
 
+    const listProps = {
+      el: this.listEl,
+    };
+
+    this.list = new ListController(listProps);
+
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
-      template: this.templateString,
+      template: props.templateString,
       scrollDetector: this.scroll,
     };
 
@@ -278,8 +310,8 @@ class InfinityScroll {
 
     if (this.dataLoadType === 'instant') {
       this.listData = props.data;
-      this.LIST_LENGTH = this.listData && this.listData.length;
-      console.log(this.LIST_LENGTH);
+      this.list.length = this.listData && this.listData.length;
+      console.log(this.list.length);
       domChangerProps.data = this.listData;
       this.infinityDomChanger = new DomManager(domChangerProps);
       this.start();
@@ -293,7 +325,7 @@ class InfinityScroll {
         })
         .then((data) => {
           console.log('second then');
-          this.LIST_LENGTH = this.listData && this.listData.length;
+          this.list.length = this.listData && this.listData.length;
           domChangerProps.data = this.listData;
           this.infinityDomChanger = new DomManager(domChangerProps);
           this.start();
@@ -340,7 +372,7 @@ class InfinityScroll {
 
   setPaddingToList(offset = 0): void {
     let paddingBottom =
-      this.LIST_LENGTH * this.listItemHeight -
+      this.list.length * this.list.itemHeight -
       this.listChunk.chunkHeight * 4 -
       offset;
 
@@ -376,7 +408,7 @@ class InfinityScroll {
       start = this.scroll.LIST_LAST_SCROLL_POSITION;
     }
 
-    const offset = start * this.listItemHeight;
+    const offset = start * this.list.itemHeight;
 
     this.listEl.style.transform = `translate(0,${offset}px)`;
     this.setPaddingToList(offset);
@@ -385,8 +417,8 @@ class InfinityScroll {
   fillList(): void {
     if (
       this.GLOBAL_ITEM_COUNTER > 49999 ||
-      this.GLOBAL_ITEM_COUNTER >= this.LIST_LENGTH ||
-      this.GLOBAL_ITEM_COUNTER >= this.LIST_FULL_VISIBLE_SIZE
+      this.GLOBAL_ITEM_COUNTER >= this.list.length ||
+      this.GLOBAL_ITEM_COUNTER >= this.list.FULL_VISIBLE_SIZE
     )
       return;
 
@@ -394,9 +426,9 @@ class InfinityScroll {
     for (
       let i = 0;
       i < 1000 &&
-      i < this.LIST_LENGTH - 1 &&
-      this.GLOBAL_ITEM_COUNTER < this.LIST_LENGTH &&
-      this.GLOBAL_ITEM_COUNTER < this.LIST_FULL_VISIBLE_SIZE;
+      i < this.list.length - 1 &&
+      this.GLOBAL_ITEM_COUNTER < this.list.length &&
+      this.GLOBAL_ITEM_COUNTER < this.list.FULL_VISIBLE_SIZE;
       i++
     ) {
       templateFragments += this.infinityDomChanger.createItem(
@@ -416,42 +448,42 @@ class InfinityScroll {
     const listWrpStyles = window.getComputedStyle(listWrp);
     const listItem = list.firstChild as HTMLElement;
 
-    this.listWrpHeight =
+    this.list.wrapperHeight =
       parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
 
-    if (this.listWrpHeight < 2) {
+    if (this.list.wrapperHeight < 2) {
       console.error('You must set height to your list-wrapper!');
       return;
     }
 
-    this.listItemHeight = listItem?.offsetHeight || this.listWrpHeight;
+    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
     this.listChunk.chunkAmount = Math.ceil(
-      this.listWrpHeight / this.listItemHeight
+      this.list.wrapperHeight / this.list.itemHeight
     );
 
-    this.LIST_FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
-    this.LIST_HALF_VISIBLE_SIZE = this.LIST_FULL_VISIBLE_SIZE / 2;
-    this.LIST_START_OF_LAST_VISIBLE_SIZE =
-      this.LIST_LENGTH - this.LIST_HALF_VISIBLE_SIZE;
+    this.list.FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
+    this.list.HALF_VISIBLE_SIZE = this.list.FULL_VISIBLE_SIZE / 2;
+    this.list.START_OF_LAST_VISIBLE_SIZE =
+      this.list.length - this.list.HALF_VISIBLE_SIZE;
     this.scroll.LIST_LAST_SCROLL_POSITION =
-      this.LIST_LENGTH - this.LIST_FULL_VISIBLE_SIZE;
+      this.list.length - this.list.FULL_VISIBLE_SIZE;
 
     this.LAST_CHUNK_ORDER_NUMBER = Math.floor(
-      this.LIST_LENGTH / this.listChunk.chunkAmount
+      this.list.length / this.listChunk.chunkAmount
     );
 
     this.listChunk.chunkHeight =
-      this.listChunk.chunkAmount * this.listItemHeight;
+      this.listChunk.chunkAmount * this.list.itemHeight;
 
-    this.tailingElementsAmount = this.LIST_LENGTH % this.listChunk.chunkAmount;
+    this.tailingElementsAmount = this.list.length % this.listChunk.chunkAmount;
 
     this.setPaddingToList();
   }
 
-  TAG_TPL(element: unknown) {
-    return this.templateString(element, this);
-  }
+  // TAG_TPL(element: unknown) {
+  //   return this.templateString(element, this);
+  // }
 
   createItem(elemNum: number): string {
     const element = this.listData[elemNum];
@@ -478,13 +510,13 @@ class InfinityScroll {
     const sequenceNumber = newSequence;
 
     let templateFragments = '';
-    for (let i = 0; i < 1000 && i < this.LIST_FULL_VISIBLE_SIZE; i++) {
+    for (let i = 0; i < 1000 && i < this.list.FULL_VISIBLE_SIZE; i++) {
       // add items
       const elemNum = i + sequenceNumber;
       templateFragments += this.infinityDomChanger.createItem(elemNum);
     }
 
-    const newOffset = newSequence * this.listItemHeight;
+    const newOffset = newSequence * this.list.itemHeight;
 
     this.listEl.innerHTML = templateFragments;
     this.setOffsetToList(newOffset);
@@ -507,7 +539,7 @@ class InfinityScroll {
     // Это работает праивльно (в начале списка)
     let newSequence =
       this.scroll.scrollDirection === 'down'
-        ? this.scroll.currentListScroll + this.LIST_HALF_VISIBLE_SIZE
+        ? this.scroll.currentListScroll + this.list.HALF_VISIBLE_SIZE
         : this.scroll.currentListScroll - this.listChunk.chunkAmount;
 
     if (newSequence < 0) newSequence = 0;
@@ -525,7 +557,7 @@ class InfinityScroll {
 
       const isReachBottomLimit =
         this.scroll.scrollDirection === 'down' &&
-        i + sequenceNumber > this.LIST_LENGTH - 1;
+        i + sequenceNumber > this.list.length - 1;
 
       const allowToChange = !isReachTopLimit && !isReachBottomLimit;
 
@@ -555,14 +587,14 @@ class InfinityScroll {
 
   modifyCurrentDOM(): void {
     const isBeginOfListFromTop =
-      this.scroll.currentListScroll < this.LIST_HALF_VISIBLE_SIZE;
+      this.scroll.currentListScroll < this.list.HALF_VISIBLE_SIZE;
 
     const isEndOfListFromTop =
-      this.scroll.currentListScroll > this.LIST_START_OF_LAST_VISIBLE_SIZE;
+      this.scroll.currentListScroll > this.list.START_OF_LAST_VISIBLE_SIZE;
 
     const isBeginOfListFromBottom =
       this.scroll.currentListScroll >=
-      this.LIST_LENGTH - this.listChunk.chunkAmount * 3;
+      this.list.length - this.listChunk.chunkAmount * 3;
 
     const isEndOfListFromBottom =
       this.scroll.currentListScroll < this.tailingElementsAmount;
@@ -596,7 +628,7 @@ class InfinityScroll {
 
     checkChildrenAmount(
       this.listEl.childNodes.length,
-      this.LIST_FULL_VISIBLE_SIZE
+      this.list.FULL_VISIBLE_SIZE
     );
   }
 
@@ -608,7 +640,7 @@ class InfinityScroll {
 
     checkChildrenAmount(
       this.listEl.childNodes.length,
-      this.LIST_FULL_VISIBLE_SIZE
+      this.list.FULL_VISIBLE_SIZE
     );
 
     let newCurrentListScroll =
