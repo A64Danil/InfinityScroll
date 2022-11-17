@@ -113,14 +113,71 @@ class DomManager {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private template;
 
-  private scroll: ScrollDetector;
+  private list: ListController;
 
-  constructor(props: unknown) {
+  private listChunk: ChunkController;
+
+  private readonly scroll: ScrollDetector;
+
+  constructor(props: {
+    data: any;
+    targetElem: HTMLElement;
+    list: ListController;
+    chunk: ChunkController;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    template: Function;
+    scrollDetector: ScrollDetector;
+  }) {
     this.data = props.data;
     this.targetElem = props.targetElem;
+    this.list = props.list;
+    this.listChunk = props.chunk;
     this.template = props.template;
     this.scroll = props.scrollDetector;
-    console.log(this.scroll);
+  }
+
+  setPaddingToList(offset = 0): void {
+    let paddingBottom =
+      this.list.length * this.list.itemHeight -
+      this.listChunk.chunkHeight * 4 -
+      offset;
+
+    // TODO: проверить, попадаем ли мы туда
+    if (paddingBottom < 0) {
+      console.error('==========Мы попали в if paddingBottom < 0 =======');
+      paddingBottom = 0;
+    }
+    this.targetElem.style.paddingBottom = `${paddingBottom}px`;
+  }
+
+  setOffsetToList(forcedOffset: number | undefined = undefined): void {
+    console.log('currentListScroll', this.scroll.currentListScroll);
+
+    if (forcedOffset !== undefined) {
+      this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
+      this.setPaddingToList(forcedOffset);
+      return;
+    }
+
+    let start = this.scroll.currentListScroll - this.listChunk.chunkAmount;
+
+    // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
+    if (start < 0) {
+      start = 0;
+    }
+
+    // Если этого нет, то попадаем в padding 0!
+    if (
+      this.scroll.scrollDirection === 'down' &&
+      start > this.scroll.LIST_LAST_SCROLL_POSITION
+    ) {
+      start = this.scroll.LIST_LAST_SCROLL_POSITION;
+    }
+
+    const offset = start * this.list.itemHeight;
+
+    this.targetElem.style.transform = `translate(0,${offset}px)`;
+    this.setPaddingToList(offset);
   }
 
   createItem(elemNum: number): string {
@@ -232,7 +289,7 @@ class InfinityScroll {
 
   private isWaitRender = false;
 
-  private infinityDomChanger: DomManager;
+  private domMngr: DomManager;
 
   private scroll: ScrollDetector;
 
@@ -261,6 +318,8 @@ class InfinityScroll {
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
+      list: this.list,
+      chunk: this.listChunk,
       template: props.templateString,
       scrollDetector: this.scroll,
     };
@@ -272,7 +331,7 @@ class InfinityScroll {
       this.list.length = this.listData && this.listData.length;
       console.log(this.list.length);
       domChangerProps.data = this.listData;
-      this.infinityDomChanger = new DomManager(domChangerProps);
+      this.domMngr = new DomManager(domChangerProps);
       this.start();
     } else {
       this.dataUrl = props.dataUrl;
@@ -286,7 +345,7 @@ class InfinityScroll {
           console.log('second then');
           this.list.length = this.listData && this.listData.length;
           domChangerProps.data = this.listData;
-          this.infinityDomChanger = new DomManager(domChangerProps);
+          this.domMngr = new DomManager(domChangerProps);
           this.start();
         });
     }
@@ -329,50 +388,6 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  setPaddingToList(offset = 0): void {
-    let paddingBottom =
-      this.list.length * this.list.itemHeight -
-      this.listChunk.chunkHeight * 4 -
-      offset;
-
-    // TODO: проверить, попадаем ли мы туда
-    if (paddingBottom < 0) {
-      console.error('==========Мы попали в if paddingBottom < 0 =======');
-      paddingBottom = 0;
-    }
-    this.listEl.style.paddingBottom = `${paddingBottom}px`;
-  }
-
-  setOffsetToList(forcedOffset: number | undefined = undefined): void {
-    console.log('currentListScroll', this.scroll.currentListScroll);
-
-    if (forcedOffset !== undefined) {
-      this.listEl.style.transform = `translate(0,${forcedOffset}px)`;
-      this.setPaddingToList(forcedOffset);
-      return;
-    }
-
-    let start = this.scroll.currentListScroll - this.listChunk.chunkAmount;
-
-    // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
-    if (start < 0) {
-      start = 0;
-    }
-
-    // Если этого нет, то попадаем в padding 0!
-    if (
-      this.scroll.scrollDirection === 'down' &&
-      start > this.scroll.LIST_LAST_SCROLL_POSITION
-    ) {
-      start = this.scroll.LIST_LAST_SCROLL_POSITION;
-    }
-
-    const offset = start * this.list.itemHeight;
-
-    this.listEl.style.transform = `translate(0,${offset}px)`;
-    this.setPaddingToList(offset);
-  }
-
   fillList(): void {
     if (
       this.GLOBAL_ITEM_COUNTER > 49999 ||
@@ -390,9 +405,7 @@ class InfinityScroll {
       this.GLOBAL_ITEM_COUNTER < this.list.FULL_VISIBLE_SIZE;
       i++
     ) {
-      templateFragments += this.infinityDomChanger.createItem(
-        this.GLOBAL_ITEM_COUNTER
-      );
+      templateFragments += this.domMngr.createItem(this.GLOBAL_ITEM_COUNTER);
       this.GLOBAL_ITEM_COUNTER++;
     }
 
@@ -438,21 +451,7 @@ class InfinityScroll {
     this.list.tailingElementsAmount =
       this.list.length % this.listChunk.chunkAmount;
 
-    this.setPaddingToList();
-  }
-
-  // TAG_TPL(element: unknown) {
-  //   return this.templateString(element, this);
-  // }
-
-  createItem(elemNum: number): string {
-    const element = this.listData[elemNum];
-    return this.TAG_TPL(element);
-  }
-
-  removeItem(childPosition: string) {
-    const child = this.listEl[childPosition];
-    this.listEl.removeChild(child);
+    this.domMngr.setPaddingToList();
   }
 
   resetAllList(): void {
@@ -473,13 +472,13 @@ class InfinityScroll {
     for (let i = 0; i < 1000 && i < this.list.FULL_VISIBLE_SIZE; i++) {
       // add items
       const elemNum = i + sequenceNumber;
-      templateFragments += this.infinityDomChanger.createItem(elemNum);
+      templateFragments += this.domMngr.createItem(elemNum);
     }
 
     const newOffset = newSequence * this.list.itemHeight;
 
     this.listEl.innerHTML = templateFragments;
-    this.setOffsetToList(newOffset);
+    this.domMngr.setOffsetToList(newOffset);
 
     // TODO: убрать после тестов
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
@@ -531,9 +530,9 @@ class InfinityScroll {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        templateFragments += this.infinityDomChanger.createItem(elemNum);
+        templateFragments += this.domMngr.createItem(elemNum);
         // remove items
-        this.infinityDomChanger.removeItem(childPosition);
+        this.domMngr.removeItem(childPosition);
       }
     }
 
@@ -584,7 +583,7 @@ class InfinityScroll {
     }
 
     this.changeItemsInList();
-    this.setOffsetToList();
+    this.domMngr.setOffsetToList();
 
     checkChildrenAmount(
       this.listEl.childNodes.length,
