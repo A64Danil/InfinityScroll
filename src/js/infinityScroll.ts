@@ -67,7 +67,7 @@ class ChunkController {
   chunkHeight = 0;
 
   // Порядковый номер последнего чанка в списке
-  LAST_CHUNK_ORDER_NUMBER: number;
+  LAST_ORDER_NUMBER: number;
 
   constructor() {
     console.log('start ChunkController');
@@ -96,7 +96,10 @@ class ListController {
   // Высота пункта списка
   itemHeight = 0;
 
-  constructor(props) {
+  // Количество элементов в крайнем чанке
+  tailingElementsAmount = 0;
+
+  constructor(props: { el: any }) {
     this.el = props.el;
     console.log('Start List Controller', this);
   }
@@ -219,54 +222,11 @@ class InfinityScroll {
   // Тип загрузки (список доступен сразу или надо качать с интернета)
   private dataLoadType: 'instant' | 'lazy';
 
-  // (можно удалять) Содержит в себе хтмл-шаблон, в который мы положим данные из БД
-  // private templateString: TplStringFn;
-
   // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
 
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
-
-  // Длина списка
-  // private LIST_LENGTH: number | undefined;
-
-  // Видимая часть списка (вычисляется по цсс-свойствам)
-  // private LIST_FULL_VISIBLE_SIZE = 4;
-
-  // Видимая часть списка (половина от полной)
-  // private LIST_HALF_VISIBLE_SIZE = 2;
-
-  // Номер позиции, с которой начинается последяя видимая часть списка
-  // private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
-
-  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
-  // private LIST_LAST_SCROLL_POSITION = 0;
-
-  // Текущая позиция скролла
-  // Содержит номер элемента, с которого начинается текущая видимая часть
-  // private currentListScroll = 0;
-
-  // Размер чанка (чанк - видимая часть элементов в спике)
-  // private chunkAmount = 2;
-
-  // private listWrpHeight = 0;
-
-  // private listItemHeight = 0;
-
-  // private chunkHeight = 0;
-
-  // private scrollDirection = 'down';
-
-  private tailingElementsAmount = 0;
-
-  // Предыдущая величина скролла (в пикселях)
-  // private lastScrollTopPosition = 0;
-
-  // Порядковый номер последнего чанка в списке
-  private LAST_CHUNK_ORDER_NUMBER = 0;
-
-  // private isGoingFromBottom = false;
 
   private avrTimeArr: Array<number> = [];
 
@@ -281,7 +241,6 @@ class InfinityScroll {
   private list: ListController;
 
   constructor(props: InfinityScrollPropTypes) {
-    // this.templateString = props.templateString;
     this.name = props.name;
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
@@ -469,14 +428,15 @@ class InfinityScroll {
     this.scroll.LIST_LAST_SCROLL_POSITION =
       this.list.length - this.list.FULL_VISIBLE_SIZE;
 
-    this.LAST_CHUNK_ORDER_NUMBER = Math.floor(
+    this.listChunk.LAST_ORDER_NUMBER = Math.floor(
       this.list.length / this.listChunk.chunkAmount
     );
 
     this.listChunk.chunkHeight =
       this.listChunk.chunkAmount * this.list.itemHeight;
 
-    this.tailingElementsAmount = this.list.length % this.listChunk.chunkAmount;
+    this.list.tailingElementsAmount =
+      this.list.length % this.listChunk.chunkAmount;
 
     this.setPaddingToList();
   }
@@ -553,7 +513,7 @@ class InfinityScroll {
       const isReachTopLimit =
         this.scroll.isGoingFromBottom &&
         isStartOfList &&
-        i + sequenceNumber >= this.tailingElementsAmount;
+        i + sequenceNumber >= this.list.tailingElementsAmount;
 
       const isReachBottomLimit =
         this.scroll.scrollDirection === 'down' &&
@@ -597,7 +557,7 @@ class InfinityScroll {
       this.list.length - this.listChunk.chunkAmount * 3;
 
     const isEndOfListFromBottom =
-      this.scroll.currentListScroll < this.tailingElementsAmount;
+      this.scroll.currentListScroll < this.list.tailingElementsAmount;
 
     // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
     // TODO: сделать рефакторинг 4х условий
@@ -658,7 +618,7 @@ class InfinityScroll {
       this.scroll.currentListScroll - newCurrentListScroll
     );
 
-    if (scrollDiff !== 0 && scrollDiff <= this.tailingElementsAmount) {
+    if (scrollDiff !== 0 && scrollDiff <= this.list.tailingElementsAmount) {
       return;
     }
 
@@ -668,19 +628,20 @@ class InfinityScroll {
 
     if (
       this.scroll.scrollDirection === 'down' &&
-      orderedNumberOfChunk <= this.tailingElementsAmount
+      orderedNumberOfChunk <= this.list.tailingElementsAmount
     ) {
       this.scroll.isGoingFromBottom = false;
     } else if (
       this.scroll.scrollDirection === 'up' &&
-      orderedNumberOfChunk >= this.LAST_CHUNK_ORDER_NUMBER - 1
+      orderedNumberOfChunk >= this.listChunk.LAST_ORDER_NUMBER - 1
     ) {
       this.scroll.isGoingFromBottom = true;
     }
 
     const isBigDiff =
       (this.scroll.isGoingFromBottom &&
-        scrollDiff > this.listChunk.chunkAmount + this.tailingElementsAmount) ||
+        scrollDiff >
+          this.listChunk.chunkAmount + this.list.tailingElementsAmount) ||
       (!this.scroll.isGoingFromBottom &&
         scrollDiff > this.listChunk.chunkAmount);
 
@@ -695,7 +656,7 @@ class InfinityScroll {
       console.warn('====== currentListScroll поменялся ======');
       // TODO: удалить после отладки
       if (this.scroll.isGoingFromBottom) {
-        newCurrentListScroll += this.tailingElementsAmount;
+        newCurrentListScroll += this.list.tailingElementsAmount;
       }
       this.scroll.currentListScroll = newCurrentListScroll;
 
