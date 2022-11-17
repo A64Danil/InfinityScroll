@@ -42,15 +42,20 @@ StartBtn?.addEventListener('click', () => {
 // HELPER FUNCTIONS
 class ScrollDetector {
   // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
-  private LIST_LAST_SCROLL_POSITION = 0;
+  public LIST_LAST_SCROLL_POSITION = 0;
 
   // Текущая позиция скролла
   // Содержит номер элемента, с которого начинается текущая видимая часть
-  private currentListScroll = 0;
+  // private currentListScroll = 0;
+  public currentListScroll = 0;
 
-  private scrollDirection = 'down';
+  scrollDirection = 'down';
 
-  private isGoingFromBottom = false;
+  isGoingFromBottom = false;
+
+  constructor() {
+    console.log('start ScrollDetector');
+  }
 }
 
 class ChunkController {
@@ -75,10 +80,14 @@ class DomManager {
 
   private template;
 
+  private scroll: ScrollDetector;
+
   constructor(props: unknown) {
     this.data = props.data;
     this.targetElem = props.targetElem;
     this.template = props.template;
+    this.scroll = props.scrollDetector;
+    console.log(this.scroll);
   }
 
   createItem(elemNum: number): string {
@@ -202,11 +211,11 @@ class InfinityScroll {
   private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
 
   // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
-  private LIST_LAST_SCROLL_POSITION = 0;
+  // private LIST_LAST_SCROLL_POSITION = 0;
 
   // Текущая позиция скролла
   // Содержит номер элемента, с которого начинается текущая видимая часть
-  private currentListScroll = 0;
+  // private currentListScroll = 0;
 
   // Размер чанка (чанк - видимая часть элементов в спике)
   private chunkAmount = 2;
@@ -217,7 +226,7 @@ class InfinityScroll {
 
   private chunkHeight = 0;
 
-  private scrollDirection = 'down';
+  // private scrollDirection = 'down';
 
   private tailingElementsAmount = 0;
 
@@ -227,7 +236,7 @@ class InfinityScroll {
   // Порядковый номер последнего чанка в списке
   private LAST_CHUNK_ORDER_NUMBER = 0;
 
-  private isGoingFromBottom = false;
+  // private isGoingFromBottom = false;
 
   private avrTimeArr: Array<number> = [];
 
@@ -235,9 +244,10 @@ class InfinityScroll {
 
   private infinityDomChanger: DomManager;
 
+  private scroll: ScrollDetector;
+
   constructor(props: InfinityScrollPropTypes) {
     this.templateString = props.templateString;
-    console.log(this.templateString);
     this.name = props.name;
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
@@ -245,10 +255,13 @@ class InfinityScroll {
 
     this.listEl = this.createInnerList();
 
+    this.scroll = new ScrollDetector();
+
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
       template: this.templateString,
+      scrollDetector: this.scroll,
     };
 
     this.dataLoadType = props.dataLoadType;
@@ -259,7 +272,6 @@ class InfinityScroll {
       console.log(this.LIST_LENGTH);
       domChangerProps.data = this.listData;
       this.infinityDomChanger = new DomManager(domChangerProps);
-      console.log(this.infinityDomChanger);
       this.start();
     } else {
       this.dataUrl = props.dataUrl;
@@ -274,7 +286,6 @@ class InfinityScroll {
           this.LIST_LENGTH = this.listData && this.listData.length;
           domChangerProps.data = this.listData;
           this.infinityDomChanger = new DomManager(domChangerProps);
-          console.log(this.infinityDomChanger);
           this.start();
         });
     }
@@ -330,7 +341,7 @@ class InfinityScroll {
   }
 
   setOffsetToList(forcedOffset: number | undefined = undefined): void {
-    console.log('currentListScroll', this.currentListScroll);
+    console.log('currentListScroll', this.scroll.currentListScroll);
 
     if (forcedOffset !== undefined) {
       this.listEl.style.transform = `translate(0,${forcedOffset}px)`;
@@ -338,7 +349,7 @@ class InfinityScroll {
       return;
     }
 
-    let start = this.currentListScroll - this.chunkAmount;
+    let start = this.scroll.currentListScroll - this.chunkAmount;
 
     // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
     if (start < 0) {
@@ -347,10 +358,10 @@ class InfinityScroll {
 
     // Если этого нет, то попадаем в padding 0!
     if (
-      this.scrollDirection === 'down' &&
-      start > this.LIST_LAST_SCROLL_POSITION
+      this.scroll.scrollDirection === 'down' &&
+      start > this.scroll.LIST_LAST_SCROLL_POSITION
     ) {
-      start = this.LIST_LAST_SCROLL_POSITION;
+      start = this.scroll.LIST_LAST_SCROLL_POSITION;
     }
 
     const offset = start * this.listItemHeight;
@@ -409,7 +420,7 @@ class InfinityScroll {
     this.LIST_HALF_VISIBLE_SIZE = this.LIST_FULL_VISIBLE_SIZE / 2;
     this.LIST_START_OF_LAST_VISIBLE_SIZE =
       this.LIST_LENGTH - this.LIST_HALF_VISIBLE_SIZE;
-    this.LIST_LAST_SCROLL_POSITION =
+    this.scroll.LIST_LAST_SCROLL_POSITION =
       this.LIST_LENGTH - this.LIST_FULL_VISIBLE_SIZE;
 
     this.LAST_CHUNK_ORDER_NUMBER = Math.floor(
@@ -438,10 +449,10 @@ class InfinityScroll {
   }
 
   resetAllList(): void {
-    const calculatedStart = this.currentListScroll - this.chunkAmount;
+    const calculatedStart = this.scroll.currentListScroll - this.chunkAmount;
     const newStart =
-      calculatedStart > this.LIST_LAST_SCROLL_POSITION
-        ? this.LIST_LAST_SCROLL_POSITION
+      calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
+        ? this.scroll.LIST_LAST_SCROLL_POSITION
         : calculatedStart;
 
     let newSequence = newStart;
@@ -475,13 +486,13 @@ class InfinityScroll {
 
     // for removeItems
     const childPosition =
-      this.scrollDirection === 'down' ? 'firstChild' : 'lastChild';
+      this.scroll.scrollDirection === 'down' ? 'firstChild' : 'lastChild';
 
     // Это работает праивльно (в начале списка)
     let newSequence =
-      this.scrollDirection === 'down'
-        ? this.currentListScroll + this.LIST_HALF_VISIBLE_SIZE
-        : this.currentListScroll - this.chunkAmount;
+      this.scroll.scrollDirection === 'down'
+        ? this.scroll.currentListScroll + this.LIST_HALF_VISIBLE_SIZE
+        : this.scroll.currentListScroll - this.chunkAmount;
 
     if (newSequence < 0) newSequence = 0;
 
@@ -489,15 +500,15 @@ class InfinityScroll {
 
     for (let i = 0; i < 1000 && i < this.chunkAmount; i++) {
       const isStartOfList =
-        this.scrollDirection === 'up' && sequenceNumber === 0;
+        this.scroll.scrollDirection === 'up' && sequenceNumber === 0;
 
       const isReachTopLimit =
-        this.isGoingFromBottom &&
+        this.scroll.isGoingFromBottom &&
         isStartOfList &&
         i + sequenceNumber >= this.tailingElementsAmount;
 
       const isReachBottomLimit =
-        this.scrollDirection === 'down' &&
+        this.scroll.scrollDirection === 'down' &&
         i + sequenceNumber > this.LIST_LENGTH - 1;
 
       const allowToChange = !isReachTopLimit && !isReachBottomLimit;
@@ -519,7 +530,7 @@ class InfinityScroll {
     }
 
     // TODO: вынести в отдельную функцию?
-    if (this.scrollDirection === 'down') {
+    if (this.scroll.scrollDirection === 'down') {
       this.listEl.innerHTML += templateFragments;
     } else {
       this.listEl.innerHTML = templateFragments + this.listEl.innerHTML;
@@ -528,37 +539,37 @@ class InfinityScroll {
 
   modifyCurrentDOM(): void {
     const isBeginOfListFromTop =
-      this.currentListScroll < this.LIST_HALF_VISIBLE_SIZE;
+      this.scroll.currentListScroll < this.LIST_HALF_VISIBLE_SIZE;
 
     const isEndOfListFromTop =
-      this.currentListScroll > this.LIST_START_OF_LAST_VISIBLE_SIZE;
+      this.scroll.currentListScroll > this.LIST_START_OF_LAST_VISIBLE_SIZE;
 
     const isBeginOfListFromBottom =
-      this.currentListScroll >= this.LIST_LENGTH - this.chunkAmount * 3;
+      this.scroll.currentListScroll >= this.LIST_LENGTH - this.chunkAmount * 3;
 
     const isEndOfListFromBottom =
-      this.currentListScroll < this.tailingElementsAmount;
+      this.scroll.currentListScroll < this.tailingElementsAmount;
 
     // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
     // TODO: сделать рефакторинг 4х условий
-    if (this.scrollDirection === 'down' && isBeginOfListFromTop) {
+    if (this.scroll.scrollDirection === 'down' && isBeginOfListFromTop) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return;
     }
 
-    if (this.scrollDirection === 'down' && isEndOfListFromTop) {
+    if (this.scroll.scrollDirection === 'down' && isEndOfListFromTop) {
       console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
       return;
     }
 
-    if (this.scrollDirection === 'up' && isBeginOfListFromBottom) {
+    if (this.scroll.scrollDirection === 'up' && isBeginOfListFromBottom) {
       console.log(
         'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
       );
       return;
     }
 
-    if (this.scrollDirection === 'up' && isEndOfListFromBottom) {
+    if (this.scroll.scrollDirection === 'up' && isEndOfListFromBottom) {
       console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
       return;
     }
@@ -584,14 +595,16 @@ class InfinityScroll {
     let newCurrentListScroll = orderedNumberOfChunk * this.chunkAmount;
 
     if (scrollTop > this.lastScrollTopPosition) {
-      this.scrollDirection = 'down';
+      this.scroll.scrollDirection = 'down';
     } else {
-      this.scrollDirection = 'up';
+      this.scroll.scrollDirection = 'up';
     }
 
     this.lastScrollTopPosition = scrollTop;
 
-    const scrollDiff = Math.abs(this.currentListScroll - newCurrentListScroll);
+    const scrollDiff = Math.abs(
+      this.scroll.currentListScroll - newCurrentListScroll
+    );
 
     if (scrollDiff !== 0 && scrollDiff <= this.tailingElementsAmount) {
       return;
@@ -602,21 +615,21 @@ class InfinityScroll {
     }
 
     if (
-      this.scrollDirection === 'down' &&
+      this.scroll.scrollDirection === 'down' &&
       orderedNumberOfChunk <= this.tailingElementsAmount
     ) {
-      this.isGoingFromBottom = false;
+      this.scroll.isGoingFromBottom = false;
     } else if (
-      this.scrollDirection === 'up' &&
+      this.scroll.scrollDirection === 'up' &&
       orderedNumberOfChunk >= this.LAST_CHUNK_ORDER_NUMBER - 1
     ) {
-      this.isGoingFromBottom = true;
+      this.scroll.isGoingFromBottom = true;
     }
 
     const isBigDiff =
-      (this.isGoingFromBottom &&
+      (this.scroll.isGoingFromBottom &&
         scrollDiff > this.chunkAmount + this.tailingElementsAmount) ||
-      (!this.isGoingFromBottom && scrollDiff > this.chunkAmount);
+      (!this.scroll.isGoingFromBottom && scrollDiff > this.chunkAmount);
 
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
@@ -625,13 +638,13 @@ class InfinityScroll {
       }, 30);
     }
 
-    if (this.currentListScroll !== newCurrentListScroll) {
+    if (this.scroll.currentListScroll !== newCurrentListScroll) {
       console.warn('====== currentListScroll поменялся ======');
       // TODO: удалить после отладки
-      if (this.isGoingFromBottom) {
+      if (this.scroll.isGoingFromBottom) {
         newCurrentListScroll += this.tailingElementsAmount;
       }
-      this.currentListScroll = newCurrentListScroll;
+      this.scroll.currentListScroll = newCurrentListScroll;
 
       // DOM Manipulation
       this.modifyCurrentDOM();
