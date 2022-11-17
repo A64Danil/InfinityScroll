@@ -1,6 +1,5 @@
+// eslint-disable-next-line max-classes-per-file
 import BigDataList100 from '../../mocks/bigList100.json'; // import mock data
-import BigDataList10k from '../../mocks/bigList10000.json'; // import mock data
-import BigDataList100k from '../../mocks/bigList100000.json'; // import mock data
 
 console.log('TS file loaded');
 
@@ -42,7 +41,40 @@ StartBtn?.addEventListener('click', () => {
   console.log('Nothing happens');
 });
 
-// START OF CLASS REALIZATION OF SCROLL
+// HELPER FUNCTIONS
+class ScrollDetector {
+  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
+  private LIST_LAST_SCROLL_POSITION = 0;
+
+  // Текущая позиция скролла
+  // Содержит номер элемента, с которого начинается текущая видимая часть
+  private currentListScroll = 0;
+
+  private scrollDirection = 'down';
+
+  private isGoingFromBottom = false;
+}
+
+class ChunkController {
+  // Размер чанка (чанк - видимая часть элементов в спике)
+  private chunkAmount = 2;
+
+  private chunkHeight = 0;
+
+  // Порядковый номер последнего чанка в списке
+  private LAST_CHUNK_ORDER_NUMBER: number;
+}
+
+class ListController {
+  // Содержит генерируемый элемент внутри корневого
+  private listEl: HTMLElement | null;
+}
+
+class DomChanger {
+  // public context
+}
+
+// START OF CLASS REALIZATION OF INFINITYSCROLL
 interface ListData {
   name: string;
   number: number;
@@ -91,9 +123,9 @@ const lazyListProps: InfinityScrollPropTypes = {
   ): string => `<li 
         class="infinityScrollList__listItem" 
         aria-setsize="${parentList.LIST_LENGTH}" 
-        aria-posinset="${element.number + 1}"
+        aria-posinset="${element.id}"
         >
-            ${element.name} ${element.number + 1}
+            ${element.email} ${element.id}
     </li>`,
 };
 
@@ -103,42 +135,62 @@ const nameToTag = {
 };
 
 class InfinityScroll {
+  // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
   private delay = 0;
 
+  // хранит в себе id сетТаймаута
   private timerId: number | undefined;
 
+  // ввёл, но пока не использовал
   private name: string;
 
+  // хранит html-id главного корневого элемента
   private selectorId: string;
 
+  // хранит ссылку на корневой html-элеент
   private wrapperEl: HTMLElement | null;
 
-  private listData: Array<ListData> | Promise<unknown>;
+  // Массив данных для превращения в хтмл-ссписок
+  private listData: unknown;
 
+  // Тип списка (список или таблица)
   private listType: string;
 
+  // dataSourceUrl - Ссылка на БД, откуда качать инфу
   private dataUrl: string | undefined;
 
+  // Тип загрузки (список доступен сразу или надо качать с интернета)
   private dataLoadType: 'instant' | 'lazy';
 
+  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private templateString: TplStringFn;
 
+  // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
 
+  // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
+  // Длина списка
   private LIST_LENGTH: number | undefined;
 
+  // Видимая часть списка (вычисляется по цсс-свойствам)
   private LIST_FULL_VISIBLE_SIZE = 4;
 
+  // Видимая часть списка (половина от полной)
   private LIST_HALF_VISIBLE_SIZE = 2;
 
+  // Номер позиции, с которой начинается последяя видимая часть списка
   private LIST_START_OF_LAST_VISIBLE_SIZE = 2;
 
+  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
   private LIST_LAST_SCROLL_POSITION = 0;
 
+  // Текущая позиция скролла
+  // Содержит номер элемента, с которого начинается текущая видимая часть
   private currentListScroll = 0;
 
+  // Размер чанка (чанк - видимая часть элементов в спике)
   private chunkAmount = 2;
 
   private listWrpHeight = 0;
@@ -151,8 +203,10 @@ class InfinityScroll {
 
   private tailingElementsAmount = 0;
 
+  // Предыдущая величина скролла (в пикселях)
   private lastScrollTopPosition = 0;
 
+  // Порядковый номер последнего чанка в списке
   private LAST_CHUNK_ORDER_NUMBER = 0;
 
   private isGoingFromBottom = false;
@@ -167,9 +221,20 @@ class InfinityScroll {
       this.listData = props.data;
       this.LIST_LENGTH = this.listData && this.listData.length;
       console.log(this.LIST_LENGTH);
+      this.start();
     } else {
       this.dataUrl = props.dataUrl;
-      this.listData = this.getRemoteData().then((data) => data);
+      this.getRemoteData()
+        .then((data) => {
+          console.log(data);
+          this.listData = data;
+          return data;
+        })
+        .then((data) => {
+          console.log('second then');
+          this.LIST_LENGTH = this.listData && this.listData.length;
+          this.start();
+        });
     }
 
     this.templateString = props.templateString;
@@ -182,13 +247,13 @@ class InfinityScroll {
     this.listEl = this.createInnerList();
   }
 
-  async start() {
+  start() {
     console.log(this);
     if (this.dataLoadType === 'lazy') {
-      const data = await this.listData;
-      console.log(data);
-      return;
+      console.log(this.listData);
+      // return;
     }
+    console.log('before get sizes');
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
     this.getAllSizes();
@@ -538,10 +603,10 @@ class InfinityScroll {
     }
   }
 
-  async getRemoteData(): Promise<unknown> {
+  getRemoteData(): Promise<unknown> {
     console.log('try to get data from', this.dataUrl);
 
-    await fetch(this.dataUrl).then((response) =>
+    return fetch(this.dataUrl).then((response) =>
       response
         .json()
         .then((data) => {
@@ -559,7 +624,6 @@ const instantList = document.getElementById(instantListProps.selectorId);
 if (instantList !== null) {
   console.log('Instant list Started');
   const myInstantScroll = new InfinityScroll(instantListProps);
-  myInstantScroll.start();
 }
 
 const lazyList = document.getElementById(lazyListProps.selectorId);
@@ -567,5 +631,4 @@ const lazyList = document.getElementById(lazyListProps.selectorId);
 if (lazyList !== null) {
   console.log('Lazy list Started');
   const myLazyScroll = new InfinityScroll(lazyListProps);
-  myLazyScroll.start();
 }
