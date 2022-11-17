@@ -9,8 +9,6 @@ const checkChildrenAmount = (length: number, fullSize: number): void => {
   }
 };
 
-// TODO: придумать нормальные имена для элементов
-
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
   '#infinityScrollListStartBtn'
 );
@@ -70,8 +68,28 @@ class ListController {
   private listEl: HTMLElement | null;
 }
 
-class DomChanger {
-  // public context
+class DomManager {
+  private data;
+
+  private targetElem;
+
+  private template;
+
+  constructor(props: unknown) {
+    this.data = props.data;
+    this.targetElem = props.targetElem;
+    this.template = props.template;
+  }
+
+  createItem(elemNum: number): string {
+    const element = this.data[elemNum];
+    return this.template(element, this.targetElem);
+  }
+
+  removeItem(childPosition: string): void {
+    const child = this.targetElem[childPosition];
+    this.targetElem.removeChild(child);
+  }
 }
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
@@ -215,12 +233,33 @@ class InfinityScroll {
 
   private isWaitRender = false;
 
+  private infinityDomChanger: DomManager;
+
   constructor(props: InfinityScrollPropTypes) {
+    this.templateString = props.templateString;
+    console.log(this.templateString);
+    this.name = props.name;
+    this.selectorId = props.selectorId;
+    this.wrapperEl = document.getElementById(props.selectorId);
+    this.listType = props.listType;
+
+    this.listEl = this.createInnerList();
+
+    const domChangerProps = {
+      data: null,
+      targetElem: this.listEl,
+      template: this.templateString,
+    };
+
     this.dataLoadType = props.dataLoadType;
+
     if (this.dataLoadType === 'instant') {
       this.listData = props.data;
       this.LIST_LENGTH = this.listData && this.listData.length;
       console.log(this.LIST_LENGTH);
+      domChangerProps.data = this.listData;
+      this.infinityDomChanger = new DomManager(domChangerProps);
+      console.log(this.infinityDomChanger);
       this.start();
     } else {
       this.dataUrl = props.dataUrl;
@@ -233,18 +272,12 @@ class InfinityScroll {
         .then((data) => {
           console.log('second then');
           this.LIST_LENGTH = this.listData && this.listData.length;
+          domChangerProps.data = this.listData;
+          this.infinityDomChanger = new DomManager(domChangerProps);
+          console.log(this.infinityDomChanger);
           this.start();
         });
     }
-
-    this.templateString = props.templateString;
-
-    this.name = props.name;
-    this.selectorId = props.selectorId;
-    this.wrapperEl = document.getElementById(props.selectorId);
-    this.listType = props.listType;
-
-    this.listEl = this.createInnerList();
   }
 
   start() {
@@ -343,7 +376,9 @@ class InfinityScroll {
       this.GLOBAL_ITEM_COUNTER < this.LIST_FULL_VISIBLE_SIZE;
       i++
     ) {
-      templateFragments += this.createItem(this.GLOBAL_ITEM_COUNTER);
+      templateFragments += this.infinityDomChanger.createItem(
+        this.GLOBAL_ITEM_COUNTER
+      );
       this.GLOBAL_ITEM_COUNTER++;
     }
 
@@ -419,7 +454,7 @@ class InfinityScroll {
     for (let i = 0; i < 1000 && i < this.LIST_FULL_VISIBLE_SIZE; i++) {
       // add items
       const elemNum = i + sequenceNumber;
-      templateFragments += this.createItem(elemNum);
+      templateFragments += this.infinityDomChanger.createItem(elemNum);
     }
 
     const newOffset = newSequence * this.listItemHeight;
@@ -477,9 +512,9 @@ class InfinityScroll {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        templateFragments += this.createItem(elemNum);
+        templateFragments += this.infinityDomChanger.createItem(elemNum);
         // remove items
-        this.removeItem(childPosition);
+        this.infinityDomChanger.removeItem(childPosition);
       }
     }
 
