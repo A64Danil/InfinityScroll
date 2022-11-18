@@ -106,12 +106,21 @@ class ListController {
 }
 
 class DomManager {
+  // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
+  private delay = 0;
+
+  // хранит в себе id сетТаймаута
+  private fillListTimerId: number | undefined;
+
   private data;
 
   private targetElem;
 
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private template;
+
+  // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
+  private GLOBAL_ITEM_COUNTER = 0;
 
   private list: ListController;
 
@@ -189,6 +198,32 @@ class DomManager {
     const child = this.targetElem[childPosition];
     this.targetElem.removeChild(child);
   }
+
+  fillList(): void {
+    if (
+      this.GLOBAL_ITEM_COUNTER > 49999 ||
+      this.GLOBAL_ITEM_COUNTER >= this.list.length ||
+      this.GLOBAL_ITEM_COUNTER >= this.list.FULL_VISIBLE_SIZE
+    )
+      return;
+
+    let templateFragments = '';
+    for (
+      let i = 0;
+      i < 1000 &&
+      i < this.list.length - 1 &&
+      this.GLOBAL_ITEM_COUNTER < this.list.length &&
+      this.GLOBAL_ITEM_COUNTER < this.list.FULL_VISIBLE_SIZE;
+      i++
+    ) {
+      templateFragments += this.createItem(this.GLOBAL_ITEM_COUNTER);
+      this.GLOBAL_ITEM_COUNTER++;
+    }
+
+    this.targetElem.innerHTML += templateFragments;
+
+    this.fillListTimerId = window.setTimeout(() => this.fillList(), this.delay);
+  }
 }
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
@@ -252,11 +287,8 @@ const nameToTag = {
 };
 
 class InfinityScroll {
-  // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
-  private delay = 0;
-
   // хранит в себе id сетТаймаута
-  private timerId: number | undefined;
+  private timerIdRefreshList: number | undefined;
 
   // ввёл, но пока не использовал
   private name: string;
@@ -281,9 +313,6 @@ class InfinityScroll {
 
   // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
-
-  // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
-  private GLOBAL_ITEM_COUNTER = 0;
 
   private avrTimeArr: Array<number> = [];
 
@@ -361,7 +390,7 @@ class InfinityScroll {
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
     this.getAllSizes();
-    this.fillList();
+    this.domMngr.fillList();
     this.getAllSizes();
 
     let startDate = Date.now();
@@ -388,32 +417,7 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  fillList(): void {
-    if (
-      this.GLOBAL_ITEM_COUNTER > 49999 ||
-      this.GLOBAL_ITEM_COUNTER >= this.list.length ||
-      this.GLOBAL_ITEM_COUNTER >= this.list.FULL_VISIBLE_SIZE
-    )
-      return;
-
-    let templateFragments = '';
-    for (
-      let i = 0;
-      i < 1000 &&
-      i < this.list.length - 1 &&
-      this.GLOBAL_ITEM_COUNTER < this.list.length &&
-      this.GLOBAL_ITEM_COUNTER < this.list.FULL_VISIBLE_SIZE;
-      i++
-    ) {
-      templateFragments += this.domMngr.createItem(this.GLOBAL_ITEM_COUNTER);
-      this.GLOBAL_ITEM_COUNTER++;
-    }
-
-    this.listEl.innerHTML += templateFragments;
-
-    this.timerId = window.setTimeout(() => this.fillList(), this.delay);
-  }
-
+  // List
   getAllSizes(): void {
     const listWrp = this.wrapperEl;
     const list = this.listEl;
@@ -454,6 +458,7 @@ class InfinityScroll {
     this.domMngr.setPaddingToList();
   }
 
+  // DOM
   resetAllList(): void {
     const calculatedStart =
       this.scroll.currentListScroll - this.listChunk.chunkAmount;
@@ -487,6 +492,7 @@ class InfinityScroll {
     this.isWaitRender = false;
   }
 
+  // DOM
   changeItemsInList(): void {
     // for addItems
     let templateFragments = '';
@@ -544,6 +550,7 @@ class InfinityScroll {
     }
   }
 
+  // SCROLL + DOM
   modifyCurrentDOM(): void {
     const isBeginOfListFromTop =
       this.scroll.currentListScroll < this.list.HALF_VISIBLE_SIZE;
@@ -621,8 +628,8 @@ class InfinityScroll {
       return;
     }
 
-    if (this.timerId !== null && this.isWaitRender === false) {
-      clearTimeout(this.timerId);
+    if (this.timerIdRefreshList !== null && this.isWaitRender === false) {
+      clearTimeout(this.timerIdRefreshList);
     }
 
     if (
@@ -646,7 +653,7 @@ class InfinityScroll {
 
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
-      this.timerId = window.setTimeout(() => {
+      this.timerIdRefreshList = window.setTimeout(() => {
         this.resetAllList();
       }, 30);
     }
