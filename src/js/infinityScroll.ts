@@ -76,7 +76,7 @@ class ChunkController {
 
 class ListController {
   // Содержит генерируемый элемент внутри корневого
-  el: HTMLElement | null;
+  el: HTMLElement;
 
   // Длина списка
   length: number | undefined;
@@ -99,9 +99,60 @@ class ListController {
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
 
-  constructor(props: { el: any }) {
+  private readonly wrapperEl: HTMLElement;
+
+  private listChunk: ChunkController;
+
+  private readonly scroll: ScrollDetector;
+
+  constructor(props: {
+    wrapperEl: HTMLElement;
+    el: HTMLElement;
+    scroll: ScrollDetector;
+    listChunk: ChunkController;
+  }) {
     this.el = props.el;
+    this.wrapperEl = props.wrapperEl;
+    this.listChunk = props.listChunk;
+    this.scroll = props.scroll;
     console.log('Start List Controller', this);
+  }
+
+  getAllSizes(): void {
+    console.log('GET SIZES');
+    const listWrp = this.wrapperEl;
+    const list = this.el;
+    const listWrpStyles = window.getComputedStyle(listWrp);
+    const listItem = list.firstChild as HTMLElement;
+
+    this.wrapperHeight =
+      parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
+
+    if (this.wrapperHeight < 2) {
+      console.error('You must set height to your list-wrapper!');
+      return;
+    }
+
+    this.itemHeight = listItem?.offsetHeight || this.wrapperHeight;
+
+    this.listChunk.chunkAmount = Math.ceil(
+      this.wrapperHeight / this.itemHeight
+    );
+
+    this.FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
+    this.HALF_VISIBLE_SIZE = this.FULL_VISIBLE_SIZE / 2;
+    this.START_OF_LAST_VISIBLE_SIZE = this.length - this.HALF_VISIBLE_SIZE;
+    console.log(this.scroll.LIST_LAST_SCROLL_POSITION);
+    this.scroll.LIST_LAST_SCROLL_POSITION =
+      this.length - this.FULL_VISIBLE_SIZE;
+
+    this.listChunk.LAST_ORDER_NUMBER = Math.floor(
+      this.length / this.listChunk.chunkAmount
+    );
+
+    this.listChunk.chunkHeight = this.listChunk.chunkAmount * this.itemHeight;
+
+    this.tailingElementsAmount = this.length % this.listChunk.chunkAmount;
   }
 }
 
@@ -340,6 +391,9 @@ class InfinityScroll {
 
     const listProps = {
       el: this.listEl,
+      wrapperEl: this.wrapperEl,
+      scroll: this.scroll,
+      listChunk: this.listChunk,
     };
 
     this.list = new ListController(listProps);
@@ -389,9 +443,10 @@ class InfinityScroll {
     console.log('before get sizes');
     // this.setMainVars();
     // TODO: перебрать эту часть чтобы не было двух повторных вызовов
-    this.getAllSizes();
+    this.list.getAllSizes();
     this.domMngr.fillList();
-    this.getAllSizes();
+    this.list.getAllSizes();
+    this.domMngr.setPaddingToList();
 
     let startDate = Date.now();
 
@@ -415,47 +470,6 @@ class InfinityScroll {
     newEl.setAttribute('id', newElID);
     newEl.setAttribute('class', 'Demo_infinityScrollList');
     return this.wrapperEl?.appendChild(newEl);
-  }
-
-  // List
-  getAllSizes(): void {
-    const listWrp = this.wrapperEl;
-    const list = this.listEl;
-    const listWrpStyles = window.getComputedStyle(listWrp);
-    const listItem = list.firstChild as HTMLElement;
-
-    this.list.wrapperHeight =
-      parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
-
-    if (this.list.wrapperHeight < 2) {
-      console.error('You must set height to your list-wrapper!');
-      return;
-    }
-
-    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
-
-    this.listChunk.chunkAmount = Math.ceil(
-      this.list.wrapperHeight / this.list.itemHeight
-    );
-
-    this.list.FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
-    this.list.HALF_VISIBLE_SIZE = this.list.FULL_VISIBLE_SIZE / 2;
-    this.list.START_OF_LAST_VISIBLE_SIZE =
-      this.list.length - this.list.HALF_VISIBLE_SIZE;
-    this.scroll.LIST_LAST_SCROLL_POSITION =
-      this.list.length - this.list.FULL_VISIBLE_SIZE;
-
-    this.listChunk.LAST_ORDER_NUMBER = Math.floor(
-      this.list.length / this.listChunk.chunkAmount
-    );
-
-    this.listChunk.chunkHeight =
-      this.listChunk.chunkAmount * this.list.itemHeight;
-
-    this.list.tailingElementsAmount =
-      this.list.length % this.listChunk.chunkAmount;
-
-    this.domMngr.setPaddingToList();
   }
 
   // DOM
