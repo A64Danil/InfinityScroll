@@ -91,7 +91,6 @@ class ScrollDetector {
   }
 
   isAllowRenderNearBorder() {
-    console.log('isAllowRenderNearBorder');
     if (this.scrollDirection === 'down' && this.isBeginOfListFromTop()) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return false;
@@ -430,6 +429,20 @@ class DomManager {
       this.targetElem.innerHTML = templateFragments + this.targetElem.innerHTML;
     }
   }
+
+  modifyCurrentDOM(): void {
+    if (!this.scroll.isAllowRenderNearBorder()) {
+      return;
+    }
+
+    this.changeItemsInList();
+    this.setOffsetToList();
+
+    checkChildrenAmount(
+      this.listEl.childNodes.length,
+      this.list.FULL_VISIBLE_SIZE
+    );
+  }
 }
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
@@ -631,7 +644,6 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  // SCROLL + DOM
   modifyCurrentDOM(): void {
     if (!this.scroll.isAllowRenderNearBorder()) {
       return;
@@ -715,7 +727,7 @@ class InfinityScroll {
       this.scroll.currentListScroll = newCurrentListScroll;
 
       // DOM Manipulation
-      this.modifyCurrentDOM();
+      this.domMngr.modifyCurrentDOM();
     }
   }
 
