@@ -315,6 +315,63 @@ class DomManager {
     // TODO: не хватает этой переменной
     this.infinityScroll.isWaitRender = false;
   }
+
+  changeItemsInList(): void {
+    // for addItems
+    let templateFragments = '';
+
+    // for removeItems
+    const childPosition =
+      this.scroll.scrollDirection === 'down' ? 'firstChild' : 'lastChild';
+
+    // Это работает праивльно (в начале списка)
+    let newSequence =
+      this.scroll.scrollDirection === 'down'
+        ? this.scroll.currentListScroll + this.list.HALF_VISIBLE_SIZE
+        : this.scroll.currentListScroll - this.listChunk.chunkAmount;
+
+    if (newSequence < 0) newSequence = 0;
+
+    const sequenceNumber = newSequence;
+
+    for (let i = 0; i < 1000 && i < this.listChunk.chunkAmount; i++) {
+      const isStartOfList =
+        this.scroll.scrollDirection === 'up' && sequenceNumber === 0;
+
+      const isReachTopLimit =
+        this.scroll.isGoingFromBottom &&
+        isStartOfList &&
+        i + sequenceNumber >= this.list.tailingElementsAmount;
+
+      const isReachBottomLimit =
+        this.scroll.scrollDirection === 'down' &&
+        i + sequenceNumber > this.list.length - 1;
+
+      const allowToChange = !isReachTopLimit && !isReachBottomLimit;
+
+      // TODO: убрать после тестов
+      if (isReachBottomLimit) {
+        console.warn('Выходим за пределы списка в его нижней части');
+      } else if (isReachTopLimit) {
+        console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+      }
+
+      if (allowToChange) {
+        // add items
+        const elemNum = i + sequenceNumber;
+        templateFragments += this.createItem(elemNum);
+        // remove items
+        this.removeItem(childPosition);
+      }
+    }
+
+    // TODO: вынести в отдельную функцию?
+    if (this.scroll.scrollDirection === 'down') {
+      this.targetElem.innerHTML += templateFragments;
+    } else {
+      this.targetElem.innerHTML = templateFragments + this.targetElem.innerHTML;
+    }
+  }
 }
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
@@ -513,64 +570,6 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  // DOM
-  changeItemsInList(): void {
-    // for addItems
-    let templateFragments = '';
-
-    // for removeItems
-    const childPosition =
-      this.scroll.scrollDirection === 'down' ? 'firstChild' : 'lastChild';
-
-    // Это работает праивльно (в начале списка)
-    let newSequence =
-      this.scroll.scrollDirection === 'down'
-        ? this.scroll.currentListScroll + this.list.HALF_VISIBLE_SIZE
-        : this.scroll.currentListScroll - this.listChunk.chunkAmount;
-
-    if (newSequence < 0) newSequence = 0;
-
-    const sequenceNumber = newSequence;
-
-    for (let i = 0; i < 1000 && i < this.listChunk.chunkAmount; i++) {
-      const isStartOfList =
-        this.scroll.scrollDirection === 'up' && sequenceNumber === 0;
-
-      const isReachTopLimit =
-        this.scroll.isGoingFromBottom &&
-        isStartOfList &&
-        i + sequenceNumber >= this.list.tailingElementsAmount;
-
-      const isReachBottomLimit =
-        this.scroll.scrollDirection === 'down' &&
-        i + sequenceNumber > this.list.length - 1;
-
-      const allowToChange = !isReachTopLimit && !isReachBottomLimit;
-
-      // TODO: убрать после тестов
-      if (isReachBottomLimit) {
-        console.warn('Выходим за пределы списка в его нижней части');
-      } else if (isReachTopLimit) {
-        console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
-      }
-
-      if (allowToChange) {
-        // add items
-        const elemNum = i + sequenceNumber;
-        templateFragments += this.domMngr.createItem(elemNum);
-        // remove items
-        this.domMngr.removeItem(childPosition);
-      }
-    }
-
-    // TODO: вынести в отдельную функцию?
-    if (this.scroll.scrollDirection === 'down') {
-      this.listEl.innerHTML += templateFragments;
-    } else {
-      this.listEl.innerHTML = templateFragments + this.listEl.innerHTML;
-    }
-  }
-
   // SCROLL + DOM
   modifyCurrentDOM(): void {
     const isBeginOfListFromTop =
@@ -610,7 +609,7 @@ class InfinityScroll {
       return;
     }
 
-    this.changeItemsInList();
+    this.domMngr.changeItemsInList();
     this.domMngr.setOffsetToList();
 
     checkChildrenAmount(
