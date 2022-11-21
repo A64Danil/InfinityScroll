@@ -55,8 +55,66 @@ class ScrollDetector {
 
   lastScrollTopPosition = 0;
 
+  private list: ListController | undefined;
+
+  private listChunk: ChunkController | undefined;
+
   constructor() {
     console.log('start ScrollDetector');
+  }
+
+  setList(list: ListController) {
+    this.list = list;
+  }
+
+  setListChunk(listChunk: ChunkController) {
+    this.listChunk = listChunk;
+  }
+
+  isBeginOfListFromTop() {
+    return this.currentListScroll < this.list.HALF_VISIBLE_SIZE;
+  }
+
+  isEndOfListFromTop() {
+    return this.currentListScroll > this.list.START_OF_LAST_VISIBLE_SIZE;
+  }
+
+  isBeginOfListFromBottom() {
+    return (
+      this.currentListScroll >=
+      this.list.length - this.listChunk.chunkAmount * 3
+    );
+  }
+
+  isEndOfListFromBottom() {
+    return this.currentListScroll < this.list.tailingElementsAmount;
+  }
+
+  isAllowRenderNearBorder() {
+    console.log('isAllowRenderNearBorder');
+    if (this.scrollDirection === 'down' && this.isBeginOfListFromTop()) {
+      console.log('Пока рендерить не надо. Вы в самом верху списка.');
+      return false;
+    }
+
+    if (this.scrollDirection === 'down' && this.isEndOfListFromTop()) {
+      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+      return false;
+    }
+
+    if (this.scrollDirection === 'up' && this.isBeginOfListFromBottom()) {
+      console.log(
+        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
+      );
+      return false;
+    }
+
+    if (this.scrollDirection === 'up' && this.isEndOfListFromBottom()) {
+      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+      return false;
+    }
+
+    return true;
   }
 }
 
@@ -495,6 +553,9 @@ class InfinityScroll {
 
     this.list = new ListController(listProps);
 
+    this.scroll.setList(this.list);
+    this.scroll.setListChunk(this.listChunk);
+
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
@@ -572,40 +633,7 @@ class InfinityScroll {
 
   // SCROLL + DOM
   modifyCurrentDOM(): void {
-    const isBeginOfListFromTop =
-      this.scroll.currentListScroll < this.list.HALF_VISIBLE_SIZE;
-
-    const isEndOfListFromTop =
-      this.scroll.currentListScroll > this.list.START_OF_LAST_VISIBLE_SIZE;
-
-    const isBeginOfListFromBottom =
-      this.scroll.currentListScroll >=
-      this.list.length - this.listChunk.chunkAmount * 3;
-
-    const isEndOfListFromBottom =
-      this.scroll.currentListScroll < this.list.tailingElementsAmount;
-
-    // Главное правило - если идём вниз, то множитель х2, если вверх, то х3 (т.к. считаем от начала чанка)
-    // TODO: сделать рефакторинг 4х условий
-    if (this.scroll.scrollDirection === 'down' && isBeginOfListFromTop) {
-      console.log('Пока рендерить не надо. Вы в самом верху списка.');
-      return;
-    }
-
-    if (this.scroll.scrollDirection === 'down' && isEndOfListFromTop) {
-      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-      return;
-    }
-
-    if (this.scroll.scrollDirection === 'up' && isBeginOfListFromBottom) {
-      console.log(
-        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
-      );
-      return;
-    }
-
-    if (this.scroll.scrollDirection === 'up' && isEndOfListFromBottom) {
-      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+    if (!this.scroll.isAllowRenderNearBorder()) {
       return;
     }
 
