@@ -173,15 +173,20 @@ class DomManager {
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
+  private avrTimeArr: Array<number> = [];
+
   private list: ListController;
 
   private listChunk: ChunkController;
 
   private readonly scroll: ScrollDetector;
 
+  private infinityScroll: InfinityScroll;
+
   constructor(props: {
     data: any;
     targetElem: HTMLElement;
+    infinityScroll: InfinityScroll;
     list: ListController;
     chunk: ChunkController;
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -190,6 +195,7 @@ class DomManager {
   }) {
     this.data = props.data;
     this.targetElem = props.targetElem;
+    this.infinityScroll = props.infinityScroll;
     this.list = props.list;
     this.listChunk = props.chunk;
     this.template = props.template;
@@ -274,6 +280,40 @@ class DomManager {
     this.targetElem.innerHTML += templateFragments;
 
     this.fillListTimerId = window.setTimeout(() => this.fillList(), this.delay);
+  }
+
+  resetAllList(): void {
+    const calculatedStart =
+      this.scroll.currentListScroll - this.listChunk.chunkAmount;
+    const newStart =
+      calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
+        ? this.scroll.LIST_LAST_SCROLL_POSITION
+        : calculatedStart;
+
+    let newSequence = newStart;
+
+    if (newSequence < 0) newSequence = 0;
+
+    const sequenceNumber = newSequence;
+
+    let templateFragments = '';
+    for (let i = 0; i < 1000 && i < this.list.FULL_VISIBLE_SIZE; i++) {
+      // add items
+      const elemNum = i + sequenceNumber;
+      templateFragments += this.createItem(elemNum);
+    }
+
+    const newOffset = newSequence * this.list.itemHeight;
+
+    this.targetElem.innerHTML = templateFragments;
+    this.setOffsetToList(newOffset);
+
+    // TODO: убрать после тестов
+    const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
+    console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
+
+    // TODO: не хватает этой переменной
+    this.infinityScroll.isWaitRender = false;
   }
 }
 
@@ -367,7 +407,7 @@ class InfinityScroll {
 
   private avrTimeArr: Array<number> = [];
 
-  private isWaitRender = false;
+  public isWaitRender = false;
 
   private domMngr: DomManager;
 
@@ -401,6 +441,7 @@ class InfinityScroll {
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
+      infinityScroll: this,
       list: this.list,
       chunk: this.listChunk,
       template: props.templateString,
@@ -453,7 +494,7 @@ class InfinityScroll {
     this.wrapperEl.addEventListener('scroll', (e) => {
       const diffTime = Date.now() - startDate;
       if (diffTime < 100) {
-        this.avrTimeArr.push(diffTime);
+        this.domMngr.avrTimeArr.push(diffTime);
       }
       this.calcCurrentDOMRender(e);
       startDate = Date.now();
@@ -470,40 +511,6 @@ class InfinityScroll {
     newEl.setAttribute('id', newElID);
     newEl.setAttribute('class', 'Demo_infinityScrollList');
     return this.wrapperEl?.appendChild(newEl);
-  }
-
-  // DOM
-  resetAllList(): void {
-    const calculatedStart =
-      this.scroll.currentListScroll - this.listChunk.chunkAmount;
-    const newStart =
-      calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
-        ? this.scroll.LIST_LAST_SCROLL_POSITION
-        : calculatedStart;
-
-    let newSequence = newStart;
-
-    if (newSequence < 0) newSequence = 0;
-
-    const sequenceNumber = newSequence;
-
-    let templateFragments = '';
-    for (let i = 0; i < 1000 && i < this.list.FULL_VISIBLE_SIZE; i++) {
-      // add items
-      const elemNum = i + sequenceNumber;
-      templateFragments += this.domMngr.createItem(elemNum);
-    }
-
-    const newOffset = newSequence * this.list.itemHeight;
-
-    this.listEl.innerHTML = templateFragments;
-    this.domMngr.setOffsetToList(newOffset);
-
-    // TODO: убрать после тестов
-    const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
-    console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
-
-    this.isWaitRender = false;
   }
 
   // DOM
@@ -668,7 +675,7 @@ class InfinityScroll {
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
       this.timerIdRefreshList = window.setTimeout(() => {
-        this.resetAllList();
+        this.domMngr.resetAllList();
       }, 30);
     }
 
