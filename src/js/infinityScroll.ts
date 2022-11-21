@@ -644,20 +644,6 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  modifyCurrentDOM(): void {
-    if (!this.scroll.isAllowRenderNearBorder()) {
-      return;
-    }
-
-    this.domMngr.changeItemsInList();
-    this.domMngr.setOffsetToList();
-
-    checkChildrenAmount(
-      this.listEl.childNodes.length,
-      this.list.FULL_VISIBLE_SIZE
-    );
-  }
-
   calcCurrentDOMRender(e: Event & { target: Element }) {
     const { scrollTop } = e.target;
     const orderedNumberOfChunk = Math.floor(
