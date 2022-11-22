@@ -703,32 +703,47 @@ class InfinityScroll {
     return this.wrapperEl?.appendChild(newEl);
   }
 
-  calcCurrentDOMRender(e: Event & { target: Element }) {
+  calcCurrentDOMRender(e: Event & { target: Element }): void {
     const { scrollTop } = e.target;
+    // Вычисляем позицию чанка
     const chunkPosition: number = this.listChunk.getChunkPosition(scrollTop);
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.FULL_VISIBLE_SIZE
     );
-
-    const newCurrentListScroll: number = this.list.getScroll(chunkPosition);
+    // Вычисляем позицию скролла списка (не путать с браузрным скроллом)
+    const newScroll: number = this.list.getScroll(chunkPosition);
     this.scroll.setScrollDirection(scrollTop);
 
     this.scroll.lastScrollTopPosition = scrollTop;
 
-    const scrollDiff = this.scroll.getDiff(newCurrentListScroll);
-
+    const scrollDiff: number = this.scroll.getDiff(newScroll);
+    // Если скролл слишком маленький - не делаем ничего
     if (this.scroll.isSmallDiff(scrollDiff)) {
       return;
     }
 
-    // Вынести в отдельную функцию
+    this.clearTimerIfNeeded();
+    // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
+    this.scroll.setGoingFromBottom(chunkPosition);
+    // Если скролл слишком большой - рисуем всё заново
+    this.checkBigDiffToResetList(scrollDiff);
+
+    // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
+    if (this.scroll.currentListScroll !== newScroll) {
+      console.warn('====== currentListScroll поменялся ======');
+      this.scroll.setScroll(newScroll);
+      this.domMngr.modifyCurrentDOM();
+    }
+  }
+
+  clearTimerIfNeeded(): void {
     if (this.timerIdRefreshList !== null && this.isWaitRender === false) {
       clearTimeout(this.timerIdRefreshList);
     }
+  }
 
-    this.scroll.setGoingFromBottom(chunkPosition);
-
+  checkBigDiffToResetList(scrollDiff: number): void {
     const isBigDiff: boolean = this.scroll.isBigDiff(scrollDiff);
 
     if (isBigDiff && this.isWaitRender === false) {
@@ -736,12 +751,6 @@ class InfinityScroll {
       this.timerIdRefreshList = window.setTimeout(() => {
         this.domMngr.resetAllList();
       }, 30);
-    }
-
-    if (this.scroll.currentListScroll !== newCurrentListScroll) {
-      console.warn('====== currentListScroll поменялся ======');
-      this.scroll.setScroll(newCurrentListScroll);
-      this.domMngr.modifyCurrentDOM();
     }
   }
 
