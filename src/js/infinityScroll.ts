@@ -71,26 +71,75 @@ class ScrollDetector {
     this.listChunk = listChunk;
   }
 
-  isBeginOfListFromTop() {
+  setScroll(scroll: number): void {
+    this.currentListScroll = scroll;
+    if (this.isGoingFromBottom) {
+      this.currentListScroll += this.list.tailingElementsAmount;
+    }
+  }
+
+  setScrollDirection(scrollTop: number): void {
+    if (scrollTop > this.lastScrollTopPosition) {
+      this.scrollDirection = 'down';
+    } else {
+      this.scrollDirection = 'up';
+    }
+  }
+
+  getDiff(newCurrentListScroll: number): number {
+    return Math.abs(this.currentListScroll - newCurrentListScroll);
+  }
+
+  isSmallDiff(scrollDiff: number): boolean {
+    if (scrollDiff !== 0 && scrollDiff <= this.list.tailingElementsAmount) {
+      return true;
+    }
+    return false;
+  }
+
+  setGoingFromBottom(chunkPosition: number): void {
+    if (
+      this.scrollDirection === 'down' &&
+      chunkPosition <= this.list.tailingElementsAmount
+    ) {
+      this.isGoingFromBottom = false;
+    } else if (
+      this.scrollDirection === 'up' &&
+      chunkPosition >= this.listChunk.LAST_ORDER_NUMBER - 1
+    ) {
+      this.isGoingFromBottom = true;
+    }
+  }
+
+  isBigDiff(scrollDiff: number): boolean {
+    const isBigDiff =
+      (this.isGoingFromBottom &&
+        scrollDiff >
+          this.listChunk.chunkAmount + this.list.tailingElementsAmount) ||
+      (!this.isGoingFromBottom && scrollDiff > this.listChunk.chunkAmount);
+    return isBigDiff;
+  }
+
+  isBeginOfListFromTop(): boolean {
     return this.currentListScroll < this.list.HALF_VISIBLE_SIZE;
   }
 
-  isEndOfListFromTop() {
+  isEndOfListFromTop(): boolean {
     return this.currentListScroll > this.list.START_OF_LAST_VISIBLE_SIZE;
   }
 
-  isBeginOfListFromBottom() {
+  isBeginOfListFromBottom(): boolean {
     return (
       this.currentListScroll >=
       this.list.length - this.listChunk.chunkAmount * 3
     );
   }
 
-  isEndOfListFromBottom() {
+  isEndOfListFromBottom(): boolean {
     return this.currentListScroll < this.list.tailingElementsAmount;
   }
 
-  isAllowRenderNearBorder() {
+  isAllowRenderNearBorder(): boolean {
     if (this.scrollDirection === 'down' && this.isBeginOfListFromTop()) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return false;
@@ -128,6 +177,11 @@ class ChunkController {
 
   constructor() {
     console.log('start ChunkController');
+  }
+
+  getChunkPosition(scrollTop: number): number {
+    const chunkPosition = Math.floor(scrollTop / this.chunkHeight);
+    return chunkPosition;
   }
 }
 
@@ -210,6 +264,11 @@ class ListController {
     this.listChunk.chunkHeight = this.listChunk.chunkAmount * this.itemHeight;
 
     this.tailingElementsAmount = this.length % this.listChunk.chunkAmount;
+  }
+
+  getScroll(chunkPosition: number): number {
+    const listScroll = chunkPosition * this.listChunk.chunkAmount;
+    return listScroll;
   }
 }
 
@@ -439,7 +498,7 @@ class DomManager {
     this.setOffsetToList();
 
     checkChildrenAmount(
-      this.listEl.childNodes.length,
+      this.targetElem.childNodes.length,
       this.list.FULL_VISIBLE_SIZE
     );
   }
@@ -646,56 +705,31 @@ class InfinityScroll {
 
   calcCurrentDOMRender(e: Event & { target: Element }) {
     const { scrollTop } = e.target;
-    const orderedNumberOfChunk = Math.floor(
-      scrollTop / this.listChunk.chunkHeight
-    );
-
+    const chunkPosition: number = this.listChunk.getChunkPosition(scrollTop);
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.FULL_VISIBLE_SIZE
     );
 
-    let newCurrentListScroll =
-      orderedNumberOfChunk * this.listChunk.chunkAmount;
-
-    if (scrollTop > this.scroll.lastScrollTopPosition) {
-      this.scroll.scrollDirection = 'down';
-    } else {
-      this.scroll.scrollDirection = 'up';
-    }
+    const newCurrentListScroll: number = this.list.getScroll(chunkPosition);
+    this.scroll.setScrollDirection(scrollTop);
 
     this.scroll.lastScrollTopPosition = scrollTop;
 
-    const scrollDiff = Math.abs(
-      this.scroll.currentListScroll - newCurrentListScroll
-    );
+    const scrollDiff = this.scroll.getDiff(newCurrentListScroll);
 
-    if (scrollDiff !== 0 && scrollDiff <= this.list.tailingElementsAmount) {
+    if (this.scroll.isSmallDiff(scrollDiff)) {
       return;
     }
 
+    // Вынести в отдельную функцию
     if (this.timerIdRefreshList !== null && this.isWaitRender === false) {
       clearTimeout(this.timerIdRefreshList);
     }
 
-    if (
-      this.scroll.scrollDirection === 'down' &&
-      orderedNumberOfChunk <= this.list.tailingElementsAmount
-    ) {
-      this.scroll.isGoingFromBottom = false;
-    } else if (
-      this.scroll.scrollDirection === 'up' &&
-      orderedNumberOfChunk >= this.listChunk.LAST_ORDER_NUMBER - 1
-    ) {
-      this.scroll.isGoingFromBottom = true;
-    }
+    this.scroll.setGoingFromBottom(chunkPosition);
 
-    const isBigDiff =
-      (this.scroll.isGoingFromBottom &&
-        scrollDiff >
-          this.listChunk.chunkAmount + this.list.tailingElementsAmount) ||
-      (!this.scroll.isGoingFromBottom &&
-        scrollDiff > this.listChunk.chunkAmount);
+    const isBigDiff: boolean = this.scroll.isBigDiff(scrollDiff);
 
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
@@ -706,13 +740,7 @@ class InfinityScroll {
 
     if (this.scroll.currentListScroll !== newCurrentListScroll) {
       console.warn('====== currentListScroll поменялся ======');
-      // TODO: удалить после отладки
-      if (this.scroll.isGoingFromBottom) {
-        newCurrentListScroll += this.list.tailingElementsAmount;
-      }
-      this.scroll.currentListScroll = newCurrentListScroll;
-
-      // DOM Manipulation
+      this.scroll.setScroll(newCurrentListScroll);
       this.domMngr.modifyCurrentDOM();
     }
   }
