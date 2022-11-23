@@ -29,19 +29,25 @@ const nameToTag = {
 
 // HELPER FUNCTIONS
 class ScrollDetector {
+  // Последняя доступная позиция скролла
   // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
+  // TODO: проверить, нужна ли она вообще
   public LIST_LAST_SCROLL_POSITION = 0;
 
   // Текущая позиция скролла
   // Содержит номер элемента, с которого начинается текущая видимая часть
+  // ==> переменная указывает, с какого элемента начинается текущий чанк
   // private currentListScroll = 0;
+  // перенести в List и назвать VisiblePosition
   public position = 0;
 
   public direction = 'down';
 
-  isGoingFromBottom = false;
+  public isGoingFromBottom = false;
 
-  lastScrollTopPosition = 0;
+  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
+  // TODO: переименовать после удаления position
+  public lastScrollTopPosition = 0;
 
   private list: ListController | undefined;
 
@@ -177,10 +183,11 @@ class ListController {
   // Длина списка
   length: number | undefined;
 
-  // Видимая часть списка (вычисляется по цсс-свойствам)
+  // Видимый размер списка (вычисляется по цсс-свойствам)
+  // TODO: не "видимы", а присутствующий в ДОМ
   FULL_VISIBLE_SIZE = 0;
 
-  // Видимая часть списка (половина от полной)
+  // Половина видимого размер списка
   HALF_VISIBLE_SIZE = 0;
 
   // Номер позиции, с которой начинается последяя видимая часть списка
@@ -194,6 +201,9 @@ class ListController {
 
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
+
+  // Номер элемента, с которого начинается видимый чанк
+  public visiblePosition: number;
 
   private readonly wrapperEl: HTMLElement;
 
@@ -238,10 +248,16 @@ class ListController {
     this.FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
     this.HALF_VISIBLE_SIZE = this.FULL_VISIBLE_SIZE / 2;
     this.START_OF_LAST_VISIBLE_SIZE = this.length - this.HALF_VISIBLE_SIZE;
-    console.log(this.scroll.LIST_LAST_SCROLL_POSITION);
+    console.log(
+      'this.scroll.LIST_LAST_SCROLL_POSITION',
+      this.scroll.LIST_LAST_SCROLL_POSITION
+    );
     this.scroll.LIST_LAST_SCROLL_POSITION =
       this.length - this.FULL_VISIBLE_SIZE;
-
+    console.log(
+      'this.scroll.LIST_LAST_SCROLL_POSITION',
+      this.scroll.LIST_LAST_SCROLL_POSITION
+    );
     this.listChunk.LAST_ORDER_NUMBER = Math.floor(
       this.length / this.listChunk.chunkAmount
     );
@@ -255,6 +271,13 @@ class ListController {
     const listScroll = chunkPosition * this.listChunk.chunkAmount;
     return listScroll;
   }
+
+  // setPosition(scroll: number): void {
+  //   this.visiblePosition = scroll;
+  //   if (this.scroll.isGoingFromBottom) {
+  //     this.visiblePosition += this.tailingElementsAmount;
+  //   }
+  // }
 }
 
 class DomManager {
@@ -490,13 +513,13 @@ class DomManager {
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 interface InfinityScrollPropTypes {
-  data?: Array<ListData>;
+  // data?: Array<ListData>;
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: string;
   name: string;
   selectorId: string;
   listType: 'list' | 'table';
-  templateString: TplStringFn;
+  // templateString: TplStringFn;
 }
 
 class InfinityScroll {
