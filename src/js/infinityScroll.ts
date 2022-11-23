@@ -16,7 +16,7 @@ const nameToTag = {
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
 2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
 3) Используем высоту чанка чтобы регулировать отступы
-4) Держим в памяти число, указывающее на начальный пункт списка в чанке - this.scroll.position
+4) Держим в памяти число, указывающее на начальный пункт списка в чанке
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
 
 // если дифф слишком большой, то делаем фуллРендер
@@ -34,13 +34,6 @@ class ScrollDetector {
   // TODO: проверить, нужна ли она вообще
   public LIST_LAST_SCROLL_POSITION = 0;
 
-  // Текущая позиция скролла
-  // Содержит номер элемента, с которого начинается текущая видимая часть
-  // ==> переменная указывает, с какого элемента начинается текущий чанк
-  // private currentListScroll = 0;
-  // перенести в List и назвать VisiblePosition
-  public position = 0;
-
   public direction = 'down';
 
   public isGoingFromBottom = false;
@@ -51,7 +44,7 @@ class ScrollDetector {
 
   private list: ListController | undefined;
 
-  private listChunk: ChunkController | undefined;
+  private chunk: ChunkController | undefined;
 
   constructor() {
     console.log('start ScrollDetector');
@@ -61,15 +54,8 @@ class ScrollDetector {
     this.list = list;
   }
 
-  setListChunk(listChunk: ChunkController) {
-    this.listChunk = listChunk;
-  }
-
-  setScroll(scroll: number): void {
-    this.position = scroll;
-    if (this.isGoingFromBottom) {
-      this.position += this.list.tailingElementsAmount;
-    }
+  setListChunk(chunk: ChunkController) {
+    this.chunk = chunk;
   }
 
   setScrollDirection(scrollTop: number): void {
@@ -81,7 +67,7 @@ class ScrollDetector {
   }
 
   getDiff(newCurrentListScroll: number): number {
-    return Math.abs(this.position - newCurrentListScroll);
+    return Math.abs(this.chunk.startRenderIndex - newCurrentListScroll);
   }
 
   isSmallDiff(scrollDiff: number): boolean {
@@ -99,7 +85,7 @@ class ScrollDetector {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkPosition >= this.listChunk.LAST_ORDER_NUMBER - 1
+      chunkPosition >= this.chunk.LAST_ORDER_NUMBER - 1
     ) {
       this.isGoingFromBottom = true;
     }
@@ -109,25 +95,28 @@ class ScrollDetector {
     const isBigDiff =
       (this.isGoingFromBottom &&
         scrollDiff >
-          this.listChunk.chunkAmount + this.list.tailingElementsAmount) ||
-      (!this.isGoingFromBottom && scrollDiff > this.listChunk.chunkAmount);
+          this.chunk.chunkAmount + this.list.tailingElementsAmount) ||
+      (!this.isGoingFromBottom && scrollDiff > this.chunk.chunkAmount);
     return isBigDiff;
   }
 
   isBeginOfListFromTop(): boolean {
-    return this.position < this.list.HALF_VISIBLE_SIZE;
+    return this.chunk.startRenderIndex < this.list.HALF_VISIBLE_SIZE;
   }
 
   isEndOfListFromTop(): boolean {
-    return this.position > this.list.START_OF_LAST_VISIBLE_SIZE;
+    return this.chunk.startRenderIndex > this.list.START_OF_LAST_VISIBLE_SIZE;
   }
 
   isBeginOfListFromBottom(): boolean {
-    return this.position >= this.list.length - this.listChunk.chunkAmount * 3;
+    return (
+      this.chunk.startRenderIndex >=
+      this.list.length - this.chunk.chunkAmount * 3
+    );
   }
 
   isEndOfListFromBottom(): boolean {
-    return this.position < this.list.tailingElementsAmount;
+    return this.chunk.startRenderIndex < this.list.tailingElementsAmount;
   }
 
   isAllowRenderNearBorder(): boolean {
@@ -166,13 +155,37 @@ class ChunkController {
   // Порядковый номер последнего чанка в списке
   LAST_ORDER_NUMBER: number;
 
-  constructor() {
+  // Номер, c которого мы будем рендерить следующуй чанк
+  public startRenderIndex = 0;
+
+  private scroll: ScrollDetector;
+
+  private list: ListController;
+
+  constructor(props: { scroll: ScrollDetector }) {
     console.log('start ChunkController');
+    this.scroll = props.scroll;
   }
 
-  getChunkPosition(scrollTop: number): number {
-    const chunkPosition = Math.floor(scrollTop / this.chunkHeight);
-    return chunkPosition;
+  setList(list: ListController) {
+    this.list = list;
+  }
+
+  getOrderNumber(scrollTop: number): number {
+    const chunkOrderNumber = Math.floor(scrollTop / this.chunkHeight);
+    return chunkOrderNumber;
+  }
+
+  setRenderIndex(scroll: number): void {
+    this.startRenderIndex = scroll;
+    if (this.scroll.isGoingFromBottom) {
+      this.startRenderIndex += this.list.tailingElementsAmount;
+    }
+  }
+
+  getRenderIndex(chunkPosition: number): number {
+    const startRenderIndex = chunkPosition * this.chunkAmount;
+    return startRenderIndex;
   }
 }
 
@@ -202,12 +215,9 @@ class ListController {
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
 
-  // Номер элемента, с которого начинается видимый чанк
-  public visiblePosition: number;
-
   private readonly wrapperEl: HTMLElement;
 
-  private listChunk: ChunkController;
+  private chunk: ChunkController;
 
   private readonly scroll: ScrollDetector;
 
@@ -215,11 +225,11 @@ class ListController {
     wrapperEl: HTMLElement;
     el: HTMLElement;
     scroll: ScrollDetector;
-    listChunk: ChunkController;
+    chunk: ChunkController;
   }) {
     this.el = props.el;
     this.wrapperEl = props.wrapperEl;
-    this.listChunk = props.listChunk;
+    this.chunk = props.chunk;
     this.scroll = props.scroll;
     console.log('Start List Controller', this);
   }
@@ -241,11 +251,9 @@ class ListController {
 
     this.itemHeight = listItem?.offsetHeight || this.wrapperHeight;
 
-    this.listChunk.chunkAmount = Math.ceil(
-      this.wrapperHeight / this.itemHeight
-    );
+    this.chunk.chunkAmount = Math.ceil(this.wrapperHeight / this.itemHeight);
 
-    this.FULL_VISIBLE_SIZE = this.listChunk.chunkAmount * 4;
+    this.FULL_VISIBLE_SIZE = this.chunk.chunkAmount * 4;
     this.HALF_VISIBLE_SIZE = this.FULL_VISIBLE_SIZE / 2;
     this.START_OF_LAST_VISIBLE_SIZE = this.length - this.HALF_VISIBLE_SIZE;
     console.log(
@@ -258,26 +266,14 @@ class ListController {
       'this.scroll.LIST_LAST_SCROLL_POSITION',
       this.scroll.LIST_LAST_SCROLL_POSITION
     );
-    this.listChunk.LAST_ORDER_NUMBER = Math.floor(
-      this.length / this.listChunk.chunkAmount
+    this.chunk.LAST_ORDER_NUMBER = Math.floor(
+      this.length / this.chunk.chunkAmount
     );
 
-    this.listChunk.chunkHeight = this.listChunk.chunkAmount * this.itemHeight;
+    this.chunk.chunkHeight = this.chunk.chunkAmount * this.itemHeight;
 
-    this.tailingElementsAmount = this.length % this.listChunk.chunkAmount;
+    this.tailingElementsAmount = this.length % this.chunk.chunkAmount;
   }
-
-  getScroll(chunkPosition: number): number {
-    const listScroll = chunkPosition * this.listChunk.chunkAmount;
-    return listScroll;
-  }
-
-  // setPosition(scroll: number): void {
-  //   this.visiblePosition = scroll;
-  //   if (this.scroll.isGoingFromBottom) {
-  //     this.visiblePosition += this.tailingElementsAmount;
-  //   }
-  // }
 }
 
 class DomManager {
@@ -301,7 +297,7 @@ class DomManager {
 
   private list: ListController;
 
-  private listChunk: ChunkController;
+  private chunk: ChunkController;
 
   private readonly scroll: ScrollDetector;
 
@@ -321,7 +317,7 @@ class DomManager {
     this.targetElem = props.targetElem;
     this.infinityScroll = props.infinityScroll;
     this.list = props.list;
-    this.listChunk = props.chunk;
+    this.chunk = props.chunk;
     this.template = props.template;
     this.scroll = props.scrollDetector;
   }
@@ -329,7 +325,7 @@ class DomManager {
   setPaddingToList(offset = 0): void {
     let paddingBottom =
       this.list.length * this.list.itemHeight -
-      this.listChunk.chunkHeight * 4 -
+      this.chunk.chunkHeight * 4 -
       offset;
 
     // TODO: проверить, попадаем ли мы туда
@@ -341,7 +337,7 @@ class DomManager {
   }
 
   setOffsetToList(forcedOffset: number | undefined = undefined): void {
-    console.log('this.scroll.position', this.scroll.position);
+    console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
@@ -349,13 +345,12 @@ class DomManager {
       return;
     }
 
-    let start = this.scroll.position - this.listChunk.chunkAmount;
+    let start = this.chunk.startRenderIndex - this.chunk.chunkAmount;
 
     // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
     if (start < 0) {
       start = 0;
     }
-
     // Если этого нет, то попадаем в padding 0!
     if (
       this.scroll.direction === 'down' &&
@@ -363,7 +358,6 @@ class DomManager {
     ) {
       start = this.scroll.LIST_LAST_SCROLL_POSITION;
     }
-
     const offset = start * this.list.itemHeight;
 
     this.targetElem.style.transform = `translate(0,${offset}px)`;
@@ -407,7 +401,8 @@ class DomManager {
   }
 
   resetAllList(): void {
-    const calculatedStart = this.scroll.position - this.listChunk.chunkAmount;
+    const calculatedStart =
+      this.chunk.startRenderIndex - this.chunk.chunkAmount;
     const newStart =
       calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
         ? this.scroll.LIST_LAST_SCROLL_POSITION
@@ -450,14 +445,14 @@ class DomManager {
     // Это работает праивльно (в начале списка)
     let newSequence =
       this.scroll.direction === 'down'
-        ? this.scroll.position + this.list.HALF_VISIBLE_SIZE
-        : this.scroll.position - this.listChunk.chunkAmount;
+        ? this.chunk.startRenderIndex + this.list.HALF_VISIBLE_SIZE
+        : this.chunk.startRenderIndex - this.chunk.chunkAmount;
 
     if (newSequence < 0) newSequence = 0;
 
     const sequenceNumber = newSequence;
 
-    for (let i = 0; i < 1000 && i < this.listChunk.chunkAmount; i++) {
+    for (let i = 0; i < 1000 && i < this.chunk.chunkAmount; i++) {
       const isStartOfList =
         this.scroll.direction === 'up' && sequenceNumber === 0;
 
@@ -558,7 +553,7 @@ class InfinityScroll {
 
   private scroll: ScrollDetector;
 
-  private listChunk: ChunkController;
+  private chunk: ChunkController;
 
   private list: ListController;
 
@@ -572,26 +567,32 @@ class InfinityScroll {
 
     this.scroll = new ScrollDetector();
 
-    this.listChunk = new ChunkController();
+    const chunkProps = {
+      scroll: this.scroll,
+    };
+
+    this.chunk = new ChunkController(chunkProps);
 
     const listProps = {
       el: this.listEl,
       wrapperEl: this.wrapperEl,
       scroll: this.scroll,
-      listChunk: this.listChunk,
+      chunk: this.chunk,
     };
 
     this.list = new ListController(listProps);
 
+    this.chunk.setList(this.list);
+
     this.scroll.setList(this.list);
-    this.scroll.setListChunk(this.listChunk);
+    this.scroll.setListChunk(this.chunk);
 
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
       infinityScroll: this,
       list: this.list,
-      chunk: this.listChunk,
+      chunk: this.chunk,
       template: props.templateString,
       scrollDetector: this.scroll,
     };
@@ -664,18 +665,18 @@ class InfinityScroll {
   calcCurrentDOMRender(e: Event & { target: Element }): void {
     const { scrollTop } = e.target;
     // Вычисляем позицию чанка
-    const chunkPosition: number = this.listChunk.getChunkPosition(scrollTop);
+    const chunkPosition: number = this.chunk.getOrderNumber(scrollTop);
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.FULL_VISIBLE_SIZE
     );
-    // Вычисляем позицию скролла списка (не путать с браузрным скроллом)
-    const newScroll: number = this.list.getScroll(chunkPosition);
+    // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
+    const newRenderIndex: number = this.chunk.getRenderIndex(chunkPosition);
     this.scroll.setScrollDirection(scrollTop);
 
     this.scroll.lastScrollTopPosition = scrollTop;
 
-    const scrollDiff: number = this.scroll.getDiff(newScroll);
+    const scrollDiff: number = this.scroll.getDiff(newRenderIndex);
     // Если скролл слишком маленький - не делаем ничего
     if (this.scroll.isSmallDiff(scrollDiff)) {
       return;
@@ -688,9 +689,9 @@ class InfinityScroll {
     this.checkBigDiffToResetList(scrollDiff);
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
-    if (this.scroll.position !== newScroll) {
-      console.warn('====== this.scroll.position поменялся ======');
-      this.scroll.setScroll(newScroll);
+    if (this.chunk.startRenderIndex !== newRenderIndex) {
+      console.warn('====== this.chunk.startRenderIndex поменялся ======');
+      this.chunk.setRenderIndex(newRenderIndex);
       this.domMngr.modifyCurrentDOM();
     }
   }
