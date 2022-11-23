@@ -16,7 +16,7 @@ const nameToTag = {
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
 2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
 3) Используем высоту чанка чтобы регулировать отступы
-4) Держим в памяти число, указывающее на начальный пункт списка в чанке - currentListScroll
+4) Держим в памяти число, указывающее на начальный пункт списка в чанке - this.scroll.position
 5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
 
 // если дифф слишком большой, то делаем фуллРендер
@@ -35,9 +35,9 @@ class ScrollDetector {
   // Текущая позиция скролла
   // Содержит номер элемента, с которого начинается текущая видимая часть
   // private currentListScroll = 0;
-  public currentListScroll = 0;
+  public position = 0;
 
-  scrollDirection = 'down';
+  public direction = 'down';
 
   isGoingFromBottom = false;
 
@@ -60,22 +60,22 @@ class ScrollDetector {
   }
 
   setScroll(scroll: number): void {
-    this.currentListScroll = scroll;
+    this.position = scroll;
     if (this.isGoingFromBottom) {
-      this.currentListScroll += this.list.tailingElementsAmount;
+      this.position += this.list.tailingElementsAmount;
     }
   }
 
   setScrollDirection(scrollTop: number): void {
     if (scrollTop > this.lastScrollTopPosition) {
-      this.scrollDirection = 'down';
+      this.direction = 'down';
     } else {
-      this.scrollDirection = 'up';
+      this.direction = 'up';
     }
   }
 
   getDiff(newCurrentListScroll: number): number {
-    return Math.abs(this.currentListScroll - newCurrentListScroll);
+    return Math.abs(this.position - newCurrentListScroll);
   }
 
   isSmallDiff(scrollDiff: number): boolean {
@@ -87,12 +87,12 @@ class ScrollDetector {
 
   setGoingFromBottom(chunkPosition: number): void {
     if (
-      this.scrollDirection === 'down' &&
+      this.direction === 'down' &&
       chunkPosition <= this.list.tailingElementsAmount
     ) {
       this.isGoingFromBottom = false;
     } else if (
-      this.scrollDirection === 'up' &&
+      this.direction === 'up' &&
       chunkPosition >= this.listChunk.LAST_ORDER_NUMBER - 1
     ) {
       this.isGoingFromBottom = true;
@@ -109,43 +109,40 @@ class ScrollDetector {
   }
 
   isBeginOfListFromTop(): boolean {
-    return this.currentListScroll < this.list.HALF_VISIBLE_SIZE;
+    return this.position < this.list.HALF_VISIBLE_SIZE;
   }
 
   isEndOfListFromTop(): boolean {
-    return this.currentListScroll > this.list.START_OF_LAST_VISIBLE_SIZE;
+    return this.position > this.list.START_OF_LAST_VISIBLE_SIZE;
   }
 
   isBeginOfListFromBottom(): boolean {
-    return (
-      this.currentListScroll >=
-      this.list.length - this.listChunk.chunkAmount * 3
-    );
+    return this.position >= this.list.length - this.listChunk.chunkAmount * 3;
   }
 
   isEndOfListFromBottom(): boolean {
-    return this.currentListScroll < this.list.tailingElementsAmount;
+    return this.position < this.list.tailingElementsAmount;
   }
 
   isAllowRenderNearBorder(): boolean {
-    if (this.scrollDirection === 'down' && this.isBeginOfListFromTop()) {
+    if (this.direction === 'down' && this.isBeginOfListFromTop()) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return false;
     }
 
-    if (this.scrollDirection === 'down' && this.isEndOfListFromTop()) {
+    if (this.direction === 'down' && this.isEndOfListFromTop()) {
       console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
       return false;
     }
 
-    if (this.scrollDirection === 'up' && this.isBeginOfListFromBottom()) {
+    if (this.direction === 'up' && this.isBeginOfListFromBottom()) {
       console.log(
         'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
       );
       return false;
     }
 
-    if (this.scrollDirection === 'up' && this.isEndOfListFromBottom()) {
+    if (this.direction === 'up' && this.isEndOfListFromBottom()) {
       console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
       return false;
     }
@@ -321,7 +318,7 @@ class DomManager {
   }
 
   setOffsetToList(forcedOffset: number | undefined = undefined): void {
-    console.log('currentListScroll', this.scroll.currentListScroll);
+    console.log('this.scroll.position', this.scroll.position);
 
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
@@ -329,7 +326,7 @@ class DomManager {
       return;
     }
 
-    let start = this.scroll.currentListScroll - this.listChunk.chunkAmount;
+    let start = this.scroll.position - this.listChunk.chunkAmount;
 
     // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
     if (start < 0) {
@@ -338,7 +335,7 @@ class DomManager {
 
     // Если этого нет, то попадаем в padding 0!
     if (
-      this.scroll.scrollDirection === 'down' &&
+      this.scroll.direction === 'down' &&
       start > this.scroll.LIST_LAST_SCROLL_POSITION
     ) {
       start = this.scroll.LIST_LAST_SCROLL_POSITION;
@@ -387,8 +384,7 @@ class DomManager {
   }
 
   resetAllList(): void {
-    const calculatedStart =
-      this.scroll.currentListScroll - this.listChunk.chunkAmount;
+    const calculatedStart = this.scroll.position - this.listChunk.chunkAmount;
     const newStart =
       calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
         ? this.scroll.LIST_LAST_SCROLL_POSITION
@@ -426,13 +422,13 @@ class DomManager {
 
     // for removeItems
     const childPosition =
-      this.scroll.scrollDirection === 'down' ? 'firstChild' : 'lastChild';
+      this.scroll.direction === 'down' ? 'firstChild' : 'lastChild';
 
     // Это работает праивльно (в начале списка)
     let newSequence =
-      this.scroll.scrollDirection === 'down'
-        ? this.scroll.currentListScroll + this.list.HALF_VISIBLE_SIZE
-        : this.scroll.currentListScroll - this.listChunk.chunkAmount;
+      this.scroll.direction === 'down'
+        ? this.scroll.position + this.list.HALF_VISIBLE_SIZE
+        : this.scroll.position - this.listChunk.chunkAmount;
 
     if (newSequence < 0) newSequence = 0;
 
@@ -440,7 +436,7 @@ class DomManager {
 
     for (let i = 0; i < 1000 && i < this.listChunk.chunkAmount; i++) {
       const isStartOfList =
-        this.scroll.scrollDirection === 'up' && sequenceNumber === 0;
+        this.scroll.direction === 'up' && sequenceNumber === 0;
 
       const isReachTopLimit =
         this.scroll.isGoingFromBottom &&
@@ -448,7 +444,7 @@ class DomManager {
         i + sequenceNumber >= this.list.tailingElementsAmount;
 
       const isReachBottomLimit =
-        this.scroll.scrollDirection === 'down' &&
+        this.scroll.direction === 'down' &&
         i + sequenceNumber > this.list.length - 1;
 
       const allowToChange = !isReachTopLimit && !isReachBottomLimit;
@@ -470,7 +466,7 @@ class DomManager {
     }
 
     // TODO: вынести в отдельную функцию?
-    if (this.scroll.scrollDirection === 'down') {
+    if (this.scroll.direction === 'down') {
       this.targetElem.innerHTML += templateFragments;
     } else {
       this.targetElem.innerHTML = templateFragments + this.targetElem.innerHTML;
@@ -669,8 +665,8 @@ class InfinityScroll {
     this.checkBigDiffToResetList(scrollDiff);
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
-    if (this.scroll.currentListScroll !== newScroll) {
-      console.warn('====== currentListScroll поменялся ======');
+    if (this.scroll.position !== newScroll) {
+      console.warn('====== this.scroll.position поменялся ======');
       this.scroll.setScroll(newScroll);
       this.domMngr.modifyCurrentDOM();
     }
