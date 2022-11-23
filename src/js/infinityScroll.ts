@@ -1,6 +1,4 @@
 // eslint-disable-next-line max-classes-per-file
-import BigDataList100 from '../../mocks/bigList100.json'; // import mock data
-
 console.log('TS file loaded');
 
 const checkChildrenAmount = (length: number, fullSize: number): void => {
@@ -9,16 +7,10 @@ const checkChildrenAmount = (length: number, fullSize: number): void => {
   }
 };
 
-const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
-  '#infinityScrollListStartBtn'
-);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BigJson1 = BigDataList100.data;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// const BigJson2 = BigDataList10k.data;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// const BigJson3 = BigDataList100k.data;
+const nameToTag = {
+  list: 'UL',
+  table: 'TABLE',
+};
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -34,10 +26,6 @@ const BigJson1 = BigDataList100.data;
 --- до рефакторинга было 450 строк кода
 
  */
-
-StartBtn?.addEventListener('click', () => {
-  console.log('Nothing happens');
-});
 
 // HELPER FUNCTIONS
 class ScrollDetector {
@@ -505,11 +493,6 @@ class DomManager {
 }
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
-interface ListData {
-  name: string;
-  number: number;
-}
-
 interface InfinityScrollPropTypes {
   data?: Array<ListData>;
   dataLoadType: 'instant' | 'lazy';
@@ -519,50 +502,6 @@ interface InfinityScrollPropTypes {
   listType: 'list' | 'table';
   templateString: TplStringFn;
 }
-
-type TplStringFn = (el: unknown, context: InfinityScroll) => string;
-
-const instantListProps: InfinityScrollPropTypes = {
-  data: BigJson1,
-  dataLoadType: 'instant',
-  name: 'my scroll list name',
-  selectorId: 'instantInfinityScrollWrapper',
-  listType: 'list',
-  templateString: (
-    element: unknown,
-    parentList?: InfinityScroll
-  ): string => `<li 
-        class="Demo_infinityScrollList__listItem" 
-        aria-setsize="${parentList.LIST_LENGTH}" 
-        aria-posinset="${element.number + 1}"
-        >
-            ${element.name} ${element.number + 1}
-    </li>`,
-};
-
-const lazyListProps: InfinityScrollPropTypes = {
-  data: BigJson1,
-  dataLoadType: 'lazy',
-  dataUrl: 'https://jsonplaceholder.typicode.com/comments',
-  name: 'my scroll list name',
-  selectorId: 'lazyInfinityScrollWrapper',
-  listType: 'list',
-  templateString: (
-    element: unknown,
-    parentList?: InfinityScroll
-  ): string => `<li 
-        class="infinityScrollList__listItem" 
-        aria-setsize="${parentList.LIST_LENGTH}" 
-        aria-posinset="${element.id}"
-        >
-            ${element.email} ${element.id}
-    </li>`,
-};
-
-const nameToTag = {
-  list: 'UL',
-  table: 'TABLE',
-};
 
 class InfinityScroll {
   // хранит в себе id сетТаймаута
@@ -771,15 +710,4 @@ class InfinityScroll {
   }
 }
 
-const instantList = document.getElementById(instantListProps.selectorId);
-if (instantList !== null) {
-  console.log('Instant list Started');
-  const myInstantScroll = new InfinityScroll(instantListProps);
-}
-
-const lazyList = document.getElementById(lazyListProps.selectorId);
-
-if (lazyList !== null) {
-  console.log('Lazy list Started');
-  const myLazyScroll = new InfinityScroll(lazyListProps);
-}
+export { InfinityScroll };
