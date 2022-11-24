@@ -218,6 +218,8 @@ class ListController {
 
   private readonly scroll: ScrollDetector;
 
+  private domMngr: DomManager;
+
   constructor(props: {
     wrapperEl: HTMLElement;
     el: HTMLElement;
@@ -231,13 +233,16 @@ class ListController {
     console.log('Start List Controller', this);
   }
 
-  // TODO: разбить на 2 функции
+  setDomMng(domMngr: DomManager) {
+    this.domMngr = domMngr;
+  }
+
   getAllSizes(): void {
     console.log('GET SIZES');
     const listWrp = this.wrapperEl;
     const list = this.el;
     const listWrpStyles = window.getComputedStyle(listWrp);
-    const listItem = list.firstChild as HTMLElement;
+    let listItem = list.firstChild as HTMLElement;
 
     this.wrapperHeight =
       parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
@@ -245,6 +250,12 @@ class ListController {
     if (this.wrapperHeight < 2) {
       console.error('You must set height to your list-wrapper!');
       return;
+    }
+
+    if (!listItem) {
+      console.warn('Элементов в списке нет');
+      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(0);
+      listItem = list.firstChild as HTMLElement;
     }
 
     this.itemHeight = listItem?.offsetHeight || this.wrapperHeight;
@@ -255,14 +266,17 @@ class ListController {
     this.halfOfExistingSizeInDOM = this.existingSizeInDOM / 2;
     this.chunk.lastRenderIndex = this.length - this.halfOfExistingSizeInDOM;
 
-    // console.log('this.existingSizeInDOM', this.existingSizeInDOM);
     this.startIndexOfLastPart = this.length - this.existingSizeInDOM;
-    console.log('this.startIndexOfLastPart', this.startIndexOfLastPart);
     this.chunk.lastOrderNumber = Math.floor(this.length / this.chunk.amount);
 
     this.chunk.htmlHeight = this.chunk.amount * this.itemHeight;
 
     this.tailingElementsAmount = this.length % this.chunk.amount;
+
+    if (listItem) {
+      console.warn('Элемент в списке есть');
+      this.domMngr.removeItem('firstChild');
+    }
   }
 }
 
@@ -275,7 +289,8 @@ class DomManager {
 
   private data;
 
-  private targetElem;
+  // TODO: сделать назад приватным
+  public targetElem;
 
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private template;
@@ -359,8 +374,9 @@ class DomManager {
     return this.template(element, this.targetElem);
   }
 
-  removeItem(childPosition: string): void {
-    const child = this.targetElem[childPosition];
+  removeItem(childPosition: 'firstChild' | 'lastChild'): void {
+    const child: ChildNode | null = this.targetElem[childPosition];
+    // TODO: узнать, чем отличается ChildNode От Node
     this.targetElem.removeChild(child);
   }
 
@@ -615,16 +631,13 @@ class InfinityScroll {
 
   start() {
     console.log(this);
+    this.list.setDomMng(this.domMngr);
     if (this.dataLoadType === 'lazy') {
       console.log(this.listData);
       // return;
     }
-    console.log('before get sizes');
-    // this.setMainVars();
-    // TODO: перебрать эту часть чтобы не было двух повторных вызовов
     this.list.getAllSizes();
     this.domMngr.fillList();
-    this.list.getAllSizes();
     this.domMngr.setPaddingToList();
 
     let startDate = Date.now();
