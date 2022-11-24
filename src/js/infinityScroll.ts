@@ -74,8 +74,7 @@ class ScrollDetector {
   setGoingFromBottom(chunkOrderNumber: number): void {
     if (
       this.direction === 'down' &&
-      // TODO: this.list.tailingElementsAmount заменить на this.chunk.firstOrderNumber
-      chunkOrderNumber <= this.list.tailingElementsAmount
+      chunkOrderNumber <= this.chunk.firstOrderNumber
     ) {
       this.isGoingFromBottom = false;
     } else if (
@@ -89,9 +88,8 @@ class ScrollDetector {
   isBigDiff(scrollDiff: number): boolean {
     const isBigDiff =
       (this.isGoingFromBottom &&
-        scrollDiff >
-          this.chunk.chunkAmount + this.list.tailingElementsAmount) ||
-      (!this.isGoingFromBottom && scrollDiff > this.chunk.chunkAmount);
+        scrollDiff > this.chunk.amount + this.list.tailingElementsAmount) ||
+      (!this.isGoingFromBottom && scrollDiff > this.chunk.amount);
     return isBigDiff;
   }
 
@@ -105,8 +103,7 @@ class ScrollDetector {
 
   isBeginOfListFromBottom(): boolean {
     return (
-      this.chunk.startRenderIndex >=
-      this.list.length - this.chunk.chunkAmount * 3
+      this.chunk.startRenderIndex >= this.list.length - this.chunk.amount * 3
     );
   }
 
@@ -143,9 +140,12 @@ class ScrollDetector {
 
 class ChunkController {
   // Размер чанка (чанк - видимая часть элементов в спике)
-  chunkAmount = 2;
+  amount = 2;
 
   htmlHeight = 0;
+
+  // TODO: разобраться чтобы не говорило что unused
+  firstOrderNumber = 0;
 
   // Порядковый номер последнего чанка в списке
   lastOrderNumber: number;
@@ -182,7 +182,7 @@ class ChunkController {
   }
 
   getRenderIndex(chunkOrderNumber: number): number {
-    const startRenderIndex = chunkOrderNumber * this.chunkAmount;
+    const startRenderIndex = chunkOrderNumber * this.amount;
     return startRenderIndex;
   }
 }
@@ -249,22 +249,20 @@ class ListController {
 
     this.itemHeight = listItem?.offsetHeight || this.wrapperHeight;
 
-    this.chunk.chunkAmount = Math.ceil(this.wrapperHeight / this.itemHeight);
+    this.chunk.amount = Math.ceil(this.wrapperHeight / this.itemHeight);
 
-    this.existingSizeInDOM = this.chunk.chunkAmount * 4;
+    this.existingSizeInDOM = this.chunk.amount * 4;
     this.halfOfExistingSizeInDOM = this.existingSizeInDOM / 2;
     this.chunk.lastRenderIndex = this.length - this.halfOfExistingSizeInDOM;
 
     // console.log('this.existingSizeInDOM', this.existingSizeInDOM);
     this.startIndexOfLastPart = this.length - this.existingSizeInDOM;
     console.log('this.startIndexOfLastPart', this.startIndexOfLastPart);
-    this.chunk.lastOrderNumber = Math.floor(
-      this.length / this.chunk.chunkAmount
-    );
+    this.chunk.lastOrderNumber = Math.floor(this.length / this.chunk.amount);
 
-    this.chunk.htmlHeight = this.chunk.chunkAmount * this.itemHeight;
+    this.chunk.htmlHeight = this.chunk.amount * this.itemHeight;
 
-    this.tailingElementsAmount = this.length % this.chunk.chunkAmount;
+    this.tailingElementsAmount = this.length % this.chunk.amount;
   }
 }
 
@@ -337,7 +335,7 @@ class DomManager {
       return;
     }
 
-    let start = this.chunk.startRenderIndex - this.chunk.chunkAmount;
+    let start = this.chunk.startRenderIndex - this.chunk.amount;
 
     // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
     if (start < 0) {
@@ -393,8 +391,7 @@ class DomManager {
   }
 
   resetAllList(): void {
-    const calculatedStart =
-      this.chunk.startRenderIndex - this.chunk.chunkAmount;
+    const calculatedStart = this.chunk.startRenderIndex - this.chunk.amount;
     const newStart =
       calculatedStart > this.list.startIndexOfLastPart
         ? this.list.startIndexOfLastPart
@@ -438,13 +435,13 @@ class DomManager {
     let newSequence =
       this.scroll.direction === 'down'
         ? this.chunk.startRenderIndex + this.list.halfOfExistingSizeInDOM
-        : this.chunk.startRenderIndex - this.chunk.chunkAmount;
+        : this.chunk.startRenderIndex - this.chunk.amount;
 
     if (newSequence < 0) newSequence = 0;
 
     const sequenceNumber = newSequence;
 
-    for (let i = 0; i < 1000 && i < this.chunk.chunkAmount; i++) {
+    for (let i = 0; i < 1000 && i < this.chunk.amount; i++) {
       const isStartOfList =
         this.scroll.direction === 'up' && sequenceNumber === 0;
 
