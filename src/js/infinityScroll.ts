@@ -186,7 +186,7 @@ class ChunkController {
 
 class ListController {
   // Содержит генерируемый элемент внутри корневого
-  el: HTMLElement;
+  // el: HTMLElement;
 
   // Длина списка
   length: number | undefined;
@@ -209,71 +209,8 @@ class ListController {
   // Стартовый индекс последней части списка
   public startIndexOfLastPart = 0;
 
-  private readonly wrapperEl: HTMLElement;
-
-  private chunk: ChunkController;
-
-  private readonly scroll: ScrollDetector;
-
-  private domMngr: DomManager;
-
-  constructor(props: {
-    wrapperEl: HTMLElement;
-    el: HTMLElement;
-    scroll: ScrollDetector;
-    chunk: ChunkController;
-  }) {
-    this.el = props.el;
-    this.wrapperEl = props.wrapperEl;
-    this.chunk = props.chunk;
-    this.scroll = props.scroll;
+  constructor() {
     console.log('Start List Controller', this);
-  }
-
-  setDomMng(domMngr: DomManager) {
-    this.domMngr = domMngr;
-  }
-
-  getAllSizes(): void {
-    console.log('GET SIZES');
-    const listWrp = this.wrapperEl;
-    const list = this.el;
-    const listWrpStyles = window.getComputedStyle(listWrp);
-    let listItem = list.firstChild as HTMLElement;
-
-    this.wrapperHeight =
-      parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
-
-    if (this.wrapperHeight < 2) {
-      console.error('You must set height to your list-wrapper!');
-      return;
-    }
-
-    if (!listItem) {
-      console.warn('Элементов в списке нет');
-      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(0);
-      listItem = list.firstChild as HTMLElement;
-    }
-
-    this.itemHeight = listItem?.offsetHeight || this.wrapperHeight;
-
-    this.chunk.amount = Math.ceil(this.wrapperHeight / this.itemHeight);
-
-    this.existingSizeInDOM = this.chunk.amount * 4;
-    this.halfOfExistingSizeInDOM = this.existingSizeInDOM / 2;
-    this.chunk.lastRenderIndex = this.length - this.halfOfExistingSizeInDOM;
-
-    this.startIndexOfLastPart = this.length - this.existingSizeInDOM;
-    this.chunk.lastOrderNumber = Math.floor(this.length / this.chunk.amount);
-
-    this.chunk.htmlHeight = this.chunk.amount * this.itemHeight;
-
-    this.tailingElementsAmount = this.length % this.chunk.amount;
-
-    if (listItem) {
-      console.warn('Элемент в списке есть');
-      this.domMngr.removeItem('firstChild');
-    }
   }
 }
 
@@ -619,12 +556,11 @@ class InfinityScroll {
 
   start() {
     console.log(this);
-    this.list.setDomMng(this.domMngr);
     if (this.dataLoadType === 'lazy') {
       console.log(this.listData);
       // return;
     }
-    this.list.getAllSizes();
+    this.getAllSizes();
     this.domMngr.fillList();
     this.domMngr.setPaddingToList();
 
@@ -650,6 +586,54 @@ class InfinityScroll {
     newEl.setAttribute('id', newElID);
     newEl.setAttribute('class', 'Demo_infinityScrollList');
     return this.wrapperEl?.appendChild(newEl);
+  }
+
+  getAllSizes(): void {
+    console.log('GET SIZES');
+    const listWrp = this.wrapperEl;
+    const list = this.listEl;
+    const listWrpStyles = window.getComputedStyle(listWrp);
+    let listItem = list.firstChild as HTMLElement;
+
+    this.list.wrapperHeight =
+      parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
+
+    if (this.list.wrapperHeight < 2) {
+      console.error('You must set height to your list-wrapper!');
+      return;
+    }
+
+    if (!listItem) {
+      console.warn('Элементов в списке нет');
+      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(0);
+      listItem = list.firstChild as HTMLElement;
+    }
+
+    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
+
+    this.chunk.amount = Math.ceil(
+      this.list.wrapperHeight / this.list.itemHeight
+    );
+
+    this.list.existingSizeInDOM = this.chunk.amount * 4;
+    this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
+    this.chunk.lastRenderIndex =
+      this.list.length - this.list.halfOfExistingSizeInDOM;
+
+    this.list.startIndexOfLastPart =
+      this.list.length - this.list.existingSizeInDOM;
+    this.chunk.lastOrderNumber = Math.floor(
+      this.list.length / this.chunk.amount
+    );
+
+    this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
+
+    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
+
+    if (listItem) {
+      console.warn('Элемент в списке есть');
+      this.domMngr.removeItem('firstChild');
+    }
   }
 
   calcCurrentDOMRender(e: Event & { target: Element }): void {
