@@ -29,11 +29,6 @@ const nameToTag = {
 
 // HELPER FUNCTIONS
 class ScrollDetector {
-  // Последняя доступная позиция скролла
-  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
-  // TODO: проверить, нужна ли она вообще
-  public LIST_LAST_SCROLL_POSITION = 0;
-
   public direction = 'down';
 
   public isGoingFromBottom = false;
@@ -85,7 +80,7 @@ class ScrollDetector {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkPosition >= this.chunk.lastRenderIndex - 1
+      chunkPosition >= this.chunk.lastOrderNumber - 1
     ) {
       this.isGoingFromBottom = true;
     }
@@ -101,11 +96,11 @@ class ScrollDetector {
   }
 
   isBeginOfListFromTop(): boolean {
-    return this.chunk.startRenderIndex < this.list.HALF_VISIBLE_SIZE;
+    return this.chunk.startRenderIndex < this.list.halfOfExistingSizeInDOM;
   }
 
   isEndOfListFromTop(): boolean {
-    return this.chunk.startRenderIndex > this.list.START_OF_LAST_VISIBLE_SIZE;
+    return this.chunk.startRenderIndex > this.chunk.lastRenderIndex;
   }
 
   isBeginOfListFromBottom(): boolean {
@@ -153,7 +148,10 @@ class ChunkController {
   htmlHeight = 0;
 
   // Порядковый номер последнего чанка в списке
-  lastRenderIndex: number;
+  lastOrderNumber: number;
+
+  // Номер, с которого начинается последний чанк
+  lastRenderIndex = 0;
 
   // Номер, c которого мы будем рендерить следующуй чанк
   public startRenderIndex = 0;
@@ -196,15 +194,11 @@ class ListController {
   // Длина списка
   length: number | undefined;
 
-  // Видимый размер списка (вычисляется по цсс-свойствам)
-  // TODO: не "видимы", а присутствующий в ДОМ
-  FULL_VISIBLE_SIZE = 0;
+  // Размер списка в ДОМ (вычисляется как "чанк * 4")
+  existingSizeInDOM = 0;
 
   // Половина видимого размер списка
-  HALF_VISIBLE_SIZE = 0;
-
-  // Номер позиции, с которой начинается последяя видимая часть списка
-  START_OF_LAST_VISIBLE_SIZE = 0;
+  halfOfExistingSizeInDOM = 0;
 
   // Высота обертки у списка
   wrapperHeight = 0;
@@ -214,6 +208,9 @@ class ListController {
 
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
+
+  // Стартовый индекс последней части списка
+  public startIndexOfLastPart = 0;
 
   private readonly wrapperEl: HTMLElement;
 
@@ -253,20 +250,14 @@ class ListController {
 
     this.chunk.chunkAmount = Math.ceil(this.wrapperHeight / this.itemHeight);
 
-    this.FULL_VISIBLE_SIZE = this.chunk.chunkAmount * 4;
-    this.HALF_VISIBLE_SIZE = this.FULL_VISIBLE_SIZE / 2;
-    this.START_OF_LAST_VISIBLE_SIZE = this.length - this.HALF_VISIBLE_SIZE;
-    console.log(
-      'this.scroll.LIST_LAST_SCROLL_POSITION',
-      this.scroll.LIST_LAST_SCROLL_POSITION
-    );
-    this.scroll.LIST_LAST_SCROLL_POSITION =
-      this.length - this.FULL_VISIBLE_SIZE;
-    console.log(
-      'this.scroll.LIST_LAST_SCROLL_POSITION',
-      this.scroll.LIST_LAST_SCROLL_POSITION
-    );
-    this.chunk.lastRenderIndex = Math.floor(
+    this.existingSizeInDOM = this.chunk.chunkAmount * 4;
+    this.halfOfExistingSizeInDOM = this.existingSizeInDOM / 2;
+    this.chunk.lastRenderIndex = this.length - this.halfOfExistingSizeInDOM;
+
+    // console.log('this.existingSizeInDOM', this.existingSizeInDOM);
+    this.startIndexOfLastPart = this.length - this.existingSizeInDOM;
+    console.log('this.startIndexOfLastPart', this.startIndexOfLastPart);
+    this.chunk.lastOrderNumber = Math.floor(
       this.length / this.chunk.chunkAmount
     );
 
@@ -354,9 +345,9 @@ class DomManager {
     // Если этого нет, то попадаем в padding 0!
     if (
       this.scroll.direction === 'down' &&
-      start > this.scroll.LIST_LAST_SCROLL_POSITION
+      start > this.list.startIndexOfLastPart
     ) {
-      start = this.scroll.LIST_LAST_SCROLL_POSITION;
+      start = this.list.startIndexOfLastPart;
     }
     const offset = start * this.list.itemHeight;
 
@@ -378,7 +369,7 @@ class DomManager {
     if (
       this.GLOBAL_ITEM_COUNTER > 49999 ||
       this.GLOBAL_ITEM_COUNTER >= this.list.length ||
-      this.GLOBAL_ITEM_COUNTER >= this.list.FULL_VISIBLE_SIZE
+      this.GLOBAL_ITEM_COUNTER >= this.list.existingSizeInDOM
     )
       return;
 
@@ -388,7 +379,7 @@ class DomManager {
       i < 1000 &&
       i < this.list.length - 1 &&
       this.GLOBAL_ITEM_COUNTER < this.list.length &&
-      this.GLOBAL_ITEM_COUNTER < this.list.FULL_VISIBLE_SIZE;
+      this.GLOBAL_ITEM_COUNTER < this.list.existingSizeInDOM;
       i++
     ) {
       templateFragments += this.createItem(this.GLOBAL_ITEM_COUNTER);
@@ -404,8 +395,8 @@ class DomManager {
     const calculatedStart =
       this.chunk.startRenderIndex - this.chunk.chunkAmount;
     const newStart =
-      calculatedStart > this.scroll.LIST_LAST_SCROLL_POSITION
-        ? this.scroll.LIST_LAST_SCROLL_POSITION
+      calculatedStart > this.list.startIndexOfLastPart
+        ? this.list.startIndexOfLastPart
         : calculatedStart;
 
     let newSequence = newStart;
@@ -415,7 +406,7 @@ class DomManager {
     const sequenceNumber = newSequence;
 
     let templateFragments = '';
-    for (let i = 0; i < 1000 && i < this.list.FULL_VISIBLE_SIZE; i++) {
+    for (let i = 0; i < 1000 && i < this.list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
       templateFragments += this.createItem(elemNum);
@@ -445,7 +436,7 @@ class DomManager {
     // Это работает праивльно (в начале списка)
     let newSequence =
       this.scroll.direction === 'down'
-        ? this.chunk.startRenderIndex + this.list.HALF_VISIBLE_SIZE
+        ? this.chunk.startRenderIndex + this.list.halfOfExistingSizeInDOM
         : this.chunk.startRenderIndex - this.chunk.chunkAmount;
 
     if (newSequence < 0) newSequence = 0;
@@ -501,7 +492,7 @@ class DomManager {
 
     checkChildrenAmount(
       this.targetElem.childNodes.length,
-      this.list.FULL_VISIBLE_SIZE
+      this.list.existingSizeInDOM
     );
   }
 }
@@ -668,7 +659,7 @@ class InfinityScroll {
     const chunkPosition: number = this.chunk.getOrderNumber(scrollTop);
     checkChildrenAmount(
       this.listEl.childNodes.length,
-      this.list.FULL_VISIBLE_SIZE
+      this.list.existingSizeInDOM
     );
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
     const newRenderIndex: number = this.chunk.getRenderIndex(chunkPosition);
