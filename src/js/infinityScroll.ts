@@ -64,8 +64,10 @@ class ScrollDetector {
     return Math.abs(this.chunk.startRenderIndex - newCurrentListScroll);
   }
 
-  isSmallDiff(scrollDiff: number): boolean {
-    if (scrollDiff !== 0 && scrollDiff <= this.list.tailingElementsAmount) {
+  // TODO: говорит, нужен this
+  // eslint-disable-next-line class-methods-use-this
+  isSmallDiff(scrollDiff: number, tailingElementsAmount: number): boolean {
+    if (scrollDiff !== 0 && scrollDiff <= tailingElementsAmount) {
       return true;
     }
     return false;
@@ -85,15 +87,22 @@ class ScrollDetector {
     }
   }
 
-  isBigDiff(scrollDiff: number): boolean {
+  isBigDiff(
+    scrollDiff: number,
+    chunkAmount: number,
+    tailingElementsAmount: number
+  ): boolean {
     const isBigDiff =
       (this.isGoingFromBottom &&
-        scrollDiff > this.chunk.amount + this.list.tailingElementsAmount) ||
-      (!this.isGoingFromBottom && scrollDiff > this.chunk.amount);
+        scrollDiff > chunkAmount + tailingElementsAmount) ||
+      (!this.isGoingFromBottom && scrollDiff > chunkAmount);
     return isBigDiff;
   }
 
-  isBeginOfListFromTop(): boolean {
+  isBeginOfListFromTop(
+    startRenderIndex: number,
+    halfOfExistingSizeInDOM: number
+  ): boolean {
     return this.chunk.startRenderIndex < this.list.halfOfExistingSizeInDOM;
   }
 
@@ -101,13 +110,20 @@ class ScrollDetector {
     return this.chunk.startRenderIndex > this.chunk.lastRenderIndex;
   }
 
-  isBeginOfListFromBottom(): boolean {
+  isBeginOfListFromBottom(
+    startRenderIndex: number,
+    listLength: number,
+    chunkAmount: number
+  ): boolean {
     return (
       this.chunk.startRenderIndex >= this.list.length - this.chunk.amount * 3
     );
   }
 
-  isEndOfListFromBottom(): boolean {
+  isEndOfListFromBottom(
+    startRenderIndex: number,
+    tailingElementsAmount: number
+  ): boolean {
     return this.chunk.startRenderIndex < this.list.tailingElementsAmount;
   }
 
@@ -669,7 +685,7 @@ class InfinityScroll {
 
     const scrollDiff: number = this.scroll.getDiff(newRenderIndex);
     // Если скролл слишком маленький - не делаем ничего
-    if (this.scroll.isSmallDiff(scrollDiff)) {
+    if (this.scroll.isSmallDiff(scrollDiff, this.list.tailingElementsAmount)) {
       return;
     }
 
@@ -698,7 +714,11 @@ class InfinityScroll {
   }
 
   checkBigDiffToResetList(scrollDiff: number): void {
-    const isBigDiff: boolean = this.scroll.isBigDiff(scrollDiff);
+    const isBigDiff: boolean = this.scroll.isBigDiff(
+      scrollDiff,
+      this.chunk.amount,
+      this.list.tailingElementsAmount
+    );
 
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
