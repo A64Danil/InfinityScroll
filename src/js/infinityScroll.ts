@@ -238,8 +238,6 @@ class DomManager {
 
   private chunk: ChunkController;
 
-  private readonly scroll: ScrollDetector;
-
   private infinityScroll: InfinityScroll;
 
   constructor(props: {
@@ -250,7 +248,6 @@ class DomManager {
     chunk: ChunkController;
     // eslint-disable-next-line @typescript-eslint/ban-types
     template: Function;
-    scrollDetector: ScrollDetector;
   }) {
     this.data = props.data;
     this.targetElem = props.targetElem;
@@ -258,7 +255,6 @@ class DomManager {
     this.list = props.list;
     this.chunk = props.chunk;
     this.template = props.template;
-    this.scroll = props.scrollDetector;
   }
 
   setPaddingToList(offset = 0): void {
@@ -275,7 +271,10 @@ class DomManager {
     this.targetElem.style.paddingBottom = `${paddingBottom}px`;
   }
 
-  setOffsetToList(forcedOffset: number | undefined = undefined): void {
+  setOffsetToList(
+    direction: 'down' | 'up',
+    forcedOffset: number | undefined = undefined
+  ): void {
     console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (forcedOffset !== undefined) {
@@ -291,10 +290,7 @@ class DomManager {
       start = 0;
     }
     // Если этого нет, то попадаем в padding 0!
-    if (
-      this.scroll.direction === 'down' &&
-      start > this.list.startIndexOfLastPart
-    ) {
+    if (direction === 'down' && start > this.list.startIndexOfLastPart) {
       start = this.list.startIndexOfLastPart;
     }
     const offset = start * this.list.itemHeight;
@@ -340,7 +336,7 @@ class DomManager {
     this.fillListTimerId = window.setTimeout(() => this.fillList(), this.delay);
   }
 
-  resetAllList(): void {
+  resetAllList(direction: 'down' | 'up'): void {
     const calculatedStart = this.chunk.startRenderIndex - this.chunk.amount;
     const newStart =
       calculatedStart > this.list.startIndexOfLastPart
@@ -363,7 +359,7 @@ class DomManager {
     const newOffset = newSequence * this.list.itemHeight;
 
     this.targetElem.innerHTML = templateFragments;
-    this.setOffsetToList(newOffset);
+    this.setOffsetToList(direction, newOffset);
 
     // TODO: убрать после тестов
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
@@ -373,17 +369,19 @@ class DomManager {
     this.infinityScroll.isWaitRender = false;
   }
 
-  changeItemsInList(): void {
+  changeItemsInList(
+    direction: 'down' | 'up',
+    isGoingFromBottom: boolean
+  ): void {
     // for addItems
     let templateFragments = '';
 
     // for removeItems
-    const childPosition =
-      this.scroll.direction === 'down' ? 'firstChild' : 'lastChild';
+    const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
 
     // Это работает праивльно (в начале списка)
     let newSequence =
-      this.scroll.direction === 'down'
+      direction === 'down'
         ? this.chunk.startRenderIndex + this.list.halfOfExistingSizeInDOM
         : this.chunk.startRenderIndex - this.chunk.amount;
 
@@ -392,17 +390,15 @@ class DomManager {
     const sequenceNumber = newSequence;
 
     for (let i = 0; i < 1000 && i < this.chunk.amount; i++) {
-      const isStartOfList =
-        this.scroll.direction === 'up' && sequenceNumber === 0;
+      const isStartOfList = direction === 'up' && sequenceNumber === 0;
 
       const isReachTopLimit =
-        this.scroll.isGoingFromBottom &&
+        isGoingFromBottom &&
         isStartOfList &&
         i + sequenceNumber >= this.list.tailingElementsAmount;
 
       const isReachBottomLimit =
-        this.scroll.direction === 'down' &&
-        i + sequenceNumber > this.list.length - 1;
+        direction === 'down' && i + sequenceNumber > this.list.length - 1;
 
       const allowToChange = !isReachTopLimit && !isReachBottomLimit;
 
@@ -423,20 +419,24 @@ class DomManager {
     }
 
     // TODO: вынести в отдельную функцию?
-    if (this.scroll.direction === 'down') {
+    if (direction === 'down') {
       this.targetElem.innerHTML += templateFragments;
     } else {
       this.targetElem.innerHTML = templateFragments + this.targetElem.innerHTML;
     }
   }
 
-  modifyCurrentDOM(direction: 'down' | 'up', list: ListController): void {
+  modifyCurrentDOM(
+    direction: 'down' | 'up',
+    isGoingFromBottom: boolean,
+    list: ListController
+  ): void {
     if (!this.chunk.isAllowRenderNearBorder(direction, list)) {
       return;
     }
 
-    this.changeItemsInList();
-    this.setOffsetToList();
+    this.changeItemsInList(direction, isGoingFromBottom);
+    this.setOffsetToList(direction);
 
     checkChildrenAmount(
       this.targetElem.childNodes.length,
@@ -673,7 +673,11 @@ class InfinityScroll {
         this.scroll.isGoingFromBottom,
         this.list.tailingElementsAmount
       );
-      this.domMngr.modifyCurrentDOM(this.scroll.direction, this.list);
+      this.domMngr.modifyCurrentDOM(
+        this.scroll.direction,
+        this.scroll.isGoingFromBottom,
+        this.list
+      );
     }
   }
 
@@ -693,7 +697,7 @@ class InfinityScroll {
     if (isBigDiff && this.isWaitRender === false) {
       this.isWaitRender = true;
       this.timerIdRefreshList = window.setTimeout(() => {
-        this.domMngr.resetAllList();
+        this.domMngr.resetAllList(this.scroll.direction);
       }, 30);
     }
   }
