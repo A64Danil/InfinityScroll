@@ -36,14 +36,8 @@ class ScrollDetector {
   // Предыдущая позиция скролла (нужна чтобы сравнивать с новой)
   public prevScroll = 0;
 
-  private chunk: ChunkController | undefined;
-
   constructor() {
     console.log('start ScrollDetector');
-  }
-
-  setListChunk(chunk: ChunkController) {
-    this.chunk = chunk;
   }
 
   setScrollDirection(scroll: number): void {
@@ -68,15 +62,15 @@ class ScrollDetector {
     return false;
   }
 
-  setGoingFromBottom(chunkOrderNumber: number): void {
+  setGoingFromBottom(chunk: ChunkController, chunkOrderNumber: number): void {
     if (
       this.direction === 'down' &&
-      chunkOrderNumber <= this.chunk.firstOrderNumber
+      chunkOrderNumber <= chunk.firstOrderNumber
     ) {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkOrderNumber >= this.chunk.lastOrderNumber - 1
+      chunkOrderNumber >= chunk.lastOrderNumber - 1
     ) {
       this.isGoingFromBottom = true;
     }
@@ -586,9 +580,6 @@ class InfinityScroll {
 
     this.list = new ListController(listProps);
 
-    this.scroll.setList(this.list);
-    this.scroll.setListChunk(this.chunk);
-
     const domChangerProps = {
       data: null,
       targetElem: this.listEl,
@@ -686,7 +677,7 @@ class InfinityScroll {
 
     this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
-    this.scroll.setGoingFromBottom(chunkOrderNumber);
+    this.scroll.setGoingFromBottom(this.chunk, chunkOrderNumber);
     // Если скролл слишком большой - рисуем всё заново
     this.checkBigDiffToResetList(scrollDiff);
 
