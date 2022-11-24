@@ -156,17 +156,8 @@ class ChunkController {
   // Номер, c которого мы будем рендерить следующуй чанк
   public startRenderIndex = 0;
 
-  private scroll: ScrollDetector;
-
-  private list: ListController;
-
-  constructor(props: { scroll: ScrollDetector }) {
+  constructor() {
     console.log('start ChunkController');
-    this.scroll = props.scroll;
-  }
-
-  setList(list: ListController) {
-    this.list = list;
   }
 
   getOrderNumber(scroll: number): number {
@@ -174,10 +165,14 @@ class ChunkController {
     return chunkOrderNumber;
   }
 
-  setRenderIndex(scroll: number): void {
+  setRenderIndex(
+    scroll: number,
+    isGoingFromBottom: boolean,
+    tailingElementsAmount: number
+  ): void {
     this.startRenderIndex = scroll;
-    if (this.scroll.isGoingFromBottom) {
-      this.startRenderIndex += this.list.tailingElementsAmount;
+    if (isGoingFromBottom) {
+      this.startRenderIndex += tailingElementsAmount;
     }
   }
 
@@ -572,11 +567,7 @@ class InfinityScroll {
 
     this.scroll = new ScrollDetector();
 
-    const chunkProps = {
-      scroll: this.scroll,
-    };
-
-    this.chunk = new ChunkController(chunkProps);
+    this.chunk = new ChunkController();
 
     const listProps = {
       el: this.listEl,
@@ -586,8 +577,6 @@ class InfinityScroll {
     };
 
     this.list = new ListController(listProps);
-
-    this.chunk.setList(this.list);
 
     this.scroll.setList(this.list);
     this.scroll.setListChunk(this.chunk);
@@ -693,7 +682,11 @@ class InfinityScroll {
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== newRenderIndex) {
       console.warn('====== this.chunk.startRenderIndex поменялся ======');
-      this.chunk.setRenderIndex(newRenderIndex);
+      this.chunk.setRenderIndex(
+        newRenderIndex,
+        this.scroll.isGoingFromBottom,
+        this.list.tailingElementsAmount
+      );
       this.domMngr.modifyCurrentDOM();
     }
   }
