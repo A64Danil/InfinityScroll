@@ -215,6 +215,8 @@ class ListController {
 }
 
 class DomManager {
+  public isWaitRender = false;
+
   // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
   private delay = 0;
 
@@ -234,20 +236,14 @@ class DomManager {
 
   private avrTimeArr: Array<number> = [];
 
-  private infinityScroll: InfinityScroll;
-
   constructor(props: {
     data: any;
     targetElem: HTMLElement;
-    infinityScroll: InfinityScroll;
-    list: ListController;
-    chunk: ChunkController;
     // eslint-disable-next-line @typescript-eslint/ban-types
     template: Function;
   }) {
     this.data = props.data;
     this.targetElem = props.targetElem;
-    this.infinityScroll = props.infinityScroll;
     this.template = props.template;
   }
 
@@ -371,7 +367,7 @@ class DomManager {
     console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
     // TODO: не хватает этой переменной
-    this.infinityScroll.isWaitRender = false;
+    this.isWaitRender = false;
   }
 
   changeItemsInList(
@@ -493,8 +489,6 @@ class InfinityScroll {
   private listEl: HTMLElement | null;
 
   private avrTimeArr: Array<number> = [];
-
-  public isWaitRender = false;
 
   private domMngr: DomManager;
 
@@ -681,7 +675,10 @@ class InfinityScroll {
   }
 
   clearTimerIfNeeded(): void {
-    if (this.timerIdRefreshList !== null && this.isWaitRender === false) {
+    if (
+      this.timerIdRefreshList !== null &&
+      this.domMngr.isWaitRender === false
+    ) {
       clearTimeout(this.timerIdRefreshList);
     }
   }
@@ -693,8 +690,8 @@ class InfinityScroll {
       this.list.tailingElementsAmount
     );
 
-    if (isBigDiff && this.isWaitRender === false) {
-      this.isWaitRender = true;
+    if (isBigDiff && this.domMngr.isWaitRender === false) {
+      this.domMngr.isWaitRender = true;
       this.timerIdRefreshList = window.setTimeout(() => {
         this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
       }, 30);
