@@ -655,7 +655,7 @@ class InfinityScroll {
   }
 
   calcCurrentDOMRender(e: Event & { target: Element }): void {
-    const { scroll } = e.target;
+    const scroll = e.target.scrollTop;
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
     checkChildrenAmount(
