@@ -85,7 +85,7 @@ class ScrollDetector {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkPosition >= this.chunk.LAST_ORDER_NUMBER - 1
+      chunkPosition >= this.chunk.lastRenderIndex - 1
     ) {
       this.isGoingFromBottom = true;
     }
@@ -150,10 +150,10 @@ class ChunkController {
   // Размер чанка (чанк - видимая часть элементов в спике)
   chunkAmount = 2;
 
-  chunkHeight = 0;
+  htmlHeight = 0;
 
   // Порядковый номер последнего чанка в списке
-  LAST_ORDER_NUMBER: number;
+  lastRenderIndex: number;
 
   // Номер, c которого мы будем рендерить следующуй чанк
   public startRenderIndex = 0;
@@ -172,7 +172,7 @@ class ChunkController {
   }
 
   getOrderNumber(scrollTop: number): number {
-    const chunkOrderNumber = Math.floor(scrollTop / this.chunkHeight);
+    const chunkOrderNumber = Math.floor(scrollTop / this.htmlHeight);
     return chunkOrderNumber;
   }
 
@@ -266,11 +266,11 @@ class ListController {
       'this.scroll.LIST_LAST_SCROLL_POSITION',
       this.scroll.LIST_LAST_SCROLL_POSITION
     );
-    this.chunk.LAST_ORDER_NUMBER = Math.floor(
+    this.chunk.lastRenderIndex = Math.floor(
       this.length / this.chunk.chunkAmount
     );
 
-    this.chunk.chunkHeight = this.chunk.chunkAmount * this.itemHeight;
+    this.chunk.htmlHeight = this.chunk.chunkAmount * this.itemHeight;
 
     this.tailingElementsAmount = this.length % this.chunk.chunkAmount;
   }
@@ -325,7 +325,7 @@ class DomManager {
   setPaddingToList(offset = 0): void {
     let paddingBottom =
       this.list.length * this.list.itemHeight -
-      this.chunk.chunkHeight * 4 -
+      this.chunk.htmlHeight * 4 -
       offset;
 
     // TODO: проверить, попадаем ли мы туда
