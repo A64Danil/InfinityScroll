@@ -33,9 +33,8 @@ class ScrollDetector {
 
   public isGoingFromBottom = false;
 
-  // Предыдущая сохраненная позиция скролла (нужна чтобы сравнивать с новой)
-  // TODO: переименовать после удаления position
-  public lastScrollTopPosition = 0;
+  // Предыдущая позиция скролла (нужна чтобы сравнивать с новой)
+  public prevScroll = 0;
 
   private list: ListController | undefined;
 
@@ -53,8 +52,8 @@ class ScrollDetector {
     this.chunk = chunk;
   }
 
-  setScrollDirection(scrollTop: number): void {
-    if (scrollTop > this.lastScrollTopPosition) {
+  setScrollDirection(scroll: number): void {
+    if (scroll > this.prevScroll) {
       this.direction = 'down';
     } else {
       this.direction = 'up';
@@ -72,15 +71,16 @@ class ScrollDetector {
     return false;
   }
 
-  setGoingFromBottom(chunkPosition: number): void {
+  setGoingFromBottom(chunkOrderNumber: number): void {
     if (
       this.direction === 'down' &&
-      chunkPosition <= this.list.tailingElementsAmount
+      // TODO: this.list.tailingElementsAmount заменить на this.chunk.firstOrderNumber
+      chunkOrderNumber <= this.list.tailingElementsAmount
     ) {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkPosition >= this.chunk.lastOrderNumber - 1
+      chunkOrderNumber >= this.chunk.lastOrderNumber - 1
     ) {
       this.isGoingFromBottom = true;
     }
@@ -169,8 +169,8 @@ class ChunkController {
     this.list = list;
   }
 
-  getOrderNumber(scrollTop: number): number {
-    const chunkOrderNumber = Math.floor(scrollTop / this.htmlHeight);
+  getOrderNumber(scroll: number): number {
+    const chunkOrderNumber = Math.floor(scroll / this.htmlHeight);
     return chunkOrderNumber;
   }
 
@@ -181,8 +181,8 @@ class ChunkController {
     }
   }
 
-  getRenderIndex(chunkPosition: number): number {
-    const startRenderIndex = chunkPosition * this.chunkAmount;
+  getRenderIndex(chunkOrderNumber: number): number {
+    const startRenderIndex = chunkOrderNumber * this.chunkAmount;
     return startRenderIndex;
   }
 }
@@ -231,6 +231,7 @@ class ListController {
     console.log('Start List Controller', this);
   }
 
+  // TODO: разбить на 2 функции
   getAllSizes(): void {
     console.log('GET SIZES');
     const listWrp = this.wrapperEl;
@@ -654,18 +655,18 @@ class InfinityScroll {
   }
 
   calcCurrentDOMRender(e: Event & { target: Element }): void {
-    const { scrollTop } = e.target;
+    const { scroll } = e.target;
     // Вычисляем позицию чанка
-    const chunkPosition: number = this.chunk.getOrderNumber(scrollTop);
+    const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.existingSizeInDOM
     );
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
-    const newRenderIndex: number = this.chunk.getRenderIndex(chunkPosition);
-    this.scroll.setScrollDirection(scrollTop);
+    const newRenderIndex: number = this.chunk.getRenderIndex(chunkOrderNumber);
+    this.scroll.setScrollDirection(scroll);
 
-    this.scroll.lastScrollTopPosition = scrollTop;
+    this.scroll.prevScroll = scroll;
 
     const scrollDiff: number = this.scroll.getDiff(newRenderIndex);
     // Если скролл слишком маленький - не делаем ничего
@@ -675,7 +676,7 @@ class InfinityScroll {
 
     this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
-    this.scroll.setGoingFromBottom(chunkPosition);
+    this.scroll.setGoingFromBottom(chunkOrderNumber);
     // Если скролл слишком большой - рисуем всё заново
     this.checkBigDiffToResetList(scrollDiff);
 
