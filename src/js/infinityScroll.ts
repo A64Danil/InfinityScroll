@@ -29,23 +29,17 @@ const nameToTag = {
 
 // HELPER FUNCTIONS
 class ScrollDetector {
-  public direction = 'down';
+  public direction: 'down' | 'up' = 'down';
 
   public isGoingFromBottom = false;
 
   // Предыдущая позиция скролла (нужна чтобы сравнивать с новой)
   public prevScroll = 0;
 
-  private list: ListController | undefined;
-
   private chunk: ChunkController | undefined;
 
   constructor() {
     console.log('start ScrollDetector');
-  }
-
-  setList(list: ListController) {
-    this.list = list;
   }
 
   setListChunk(chunk: ChunkController) {
@@ -60,8 +54,9 @@ class ScrollDetector {
     }
   }
 
-  getDiff(newCurrentListScroll: number): number {
-    return Math.abs(this.chunk.startRenderIndex - newCurrentListScroll);
+  // eslint-disable-next-line class-methods-use-this
+  getDiff(startRenderIndex: number, newRenderIndex: number): number {
+    return Math.abs(startRenderIndex - newRenderIndex);
   }
 
   // TODO: говорит, нужен this
@@ -97,60 +92,6 @@ class ScrollDetector {
         scrollDiff > chunkAmount + tailingElementsAmount) ||
       (!this.isGoingFromBottom && scrollDiff > chunkAmount);
     return isBigDiff;
-  }
-
-  isBeginOfListFromTop(
-    startRenderIndex: number,
-    halfOfExistingSizeInDOM: number
-  ): boolean {
-    return this.chunk.startRenderIndex < this.list.halfOfExistingSizeInDOM;
-  }
-
-  isEndOfListFromTop(): boolean {
-    return this.chunk.startRenderIndex > this.chunk.lastRenderIndex;
-  }
-
-  isBeginOfListFromBottom(
-    startRenderIndex: number,
-    listLength: number,
-    chunkAmount: number
-  ): boolean {
-    return (
-      this.chunk.startRenderIndex >= this.list.length - this.chunk.amount * 3
-    );
-  }
-
-  isEndOfListFromBottom(
-    startRenderIndex: number,
-    tailingElementsAmount: number
-  ): boolean {
-    return this.chunk.startRenderIndex < this.list.tailingElementsAmount;
-  }
-
-  isAllowRenderNearBorder(): boolean {
-    if (this.direction === 'down' && this.isBeginOfListFromTop()) {
-      console.log('Пока рендерить не надо. Вы в самом верху списка.');
-      return false;
-    }
-
-    if (this.direction === 'down' && this.isEndOfListFromTop()) {
-      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-      return false;
-    }
-
-    if (this.direction === 'up' && this.isBeginOfListFromBottom()) {
-      console.log(
-        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
-      );
-      return false;
-    }
-
-    if (this.direction === 'up' && this.isEndOfListFromBottom()) {
-      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-      return false;
-    }
-
-    return true;
   }
 }
 
@@ -195,6 +136,57 @@ class ChunkController {
   getRenderIndex(chunkOrderNumber: number): number {
     const startRenderIndex = chunkOrderNumber * this.amount;
     return startRenderIndex;
+  }
+
+  isBeginOfListFromTop(halfOfExistingSizeInDOM: number): boolean {
+    return this.startRenderIndex < halfOfExistingSizeInDOM;
+  }
+
+  isEndOfListFromTop(): boolean {
+    return this.startRenderIndex > this.lastRenderIndex;
+  }
+
+  isBeginOfListFromBottom(listLength: number): boolean {
+    return this.startRenderIndex >= listLength - this.amount * 3;
+  }
+
+  isEndOfListFromBottom(tailingElementsAmount: number): boolean {
+    return this.startRenderIndex < tailingElementsAmount;
+  }
+
+  isAllowRenderNearBorder(
+    direction: 'down' | 'up',
+    list: ListController
+  ): boolean {
+    if (
+      direction === 'down' &&
+      this.isBeginOfListFromTop(list.halfOfExistingSizeInDOM)
+    ) {
+      console.log('Пока рендерить не надо. Вы в самом верху списка.');
+      return false;
+    }
+
+    if (direction === 'down' && this.isEndOfListFromTop()) {
+      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+      return false;
+    }
+
+    if (direction === 'up' && this.isBeginOfListFromBottom(list.length)) {
+      console.log(
+        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
+      );
+      return false;
+    }
+
+    if (
+      direction === 'up' &&
+      this.isEndOfListFromBottom(list.tailingElementsAmount)
+    ) {
+      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+      return false;
+    }
+
+    return true;
   }
 }
 
@@ -507,8 +499,8 @@ class DomManager {
     }
   }
 
-  modifyCurrentDOM(): void {
-    if (!this.scroll.isAllowRenderNearBorder()) {
+  modifyCurrentDOM(direction: 'down' | 'up', list: ListController): void {
+    if (!this.chunk.isAllowRenderNearBorder(direction, list)) {
       return;
     }
 
@@ -683,7 +675,10 @@ class InfinityScroll {
 
     this.scroll.prevScroll = scroll;
 
-    const scrollDiff: number = this.scroll.getDiff(newRenderIndex);
+    const scrollDiff: number = this.scroll.getDiff(
+      this.chunk.startRenderIndex,
+      newRenderIndex
+    );
     // Если скролл слишком маленький - не делаем ничего
     if (this.scroll.isSmallDiff(scrollDiff, this.list.tailingElementsAmount)) {
       return;
@@ -703,7 +698,7 @@ class InfinityScroll {
         this.scroll.isGoingFromBottom,
         this.list.tailingElementsAmount
       );
-      this.domMngr.modifyCurrentDOM();
+      this.domMngr.modifyCurrentDOM(this.scroll.direction, this.list);
     }
   }
 
