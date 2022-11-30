@@ -28,6 +28,78 @@ const nameToTag = {
  */
 
 // HELPER FUNCTIONS
+class RenderController {
+  private halfOfExistingSizeInDOM: number | undefined;
+
+  private lastRenderIndex: number | undefined;
+
+  private listLength: number | undefined;
+
+  private chunkAmount: number | undefined;
+
+  private tailingElementsAmount: number | undefined;
+
+  constructor(renderProps: {
+    halfOfExistingSizeInDOM: number | undefined;
+    lastRenderIndex: number | undefined;
+    listLength: number | undefined;
+    chunkAmount: number | undefined;
+    tailingElementsAmount: number | undefined;
+  }) {
+    this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM;
+    this.lastRenderIndex = renderProps.lastRenderIndex;
+    this.listLength = renderProps.listLength;
+    this.chunkAmount = renderProps.chunkAmount;
+    this.tailingElementsAmount = renderProps.tailingElementsAmount;
+    console.log(this);
+  }
+
+  isBeginOfListFromTop(startRenderIndex: number): boolean {
+    return startRenderIndex < this.halfOfExistingSizeInDOM;
+  }
+
+  isEndOfListFromTop(startRenderIndex: number): boolean {
+    return startRenderIndex > this.lastRenderIndex;
+  }
+
+  isBeginOfListFromBottom(startRenderIndex: number): boolean {
+    return startRenderIndex >= this.listLength - this.chunkAmount * 3;
+  }
+
+  isEndOfListFromBottom(startRenderIndex: number): boolean {
+    return startRenderIndex < this.tailingElementsAmount;
+  }
+
+  isAllowRenderNearBorder(
+    direction: 'down' | 'up',
+    startRenderIndex: number
+  ): boolean {
+    if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
+      console.log('Пока рендерить не надо. Вы в самом верху списка.');
+      return false;
+    }
+
+    if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
+      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+      return false;
+    }
+
+    if (direction === 'up' && this.isBeginOfListFromBottom(startRenderIndex)) {
+      console.log(
+        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
+      );
+      return false;
+    }
+
+    if (direction === 'up' && this.isEndOfListFromBottom(startRenderIndex)) {
+      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+      return false;
+    }
+
+    return true;
+  }
+}
+
 class ScrollDetector {
   public direction: 'down' | 'up' = 'down';
 
@@ -199,14 +271,11 @@ class ListController {
   // Половина видимого размер списка
   halfOfExistingSizeInDOM = 0;
 
-  // TODO: перенести в дом?
-  // Высота обертки у списка
   wrapperHeight = 0;
 
-  // TODO: перенести в дом?
-  // Высота пункта списка
   itemHeight = 0;
 
+  // TODO: перенести в чанк?
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
 
@@ -495,6 +564,8 @@ class InfinityScroll {
 
   private readonly list: ListController;
 
+  private render: RenderController;
+
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
     this.selectorId = props.selectorId;
@@ -546,6 +617,14 @@ class InfinityScroll {
       // return;
     }
     this.getAllSizes();
+    const renderProps = {
+      halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
+      lastRenderIndex: this.chunk.lastRenderIndex,
+      listLength: this.list.length,
+      chunkAmount: this.chunk.amount,
+      tailingElementsAmount: this.list.tailingElementsAmount,
+    };
+    this.render = new RenderController(renderProps);
     this.domMngr.fillList(this.list);
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
