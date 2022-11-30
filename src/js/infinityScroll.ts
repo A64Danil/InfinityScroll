@@ -185,8 +185,7 @@ class ChunkController {
 }
 
 class ListController {
-  // Содержит генерируемый элемент внутри корневого
-  // el: HTMLElement;
+  public data: unknown[] | unknown | undefined;
 
   // Длина списка
   length: number | undefined;
@@ -197,9 +196,11 @@ class ListController {
   // Половина видимого размер списка
   halfOfExistingSizeInDOM = 0;
 
+  // TODO: перенести в дом?
   // Высота обертки у списка
   wrapperHeight = 0;
 
+  // TODO: перенести в дом?
   // Высота пункта списка
   itemHeight = 0;
 
@@ -223,7 +224,8 @@ class DomManager {
   // хранит в себе id сетТаймаута
   private fillListTimerId: number | undefined;
 
-  private data;
+  // TODO: это вообще не отсюда
+  // private readonly data: any[] | undefined;
 
   // TODO: сделать назад приватным
   public targetElem;
@@ -237,12 +239,11 @@ class DomManager {
   private avrTimeArr: Array<number> = [];
 
   constructor(props: {
-    data: any;
     targetElem: HTMLElement;
     // eslint-disable-next-line @typescript-eslint/ban-types
     template: Function;
   }) {
-    this.data = props.data;
+    // this.data = props.data;
     this.targetElem = props.targetElem;
     this.template = props.template;
   }
@@ -293,10 +294,14 @@ class DomManager {
     this.setPaddingToList(list, chunk.htmlHeight, offset);
   }
 
-  createItem(elemNum: number): string {
-    const element = this.data[elemNum];
-    return this.template(element, this.targetElem);
+  createItem(elemData: object): string {
+    return this.template(elemData, this.targetElem);
   }
+
+  // createItemOld(elemNum: number): string {
+  //   const element = this.data[elemNum];
+  //   return this.template(element, this.targetElem);
+  // }
 
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
     const child: ChildNode | null = this.targetElem[childPosition];
@@ -321,7 +326,8 @@ class DomManager {
       this.GLOBAL_ITEM_COUNTER < list.existingSizeInDOM;
       i++
     ) {
-      templateFragments += this.createItem(this.GLOBAL_ITEM_COUNTER);
+      const elemData = list.data[this.GLOBAL_ITEM_COUNTER];
+      templateFragments += this.createItem(elemData);
       this.GLOBAL_ITEM_COUNTER++;
     }
 
@@ -354,7 +360,8 @@ class DomManager {
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
-      templateFragments += this.createItem(elemNum);
+      const elemData = list.data[elemNum];
+      templateFragments += this.createItem(elemData);
     }
 
     const newOffset = newSequence * list.itemHeight;
@@ -415,7 +422,8 @@ class DomManager {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        templateFragments += this.createItem(elemNum);
+        const elemData = list.data[elemNum];
+        templateFragments += this.createItem(elemData);
         // remove items
         this.removeItem(childPosition);
       }
@@ -451,7 +459,7 @@ class DomManager {
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 interface InfinityScrollPropTypes {
-  // data?: Array<ListData>;
+  data: unknown[];
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: string;
   name: string;
@@ -513,7 +521,6 @@ class InfinityScroll {
     this.list = new ListController();
 
     const domChangerProps = {
-      data: null,
       targetElem: this.listEl,
       infinityScroll: this,
       template: props.templateString,
@@ -521,26 +528,24 @@ class InfinityScroll {
 
     this.dataLoadType = props.dataLoadType;
 
+    this.domMngr = new DomManager(domChangerProps);
+
     if (this.dataLoadType === 'instant') {
-      this.listData = props.data;
-      this.list.length = this.listData && this.listData.length;
+      this.list.data = props.data;
+      this.list.length = this.list.data && this.list.data.length;
       console.log(this.list.length);
-      domChangerProps.data = this.listData;
-      this.domMngr = new DomManager(domChangerProps);
       this.start();
     } else {
       this.dataUrl = props.dataUrl;
       this.getRemoteData()
         .then((data) => {
           console.log(data);
-          this.listData = data;
+          this.list.data = data;
           return data;
         })
         .then((data) => {
           console.log('second then');
-          this.list.length = this.listData && this.listData.length;
-          domChangerProps.data = this.listData;
-          this.domMngr = new DomManager(domChangerProps);
+          this.list.length = this.list.data && this.list.data.length;
           this.start();
         });
     }
@@ -549,7 +554,7 @@ class InfinityScroll {
   start() {
     console.log(this);
     if (this.dataLoadType === 'lazy') {
-      console.log(this.listData);
+      console.log(this.list.data);
       // return;
     }
     this.getAllSizes();
@@ -597,7 +602,8 @@ class InfinityScroll {
 
     if (!listItem) {
       console.warn('Элементов в списке нет');
-      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(0);
+      const elemData = this.list.data[0];
+      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData);
       listItem = list.firstChild as HTMLElement;
     }
 
