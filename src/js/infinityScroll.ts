@@ -48,15 +48,16 @@ class ScrollDetector {
     }
   }
 
+  // TODO: перенести в чанк?
   // eslint-disable-next-line class-methods-use-this
-  getDiff(startRenderIndex: number, newRenderIndex: number): number {
+  getRenderIndexDiff(startRenderIndex: number, newRenderIndex: number): number {
     return Math.abs(startRenderIndex - newRenderIndex);
   }
 
   // TODO: говорит, нужен this
   // eslint-disable-next-line class-methods-use-this
-  isSmallDiff(scrollDiff: number, tailingElementsAmount: number): boolean {
-    if (scrollDiff !== 0 && scrollDiff <= tailingElementsAmount) {
+  isSmallDiff(renderIndexDiff: number, tailingElementsAmount: number): boolean {
+    if (renderIndexDiff !== 0 && renderIndexDiff <= tailingElementsAmount) {
       return true;
     }
     return false;
@@ -76,15 +77,16 @@ class ScrollDetector {
     }
   }
 
+  // TODO: перенести в чанк?
   isBigDiff(
-    scrollDiff: number,
+    renderIndexDiff: number,
     chunkAmount: number,
     tailingElementsAmount: number
   ): boolean {
     const isBigDiff =
       (this.isGoingFromBottom &&
-        scrollDiff > chunkAmount + tailingElementsAmount) ||
-      (!this.isGoingFromBottom && scrollDiff > chunkAmount);
+        renderIndexDiff > chunkAmount + tailingElementsAmount) ||
+      (!this.isGoingFromBottom && renderIndexDiff > chunkAmount);
     return isBigDiff;
   }
 }
@@ -117,19 +119,19 @@ class ChunkController {
   }
 
   setRenderIndex(
-    scroll: number,
+    renderIndex: number,
     isGoingFromBottom: boolean,
     tailingElementsAmount: number
   ): void {
-    this.startRenderIndex = scroll;
+    this.startRenderIndex = renderIndex;
     if (isGoingFromBottom) {
       this.startRenderIndex += tailingElementsAmount;
     }
   }
 
-  getRenderIndex(chunkOrderNumber: number): number {
-    const startRenderIndex = chunkOrderNumber * this.amount;
-    return startRenderIndex;
+  calcRenderIndex(chunkOrderNumber: number): number {
+    const renderIndex = chunkOrderNumber * this.amount;
+    return renderIndex;
   }
 
   isBeginOfListFromTop(halfOfExistingSizeInDOM: number): boolean {
@@ -185,6 +187,7 @@ class ChunkController {
 }
 
 class ListController {
+  // Массив данных для превращения в хтмл-ссписок
   public data: unknown[] | unknown | undefined;
 
   // Длина списка
@@ -224,25 +227,18 @@ class DomManager {
   // хранит в себе id сетТаймаута
   private fillListTimerId: number | undefined;
 
-  // TODO: это вообще не отсюда
-  // private readonly data: any[] | undefined;
-
   // TODO: сделать назад приватным
   public targetElem;
 
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
-  private template;
+  private readonly template;
 
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
   private avrTimeArr: Array<number> = [];
 
-  constructor(props: {
-    targetElem: HTMLElement;
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    template: Function;
-  }) {
+  constructor(props: { template: string; targetElem: HTMLElement }) {
     // this.data = props.data;
     this.targetElem = props.targetElem;
     this.template = props.template;
@@ -298,11 +294,6 @@ class DomManager {
     return this.template(elemData, this.targetElem);
   }
 
-  // createItemOld(elemNum: number): string {
-  //   const element = this.data[elemNum];
-  //   return this.template(element, this.targetElem);
-  // }
-
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
     const child: ChildNode | null = this.targetElem[childPosition];
     // TODO: узнать, чем отличается ChildNode От Node
@@ -345,6 +336,7 @@ class DomManager {
     direction: 'down' | 'up'
   ): void {
     const calculatedStart = chunk.startRenderIndex - chunk.amount;
+    // TODO: отрефакторить и объеденить в функцию calcSequence
     const newStart =
       calculatedStart > list.startIndexOfLastPart
         ? list.startIndexOfLastPart
@@ -389,6 +381,7 @@ class DomManager {
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
 
+    // TODO: отрефакторить и объеденить в функцию calcSequence
     // Это работает праивльно (в начале списка)
     let newSequence =
       direction === 'down'
@@ -459,6 +452,7 @@ class DomManager {
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 interface InfinityScrollPropTypes {
+  templateString: string;
   data: unknown[];
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: string;
@@ -481,9 +475,6 @@ class InfinityScroll {
   // хранит ссылку на корневой html-элеент
   private wrapperEl: HTMLElement | null;
 
-  // Массив данных для превращения в хтмл-ссписок
-  private listData: unknown;
-
   // Тип списка (список или таблица)
   private listType: string;
 
@@ -496,15 +487,13 @@ class InfinityScroll {
   // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
 
-  private avrTimeArr: Array<number> = [];
-
   private domMngr: DomManager;
 
   private scroll: ScrollDetector;
 
-  private chunk: ChunkController;
+  private readonly chunk: ChunkController;
 
-  private list: ListController;
+  private readonly list: ListController;
 
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
@@ -522,7 +511,6 @@ class InfinityScroll {
 
     const domChangerProps = {
       targetElem: this.listEl,
-      infinityScroll: this,
       template: props.templateString,
     };
 
@@ -643,17 +631,19 @@ class InfinityScroll {
       this.list.existingSizeInDOM
     );
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
-    const newRenderIndex: number = this.chunk.getRenderIndex(chunkOrderNumber);
+    const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
     this.scroll.setScrollDirection(scroll);
 
     this.scroll.prevScroll = scroll;
 
-    const scrollDiff: number = this.scroll.getDiff(
+    const renderIndexDiff: number = this.scroll.getRenderIndexDiff(
       this.chunk.startRenderIndex,
       newRenderIndex
     );
     // Если скролл слишком маленький - не делаем ничего
-    if (this.scroll.isSmallDiff(scrollDiff, this.list.tailingElementsAmount)) {
+    if (
+      this.scroll.isSmallDiff(renderIndexDiff, this.list.tailingElementsAmount)
+    ) {
       return;
     }
 
@@ -661,7 +651,7 @@ class InfinityScroll {
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(this.chunk, chunkOrderNumber);
     // Если скролл слишком большой - рисуем всё заново
-    this.checkBigDiffToResetList(scrollDiff);
+    this.checkBigDiffToResetList(renderIndexDiff);
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== newRenderIndex) {
