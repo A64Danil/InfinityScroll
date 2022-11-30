@@ -205,57 +205,6 @@ class ChunkController {
     const renderIndex = chunkOrderNumber * this.amount;
     return renderIndex;
   }
-
-  isBeginOfListFromTop(halfOfExistingSizeInDOM: number): boolean {
-    return this.startRenderIndex < halfOfExistingSizeInDOM;
-  }
-
-  isEndOfListFromTop(): boolean {
-    return this.startRenderIndex > this.lastRenderIndex;
-  }
-
-  isBeginOfListFromBottom(listLength: number): boolean {
-    return this.startRenderIndex >= listLength - this.amount * 3;
-  }
-
-  isEndOfListFromBottom(tailingElementsAmount: number): boolean {
-    return this.startRenderIndex < tailingElementsAmount;
-  }
-
-  isAllowRenderNearBorder(
-    direction: 'down' | 'up',
-    list: ListController
-  ): boolean {
-    if (
-      direction === 'down' &&
-      this.isBeginOfListFromTop(list.halfOfExistingSizeInDOM)
-    ) {
-      console.log('Пока рендерить не надо. Вы в самом верху списка.');
-      return false;
-    }
-
-    if (direction === 'down' && this.isEndOfListFromTop()) {
-      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-      return false;
-    }
-
-    if (direction === 'up' && this.isBeginOfListFromBottom(list.length)) {
-      console.log(
-        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
-      );
-      return false;
-    }
-
-    if (
-      direction === 'up' &&
-      this.isEndOfListFromBottom(list.tailingElementsAmount)
-    ) {
-      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
-      return false;
-    }
-
-    return true;
-  }
 }
 
 class ListController {
@@ -505,10 +454,6 @@ class DomManager {
     direction: 'down' | 'up',
     isGoingFromBottom: boolean
   ): void {
-    if (!chunk.isAllowRenderNearBorder(direction, list)) {
-      return;
-    }
-
     this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
     this.setOffsetToList(chunk, list, direction);
 
@@ -740,12 +685,20 @@ class InfinityScroll {
         this.scroll.isGoingFromBottom,
         this.list.tailingElementsAmount
       );
-      this.domMngr.modifyCurrentDOM(
-        this.chunk,
-        this.list,
+
+      const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
-        this.scroll.isGoingFromBottom
+        this.chunk.startRenderIndex
       );
+
+      if (isAllowRender) {
+        this.domMngr.modifyCurrentDOM(
+          this.chunk,
+          this.list,
+          this.scroll.direction,
+          this.scroll.isGoingFromBottom
+        );
+      }
     }
   }
 
