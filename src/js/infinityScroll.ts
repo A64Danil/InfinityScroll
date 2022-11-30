@@ -421,6 +421,37 @@ class DomManager {
     this.isWaitRender = false;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  checkAllowToChangeList(
+    direction: 'down' | 'up',
+    sequenceNumber: number,
+    isGoingFromBottom: boolean,
+    i: number,
+    tailingElementsAmount: number,
+    listLength: number | undefined
+  ): boolean {
+    const isStartOfList = direction === 'up' && sequenceNumber === 0;
+
+    const isReachTopLimit =
+      isGoingFromBottom &&
+      isStartOfList &&
+      i + sequenceNumber >= tailingElementsAmount;
+
+    const isReachBottomLimit =
+      direction === 'down' && i + sequenceNumber > listLength - 1;
+
+    const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
+
+    // TODO: убрать после тестов
+    if (isReachBottomLimit) {
+      console.warn('Выходим за пределы списка в его нижней части');
+    } else if (isReachTopLimit) {
+      console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+    }
+
+    return isAllowToChange;
+  }
+
   // TODO: Доделать это №3
   changeItemsInList(
     chunk: ChunkController,
@@ -452,24 +483,14 @@ class DomManager {
     );
 
     for (let i = 0; i < 1000 && i < chunk.amount; i++) {
-      const isStartOfList = direction === 'up' && sequenceNumber === 0;
-
-      const isReachTopLimit =
-        isGoingFromBottom &&
-        isStartOfList &&
-        i + sequenceNumber >= list.tailingElementsAmount;
-
-      const isReachBottomLimit =
-        direction === 'down' && i + sequenceNumber > list.length - 1;
-
-      const allowToChange = !isReachTopLimit && !isReachBottomLimit;
-
-      // TODO: убрать после тестов
-      if (isReachBottomLimit) {
-        console.warn('Выходим за пределы списка в его нижней части');
-      } else if (isReachTopLimit) {
-        console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
-      }
+      const allowToChange = this.checkAllowToChangeList(
+        direction,
+        sequenceNumber,
+        isGoingFromBottom,
+        i,
+        list.tailingElementsAmount,
+        list.length
+      );
 
       if (allowToChange) {
         // add items
