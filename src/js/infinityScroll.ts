@@ -284,6 +284,15 @@ class DomManager {
     direction: 'down' | 'up',
     forcedOffset: number | undefined = undefined
   ): void {
+    /* Список используемых переменных
+     *  chunk.startRenderIndex
+     *  chunk.htmlHeight
+     *  chunk.amount
+     *
+     *
+     * list.startIndexOfLastPart
+     * list.itemHeight
+     * */
     console.log('chunk.startRenderIndex', chunk.startRenderIndex);
 
     if (forcedOffset !== undefined) {
@@ -348,23 +357,49 @@ class DomManager {
     );
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  calcSequenceByDirection(
+    direction: 'down' | 'up',
+    halfOfExistingSizeInDOM: number,
+    startRenderIndex: number,
+    chunkAmount: number
+  ) {
+    let precalcSequence =
+      direction === 'down'
+        ? startRenderIndex + halfOfExistingSizeInDOM
+        : startRenderIndex - chunkAmount;
+
+    if (precalcSequence < 0) precalcSequence = 0;
+
+    return precalcSequence;
+  }
+
+  // TODO: вынести в хелпер?
+  // eslint-disable-next-line class-methods-use-this
+  recalcSequence(precalcSequence: number, startIndexOfLastPart: number) {
+    const newSequence =
+      precalcSequence > startIndexOfLastPart
+        ? startIndexOfLastPart
+        : precalcSequence;
+
+    return newSequence;
+  }
+
   resetAllList(
     chunk: ChunkController,
     list: ListController,
     direction: 'down' | 'up'
   ): void {
-    const calculatedStart = chunk.startRenderIndex - chunk.amount;
-    // TODO: отрефакторить и объеденить в функцию calcSequence
-    const newStart =
-      calculatedStart > list.startIndexOfLastPart
-        ? list.startIndexOfLastPart
-        : calculatedStart;
-
-    let newSequence = newStart;
-
-    if (newSequence < 0) newSequence = 0;
-
-    const sequenceNumber = newSequence;
+    const precalcSequence = this.calcSequenceByDirection(
+      direction,
+      list.halfOfExistingSizeInDOM,
+      chunk.startRenderIndex,
+      chunk.amount
+    );
+    const sequenceNumber = this.recalcSequence(
+      precalcSequence,
+      list.startIndexOfLastPart
+    );
 
     let templateFragments = '';
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
@@ -374,7 +409,7 @@ class DomManager {
       templateFragments += this.createItem(elemData);
     }
 
-    const newOffset = newSequence * list.itemHeight;
+    const newOffset = sequenceNumber * list.itemHeight;
 
     this.targetElem.innerHTML = templateFragments;
     this.setOffsetToList(chunk, list, direction, newOffset);
@@ -383,32 +418,38 @@ class DomManager {
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
     console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
-    // TODO: не хватает этой переменной
     this.isWaitRender = false;
   }
 
+  // TODO: Доделать это №3
   changeItemsInList(
     chunk: ChunkController,
     list: ListController,
     direction: 'down' | 'up',
     isGoingFromBottom: boolean
   ): void {
+    /* Список используемых переменных
+     *  chunk.startRenderIndex
+     *  chunk.amount
+     *
+     *
+     * list.halfOfExistingSizeInDOM
+     * list.tailingElementsAmount
+     * list.length
+     * list.data
+     * */
     // for addItems
     let templateFragments = '';
 
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
 
-    // TODO: отрефакторить и объеденить в функцию calcSequence
-    // Это работает праивльно (в начале списка)
-    let newSequence =
-      direction === 'down'
-        ? chunk.startRenderIndex + list.halfOfExistingSizeInDOM
-        : chunk.startRenderIndex - chunk.amount;
-
-    if (newSequence < 0) newSequence = 0;
-
-    const sequenceNumber = newSequence;
+    const sequenceNumber = this.calcSequenceByDirection(
+      direction,
+      list.halfOfExistingSizeInDOM,
+      chunk.startRenderIndex,
+      chunk.amount
+    );
 
     for (let i = 0; i < 1000 && i < chunk.amount; i++) {
       const isStartOfList = direction === 'up' && sequenceNumber === 0;
@@ -454,7 +495,26 @@ class DomManager {
     direction: 'down' | 'up',
     isGoingFromBottom: boolean
   ): void {
+    // TODO: Доделать это №4
+    /* Список используемых переменных
+     *  chunk.startRenderIndex
+     *  chunk.amount
+     *
+     *
+     * list.halfOfExistingSizeInDOM
+     * list.tailingElementsAmount
+     * list.length
+     * list.data
+     * */
     this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
+    /* Список используемых переменных
+     *  chunk.startRenderIndex
+     *  chunk.htmlHeight
+     *  chunk.amount
+     *
+     * list.startIndexOfLastPart
+     * list.itemHeight
+     * */
     this.setOffsetToList(chunk, list, direction);
 
     checkChildrenAmount(
@@ -692,6 +752,18 @@ class InfinityScroll {
       );
 
       if (isAllowRender) {
+        /* Список используемых переменных
+         *  chunk.startRenderIndex
+         *  chunk.amount
+         *  chunk.htmlHeight
+         *
+         * list.halfOfExistingSizeInDOM
+         * list.tailingElementsAmount
+         * list.length
+         * list.data
+         * list.startIndexOfLastPart
+         * list.itemHeight
+         * */
         this.domMngr.modifyCurrentDOM(
           this.chunk,
           this.list,
