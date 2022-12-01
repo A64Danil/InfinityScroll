@@ -160,17 +160,17 @@ class ScrollDetector {
 
 class ChunkController {
   // Размер чанка (чанк - видимая часть элементов в спике)
-  amount = 2;
+  public amount = 2;
 
-  htmlHeight = 0;
+  public htmlHeight = 0;
 
-  firstOrderNumber = 0;
+  public firstOrderNumber = 0;
 
   // Порядковый номер последнего чанка в списке
-  lastOrderNumber: number | undefined;
+  public lastOrderNumber = 1;
 
   // Номер, с которого начинается последний чанк
-  lastRenderIndex = 0;
+  public lastRenderIndex = 0;
 
   // Номер, c которого мы будем рендерить следующуй чанк
   public startRenderIndex = 0;
@@ -207,7 +207,7 @@ class ChunkController {
 
 class ListController {
   // Массив данных для превращения в хтмл-ссписок
-  public data: unknown[] | undefined;
+  public data: object[] | undefined;
 
   // Длина списка
   length = 0;
@@ -253,7 +253,9 @@ class DomManager {
 
   private avrTimeArr: Array<number> = [];
 
-  constructor(props: { template: string; targetElem: HTMLElement }) {
+  // TODO: описать нормально функцию
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  constructor(props: { template: Function; targetElem: HTMLElement }) {
     // this.data = props.data;
     this.targetElem = props.targetElem;
     this.template = props.template;
@@ -320,7 +322,9 @@ class DomManager {
 
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
     const child: ChildNode | null = this.targetElem[childPosition];
-    // TODO: узнать, чем отличается ChildNode От Node
+    if (!child) {
+      return;
+    }
     this.targetElem.removeChild(child);
   }
 
@@ -341,6 +345,9 @@ class DomManager {
       this.GLOBAL_ITEM_COUNTER < list.existingSizeInDOM;
       i++
     ) {
+      if (list.data === undefined) {
+        throw new Error('Your list.data is undefined');
+      }
       const elemData = list.data[this.GLOBAL_ITEM_COUNTER];
       templateFragments += this.createItem(elemData);
       this.GLOBAL_ITEM_COUNTER++;
@@ -402,6 +409,9 @@ class DomManager {
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
+      if (list.data === undefined) {
+        throw new Error('Your list.data is undefined');
+      }
       const elemData = list.data[elemNum];
       templateFragments += this.createItem(elemData);
     }
@@ -425,7 +435,7 @@ class DomManager {
     isGoingFromBottom: boolean,
     i: number,
     tailingElementsAmount: number,
-    listLength: number | undefined
+    listLength: number
   ): boolean {
     const isStartOfList = direction === 'up' && sequenceNumber === 0;
 
@@ -519,6 +529,10 @@ class DomManager {
       chunk.startRenderIndex,
       chunk.amount
     );
+
+    if (list.data === undefined) {
+      throw new Error('Your list.data is undefined');
+    }
 
     const templateFragments = this.prepareItems(
       chunk.amount,
@@ -766,9 +780,6 @@ class InfinityScroll {
 
     this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
-    // if (this.chunk.lastOrderNumber === undefined) {
-    //   throw new Error('test msg');
-    // }
     this.scroll.setGoingFromBottom(this.chunk, chunkOrderNumber);
     // Если скролл слишком большой - рисуем всё заново
     this.checkBigDiffToResetList(renderIndexDiff);
