@@ -7,6 +7,8 @@ const checkChildrenAmount = (length: number, fullSize: number): void => {
   }
 };
 
+type IScrollDirection = 'down' | 'up';
+
 const nameToTag = {
   list: 'UL',
   table: 'TABLE',
@@ -71,7 +73,7 @@ class RenderController {
   }
 
   isAllowRenderNearBorder(
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     startRenderIndex: number
   ): boolean {
     if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
@@ -101,7 +103,7 @@ class RenderController {
 }
 
 class ScrollDetector {
-  public direction: 'down' | 'up' = 'down';
+  public direction: IScrollDirection = 'down';
 
   public isGoingFromBottom = false;
 
@@ -281,7 +283,7 @@ class DomManager {
   setOffsetToList(
     chunk: ChunkController,
     list: ListController,
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     forcedOffset: number | undefined = undefined
   ): void {
     /* Список используемых переменных
@@ -359,7 +361,7 @@ class DomManager {
 
   // eslint-disable-next-line class-methods-use-this
   calcSequenceByDirection(
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     halfOfExistingSizeInDOM: number,
     startRenderIndex: number,
     chunkAmount: number
@@ -388,7 +390,7 @@ class DomManager {
   resetAllList(
     chunk: ChunkController,
     list: ListController,
-    direction: 'down' | 'up'
+    direction: IScrollDirection
   ): void {
     const precalcSequence = this.calcSequenceByDirection(
       direction,
@@ -423,7 +425,7 @@ class DomManager {
 
   // eslint-disable-next-line class-methods-use-this
   checkAllowToChangeList(
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     sequenceNumber: number,
     isGoingFromBottom: boolean,
     i: number,
@@ -452,11 +454,19 @@ class DomManager {
     return isAllowToChange;
   }
 
+  putElementsToList(direction: IScrollDirection, htmlString: string) {
+    if (direction === 'down') {
+      this.targetElem.innerHTML += htmlString;
+    } else {
+      this.targetElem.innerHTML = htmlString + this.targetElem.innerHTML;
+    }
+  }
+
   // TODO: Доделать это №3
   changeItemsInList(
     chunk: ChunkController,
     list: ListController,
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
     /* Список используемых переменных
@@ -469,8 +479,6 @@ class DomManager {
      * list.length
      * list.data
      * */
-    // for addItems
-    let templateFragments = '';
 
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
@@ -481,6 +489,8 @@ class DomManager {
       chunk.startRenderIndex,
       chunk.amount
     );
+
+    let templateFragments = '';
 
     for (let i = 0; i < 1000 && i < chunk.amount; i++) {
       const allowToChange = this.checkAllowToChangeList(
@@ -502,18 +512,13 @@ class DomManager {
       }
     }
 
-    // TODO: вынести в отдельную функцию?
-    if (direction === 'down') {
-      this.targetElem.innerHTML += templateFragments;
-    } else {
-      this.targetElem.innerHTML = templateFragments + this.targetElem.innerHTML;
-    }
+    this.putElementsToList(direction, templateFragments);
   }
 
   modifyCurrentDOM(
     chunk: ChunkController,
     list: ListController,
-    direction: 'down' | 'up',
+    direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
     // TODO: Доделать это №4
