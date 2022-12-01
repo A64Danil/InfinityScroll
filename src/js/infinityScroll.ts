@@ -167,7 +167,7 @@ class ChunkController {
   firstOrderNumber = 0;
 
   // Порядковый номер последнего чанка в списке
-  lastOrderNumber: number;
+  lastOrderNumber: number | undefined;
 
   // Номер, с которого начинается последний чанк
   lastRenderIndex = 0;
@@ -243,8 +243,7 @@ class DomManager {
   // хранит в себе id сетТаймаута
   private fillListTimerId: number | undefined;
 
-  // TODO: сделать назад приватным
-  public targetElem;
+  private readonly targetElem;
 
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
@@ -590,19 +589,19 @@ class InfinityScroll {
   private name: string;
 
   // хранит html-id главного корневого элемента
-  private selectorId: string;
+  private readonly selectorId: string;
 
   // хранит ссылку на корневой html-элеент
-  private wrapperEl: HTMLElement | null;
+  private readonly wrapperEl: HTMLElement | null;
 
   // Тип списка (список или таблица)
-  private listType: string;
+  private readonly listType: string;
 
   // dataSourceUrl - Ссылка на БД, откуда качать инфу
-  private dataUrl: string | undefined;
+  private readonly dataUrl: string | undefined;
 
   // Тип загрузки (список доступен сразу или надо качать с интернета)
-  private dataLoadType: 'instant' | 'lazy';
+  private readonly dataLoadType: 'instant' | 'lazy';
 
   // Содержит генерируемый элемент внутри корневого
   private listEl: HTMLElement | null;
@@ -615,12 +614,15 @@ class InfinityScroll {
 
   private readonly list: ListController;
 
-  private render: RenderController;
+  private render: RenderController | undefined;
 
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
     this.selectorId = props.selectorId;
     this.wrapperEl = document.getElementById(props.selectorId);
+    if (this.wrapperEl === null) {
+      throw new Error(`Object${props.selectorId}does not exist in DOM`);
+    }
     this.listType = props.listType;
 
     this.listEl = this.createInnerList();
