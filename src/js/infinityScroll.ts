@@ -207,7 +207,7 @@ class ChunkController {
 
 class ListController {
   // Массив данных для превращения в хтмл-ссписок
-  public data: unknown[] | unknown | undefined;
+  public data: unknown[] | undefined;
 
   // Длина списка
   length: number | undefined;
@@ -574,7 +574,7 @@ interface InfinityScrollPropTypes {
   templateString: string;
   data: unknown[];
   dataLoadType: 'instant' | 'lazy';
-  dataUrl?: string;
+  dataUrl?: URL;
   name: string;
   selectorId: string;
   listType: 'list' | 'table';
@@ -592,13 +592,13 @@ class InfinityScroll {
   private readonly selectorId: string;
 
   // хранит ссылку на корневой html-элеент
-  private readonly wrapperEl: HTMLElement | null;
+  private readonly wrapperEl: HTMLElement;
 
   // Тип списка (список или таблица)
   private readonly listType: string;
 
   // dataSourceUrl - Ссылка на БД, откуда качать инфу
-  private readonly dataUrl: string | undefined;
+  // private dataUrl: URL | string | undefined;
 
   // Тип загрузки (список доступен сразу или надо качать с интернета)
   private readonly dataLoadType: 'instant' | 'lazy';
@@ -619,10 +619,13 @@ class InfinityScroll {
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
     this.selectorId = props.selectorId;
-    this.wrapperEl = document.getElementById(props.selectorId);
-    if (this.wrapperEl === null) {
-      throw new Error(`Object${props.selectorId}does not exist in DOM`);
+
+    const wrapper = document.getElementById(props.selectorId);
+    if (wrapper === null) {
+      throw new Error(`Object ${props.selectorId} does not exist in DOM`);
     }
+    this.wrapperEl = wrapper;
+
     this.listType = props.listType;
 
     this.listEl = this.createInnerList();
@@ -642,25 +645,9 @@ class InfinityScroll {
 
     this.domMngr = new DomManager(domChangerProps);
 
-    if (this.dataLoadType === 'instant') {
-      this.list.data = props.data;
-      this.list.length = this.list.data && this.list.data.length;
-      console.log(this.list.length);
+    this.setListData(props).then(() => {
       this.start();
-    } else {
-      this.dataUrl = props.dataUrl;
-      this.getRemoteData()
-        .then((data) => {
-          console.log(data);
-          this.list.data = data;
-          return data;
-        })
-        .then((data) => {
-          console.log('second then');
-          this.list.length = this.list.data && this.list.data.length;
-          this.start();
-        });
-    }
+    });
   }
 
   start() {
@@ -779,6 +766,9 @@ class InfinityScroll {
 
     this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
+    // if (this.chunk.lastOrderNumber === undefined) {
+    //   throw new Error('test msg');
+    // }
     this.scroll.setGoingFromBottom(this.chunk, chunkOrderNumber);
     // Если скролл слишком большой - рисуем всё заново
     this.checkBigDiffToResetList(renderIndexDiff);
@@ -844,20 +834,45 @@ class InfinityScroll {
     }
   }
 
-  getRemoteData(): Promise<unknown> {
-    console.log('try to get data from', this.dataUrl);
+  // eslint-disable-next-line class-methods-use-this
+  getRemoteData(url: URL): Promise<unknown> {
+    console.log('try to get data from', url);
 
-    return fetch(this.dataUrl).then((response) =>
+    return fetch(url).then((response) =>
       response
         .json()
-        .then((data) => {
-          console.log(data);
-          return data;
-        })
+        .then((data) => data)
         .catch((err) => {
           console.log(err);
         })
     );
+  }
+
+  async setListData(props: InfinityScrollPropTypes) {
+    let newLength = null;
+    if (this.dataLoadType === 'instant') {
+      this.list.data = props.data;
+      newLength = props.data && props.data.length;
+    } else {
+      // this.dataUrl = props.dataUrl;
+      if (props.dataUrl === undefined) {
+        throw new Error('Your dataUrl is undefined');
+      }
+      await this.getRemoteData(props.dataUrl).then((data): void => {
+        if (!Array.isArray(data)) {
+          throw new Error('Your fetched data does not have Array type');
+        }
+        this.list.data = data;
+        newLength = data && data.length;
+      });
+    }
+    if (!Array.isArray(this.list.data)) {
+      throw new Error('Your list does not have Array type');
+    }
+    if (!newLength) {
+      throw new Error('Your list does not have length or length is 0');
+    }
+    this.list.length = newLength;
   }
 }
 
