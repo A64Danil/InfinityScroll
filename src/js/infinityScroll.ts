@@ -243,7 +243,7 @@ class DomManager {
   // хранит в себе id сетТаймаута
   private fillListTimerId: number | undefined;
 
-  private readonly targetElem;
+  readonly targetElem;
 
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
@@ -251,7 +251,7 @@ class DomManager {
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
-  private avrTimeArr: Array<number> = [];
+  public avrTimeArr: Array<number> = [];
 
   // TODO: описать нормально функцию
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -611,14 +611,11 @@ class InfinityScroll {
   // Тип списка (список или таблица)
   private readonly listType: string;
 
-  // dataSourceUrl - Ссылка на БД, откуда качать инфу
-  // private dataUrl: URL | string | undefined;
-
   // Тип загрузки (список доступен сразу или надо качать с интернета)
   private readonly dataLoadType: 'instant' | 'lazy';
 
   // Содержит генерируемый элемент внутри корневого
-  private listEl: HTMLElement | null;
+  private readonly listEl: HTMLElement;
 
   private domMngr: DomManager;
 
@@ -704,7 +701,7 @@ class InfinityScroll {
       this.listType.slice(1);
     newEl.setAttribute('id', newElID);
     newEl.setAttribute('class', 'Demo_infinityScrollList');
-    return this.wrapperEl?.appendChild(newEl);
+    return this.wrapperEl.appendChild(newEl);
   }
 
   getAllSizes(): void {
@@ -724,6 +721,9 @@ class InfinityScroll {
 
     if (!listItem) {
       console.warn('Элементов в списке нет');
+      if (!this.list.data) {
+        throw new Error('You does not have list.data');
+      }
       const elemData = this.list.data[0];
       this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData);
       listItem = list.firstChild as HTMLElement;
@@ -756,8 +756,9 @@ class InfinityScroll {
     }
   }
 
-  calcCurrentDOMRender(e: Event & { target: Element }): void {
-    const scroll = e.target.scrollTop;
+  calcCurrentDOMRender(e: Event): void {
+    const eventTarget = e.target as HTMLElement;
+    const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
     checkChildrenAmount(
@@ -793,6 +794,9 @@ class InfinityScroll {
         this.list.tailingElementsAmount
       );
 
+      if (!this.render) {
+        throw new Error('this.render is not exist');
+      }
       const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
         this.chunk.startRenderIndex
@@ -859,7 +863,7 @@ class InfinityScroll {
     );
   }
 
-  async setListData(listData: unknown[], dataUrl?: URL) {
+  async setListData(listData: object[], dataUrl?: URL) {
     let newLength = null;
     if (this.dataLoadType === 'instant') {
       this.list.data = listData;
