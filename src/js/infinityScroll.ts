@@ -31,22 +31,22 @@ const nameToTag = {
 
 // HELPER FUNCTIONS
 class RenderController {
-  private halfOfExistingSizeInDOM: number | undefined;
+  private readonly halfOfExistingSizeInDOM: number;
 
-  private lastRenderIndex: number | undefined;
+  private readonly lastRenderIndex: number;
 
-  private listLength: number | undefined;
+  private readonly listLength: number;
 
-  private chunkAmount: number | undefined;
+  private readonly chunkAmount: number;
 
-  private tailingElementsAmount: number | undefined;
+  private readonly tailingElementsAmount: number;
 
   constructor(renderProps: {
-    halfOfExistingSizeInDOM: number | undefined;
-    lastRenderIndex: number | undefined;
-    listLength: number | undefined;
-    chunkAmount: number | undefined;
-    tailingElementsAmount: number | undefined;
+    halfOfExistingSizeInDOM: number;
+    lastRenderIndex: number;
+    listLength: number;
+    chunkAmount: number;
+    tailingElementsAmount: number;
   }) {
     this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM;
     this.lastRenderIndex = renderProps.lastRenderIndex;
@@ -672,6 +672,7 @@ class InfinityScroll {
       // return;
     }
     this.getAllSizes();
+    // TODO: проверить все пропсы на undefined
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
