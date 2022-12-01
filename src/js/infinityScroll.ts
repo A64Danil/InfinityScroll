@@ -645,7 +645,7 @@ class InfinityScroll {
 
     this.domMngr = new DomManager(domChangerProps);
 
-    this.setListData(props).then(() => {
+    this.setListData(props.data, props.dataUrl).then(() => {
       this.start();
     });
   }
@@ -848,17 +848,17 @@ class InfinityScroll {
     );
   }
 
-  async setListData(props: InfinityScrollPropTypes) {
+  async setListData(listData: unknown[], dataUrl?: URL) {
     let newLength = null;
     if (this.dataLoadType === 'instant') {
-      this.list.data = props.data;
-      newLength = props.data && props.data.length;
+      this.list.data = listData;
+      newLength = listData && listData.length;
     } else {
       // this.dataUrl = props.dataUrl;
-      if (props.dataUrl === undefined) {
+      if (dataUrl === undefined) {
         throw new Error('Your dataUrl is undefined');
       }
-      await this.getRemoteData(props.dataUrl).then((data): void => {
+      await this.getRemoteData(dataUrl).then((data): void => {
         if (!Array.isArray(data)) {
           throw new Error('Your fetched data does not have Array type');
         }
