@@ -122,12 +122,6 @@ class ScrollDetector {
     }
   }
 
-  // TODO: перенести в чанк?
-  // eslint-disable-next-line class-methods-use-this
-  getRenderIndexDiff(startRenderIndex: number, newRenderIndex: number): number {
-    return Math.abs(startRenderIndex - newRenderIndex);
-  }
-
   // TODO: говорит, нужен this
   // eslint-disable-next-line class-methods-use-this
   isSmallDiff(renderIndexDiff: number, tailingElementsAmount: number): boolean {
@@ -151,7 +145,6 @@ class ScrollDetector {
     }
   }
 
-  // TODO: перенести в чанк?
   isBigDiff(
     renderIndexDiff: number,
     chunkAmount: number,
@@ -171,7 +164,6 @@ class ChunkController {
 
   htmlHeight = 0;
 
-  // TODO: разобраться чтобы не говорило что unused
   firstOrderNumber = 0;
 
   // Порядковый номер последнего чанка в списке
@@ -201,6 +193,10 @@ class ChunkController {
     if (isGoingFromBottom) {
       this.startRenderIndex += tailingElementsAmount;
     }
+  }
+
+  getRenderIndexDiff(newRenderIndex: number): number {
+    return Math.abs(this.startRenderIndex - newRenderIndex);
   }
 
   calcRenderIndex(chunkOrderNumber: number): number {
@@ -771,10 +767,7 @@ class InfinityScroll {
 
     this.scroll.prevScroll = scroll;
 
-    const renderIndexDiff: number = this.scroll.getRenderIndexDiff(
-      this.chunk.startRenderIndex,
-      newRenderIndex
-    );
+    const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
     // Если скролл слишком маленький - не делаем ничего
     if (
       this.scroll.isSmallDiff(renderIndexDiff, this.list.tailingElementsAmount)
