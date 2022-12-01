@@ -210,7 +210,7 @@ class ListController {
   public data: unknown[] | undefined;
 
   // Длина списка
-  length: number | undefined;
+  length = 0;
 
   // Размер списка в ДОМ (вычисляется как "чанк * 4")
   existingSizeInDOM = 0;
