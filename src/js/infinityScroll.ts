@@ -454,6 +454,41 @@ class DomManager {
     return isAllowToChange;
   }
 
+  prepareItems(
+    chunkAmount: number,
+    direction: IScrollDirection,
+    sequenceNumber: number,
+    isGoingFromBottom: boolean,
+    tailingElementsAmount: number,
+    listLength: number,
+    data: Array<object>,
+    childPosition: 'firstChild' | 'lastChild'
+  ): string {
+    let templateFragments = '';
+
+    for (let i = 0; i < 1000 && i < chunkAmount; i++) {
+      const allowToChange = this.checkAllowToChangeList(
+        direction,
+        sequenceNumber,
+        isGoingFromBottom,
+        i,
+        tailingElementsAmount,
+        listLength
+      );
+
+      if (allowToChange) {
+        // add items
+        const elemNum = i + sequenceNumber;
+        const elemData = data[elemNum];
+        templateFragments += this.createItem(elemData);
+        // remove items
+        this.removeItem(childPosition);
+      }
+    }
+
+    return templateFragments;
+  }
+
   putElementsToList(direction: IScrollDirection, htmlString: string) {
     if (direction === 'down') {
       this.targetElem.innerHTML += htmlString;
@@ -490,27 +525,16 @@ class DomManager {
       chunk.amount
     );
 
-    let templateFragments = '';
-
-    for (let i = 0; i < 1000 && i < chunk.amount; i++) {
-      const allowToChange = this.checkAllowToChangeList(
-        direction,
-        sequenceNumber,
-        isGoingFromBottom,
-        i,
-        list.tailingElementsAmount,
-        list.length
-      );
-
-      if (allowToChange) {
-        // add items
-        const elemNum = i + sequenceNumber;
-        const elemData = list.data[elemNum];
-        templateFragments += this.createItem(elemData);
-        // remove items
-        this.removeItem(childPosition);
-      }
-    }
+    const templateFragments = this.prepareItems(
+      chunk.amount,
+      direction,
+      sequenceNumber,
+      isGoingFromBottom,
+      list.tailingElementsAmount,
+      list.length,
+      list.data,
+      childPosition
+    );
 
     this.putElementsToList(direction, templateFragments);
   }
