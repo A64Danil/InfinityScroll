@@ -34,6 +34,8 @@ const nameToTag: NameToTagObj = {
  */
 
 // HELPER FUNCTIONS
+
+// Minor Classes
 class RenderController {
   private readonly halfOfExistingSizeInDOM: number;
 
@@ -278,12 +280,27 @@ class DomManager {
     let paddingBottom =
       list.length * list.itemHeight - chunkHtmlHeight * 4 - offset;
 
-    // TODO: проверить, попадаем ли мы туда
     if (paddingBottom < 0) {
-      console.error('==========Мы попали в if paddingBottom < 0 =======');
       paddingBottom = 0;
     }
     this.targetElem.style.paddingBottom = `${paddingBottom}px`;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  calcStartOffsetIndex(
+    startRenderIndex: number,
+    chunkAmount: number,
+    direction: IScrollDirection,
+    startIndexOfLastPart: number
+  ): number {
+    let startOffsetIndex = startRenderIndex - chunkAmount;
+    if (startOffsetIndex < 0) {
+      startOffsetIndex = 0;
+    }
+    if (direction === 'down' && startOffsetIndex > startIndexOfLastPart) {
+      startOffsetIndex = startIndexOfLastPart;
+    }
+    return startOffsetIndex;
   }
 
   setOffsetToList(
@@ -309,17 +326,13 @@ class DomManager {
       return;
     }
 
-    let start = chunk.startRenderIndex - chunk.amount;
-
-    // TODO: нужно ли следующие 2 проверки выносить в отдельную функцию?
-    if (start < 0) {
-      start = 0;
-    }
-    // Если этого нет, то попадаем в padding 0!
-    if (direction === 'down' && start > list.startIndexOfLastPart) {
-      start = list.startIndexOfLastPart;
-    }
-    const offset = start * list.itemHeight;
+    const startOffsetIndex = this.calcStartOffsetIndex(
+      chunk.startRenderIndex,
+      chunk.amount,
+      direction,
+      list.startIndexOfLastPart
+    );
+    const offset = startOffsetIndex * list.itemHeight;
 
     this.targetElem.style.transform = `translate(0,${offset}px)`;
     this.setPaddingToList(list, chunk.htmlHeight, offset);
