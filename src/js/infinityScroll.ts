@@ -13,11 +13,28 @@ type NameToTagObj = {
   [key: string]: string;
 };
 
+type ChunkPropsToModifyDom = {
+  startRenderIndex: ChunkController['startRenderIndex'];
+  amount: number;
+  htmlHeight: number;
+};
+
+type ListPropsToModifyDom = {
+  existingSizeInDOM: number;
+  halfOfExistingSizeInDOM: number;
+  tailingElementsAmount: number;
+  length: number;
+  data: object[] | undefined;
+  startIndexOfLastPart: number;
+  itemHeight: number;
+};
+
 const nameToTag: NameToTagObj = {
   list: 'UL',
   table: 'TABLE',
 };
 
+// HELPER FUNCTIONS
 function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   const keys = Object.keys(obj);
   return keys.some((key) => !obj[key]);
@@ -50,8 +67,6 @@ function getRemoteData(url: URL): Promise<unknown> {
 --- до рефакторинга было 450 строк кода
 
  */
-
-// HELPER FUNCTIONS
 
 // Minor Classes
 class RenderController {
@@ -291,7 +306,7 @@ class DomManager {
   }
 
   setPaddingToList(
-    list: ListController,
+    list: ListPropsToModifyDom,
     chunkHtmlHeight: number,
     offset = 0
   ): void {
@@ -322,8 +337,8 @@ class DomManager {
   }
 
   setOffsetToList(
-    chunk: ChunkController,
-    list: ListController,
+    chunk: ChunkPropsToModifyDom,
+    list: ListPropsToModifyDom,
     direction: IScrollDirection,
     forcedOffset: number | undefined = undefined
   ): void {
@@ -544,8 +559,8 @@ class DomManager {
 
   // TODO: Доделать это №3
   changeItemsInList(
-    chunk: ChunkController,
-    list: ListController,
+    chunk: ChunkPropsToModifyDom,
+    list: ListPropsToModifyDom,
     direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
@@ -589,8 +604,8 @@ class DomManager {
   }
 
   modifyCurrentDOM(
-    chunk: ChunkController,
-    list: ListController,
+    chunk: ChunkPropsToModifyDom,
+    list: ListPropsToModifyDom,
     direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
@@ -866,9 +881,23 @@ class InfinityScroll {
          * list.startIndexOfLastPart
          * list.itemHeight
          * */
+        const mainChunkProps = {
+          startRenderIndex: this.chunk.startRenderIndex,
+          amount: this.chunk.amount,
+          htmlHeight: this.chunk.htmlHeight,
+        };
+        const mainListProps = {
+          existingSizeInDOM: this.list.existingSizeInDOM,
+          halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
+          tailingElementsAmount: this.list.tailingElementsAmount,
+          length: this.list.length,
+          data: this.list.data,
+          startIndexOfLastPart: this.list.startIndexOfLastPart,
+          itemHeight: this.list.itemHeight,
+        };
         this.domMngr.modifyCurrentDOM(
-          this.chunk,
-          this.list,
+          mainChunkProps,
+          mainListProps,
           this.scroll.direction,
           this.scroll.isGoingFromBottom
         );
