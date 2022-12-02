@@ -9,7 +9,11 @@ const checkChildrenAmount = (length: number, fullSize: number): void => {
 
 type IScrollDirection = 'down' | 'up';
 
-const nameToTag = {
+type NameToTagObj = {
+  [key: string]: string;
+};
+
+const nameToTag: NameToTagObj = {
   list: 'UL',
   table: 'TABLE',
 };
@@ -253,7 +257,7 @@ class DomManager {
 
   public avrTimeArr: Array<number> = [];
 
-  private listLength: number;
+  private readonly listLength: number;
 
   constructor(props: {
     template: TemplateStringFunction;
