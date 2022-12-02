@@ -14,7 +14,7 @@ const BigJson1 = BigDataList100.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // const BigJson3 = BigDataList100k.data;
 
-type TplStringFn = (el: unknown, context: InfinityScroll) => string;
+type TemplateStringFunction = (element: object, listLength?: number) => string;
 
 interface ListData {
   name: string;
@@ -28,7 +28,7 @@ interface InfinityScrollPropTypes {
   name: string;
   selectorId: string;
   listType: 'list' | 'table';
-  templateString: TplStringFn;
+  templateString: TemplateStringFunction;
 }
 
 const instantListProps: InfinityScrollPropTypes = {
@@ -37,12 +37,9 @@ const instantListProps: InfinityScrollPropTypes = {
   name: 'my scroll list name',
   selectorId: 'instantInfinityScrollWrapper',
   listType: 'list',
-  templateString: (
-    element: unknown,
-    parentList?: InfinityScroll
-  ): string => `<li 
+  templateString: (element: object, listLength?: number): string => `<li 
         class="Demo_infinityScrollList__listItem" 
-        aria-setsize="${parentList.LIST_LENGTH}" 
+        aria-setsize="${listLength}" 
         aria-posinset="${element.number + 1}"
         >
             ${element.name} ${element.number + 1}
@@ -56,12 +53,9 @@ const lazyListProps: InfinityScrollPropTypes = {
   name: 'my scroll list name',
   selectorId: 'lazyInfinityScrollWrapper',
   listType: 'list',
-  templateString: (
-    element: unknown,
-    parentList?: InfinityScroll
-  ): string => `<li 
+  templateString: (element: object, listLength?: number): string => `<li 
         class="infinityScrollList__listItem" 
-        aria-setsize="${parentList.LIST_LENGTH}" 
+        aria-setsize="${listLength}" 
         aria-posinset="${element.id}"
         >
             ${element.email} ${element.id}

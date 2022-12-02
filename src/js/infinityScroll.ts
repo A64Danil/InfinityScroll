@@ -253,12 +253,17 @@ class DomManager {
 
   public avrTimeArr: Array<number> = [];
 
-  // TODO: описать нормально функцию
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  constructor(props: { template: Function; targetElem: HTMLElement }) {
+  private listLength: number;
+
+  constructor(props: {
+    template: TemplateStringFunction;
+    targetElem: HTMLElement;
+    listLength: number;
+  }) {
     // this.data = props.data;
     this.targetElem = props.targetElem;
     this.template = props.template;
+    this.listLength = props.listLength;
   }
 
   setPaddingToList(
@@ -317,7 +322,7 @@ class DomManager {
   }
 
   createItem(elemData: object): string {
-    return this.template(elemData, this.targetElem);
+    return this.template(elemData, this.listLength);
   }
 
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
@@ -583,10 +588,12 @@ class DomManager {
   }
 }
 
+type TemplateStringFunction = (element: object, listLength?: number) => string;
+
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 interface InfinityScrollPropTypes {
-  templateString: string;
-  data: unknown[];
+  templateString: TemplateStringFunction;
+  data: object[];
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: URL;
   name: string;
@@ -617,7 +624,7 @@ class InfinityScroll {
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
-  private domMngr: DomManager;
+  private domMngr: DomManager | undefined;
 
   private scroll: ScrollDetector;
 
@@ -649,19 +656,23 @@ class InfinityScroll {
 
     const domChangerProps = {
       targetElem: this.listEl,
+      listLength: 0,
       template: props.templateString,
     };
 
     this.dataLoadType = props.dataLoadType;
 
-    this.domMngr = new DomManager(domChangerProps);
-
     this.setListData(props.data, props.dataUrl).then(() => {
+      domChangerProps.listLength = this.list.length;
+      this.domMngr = new DomManager(domChangerProps);
       this.start();
     });
   }
 
   start() {
+    if (this.domMngr === undefined) {
+      throw new Error('Your DomManager is undefined');
+    }
     console.log(this);
     if (this.dataLoadType === 'lazy') {
       console.log(this.list.data);
@@ -684,7 +695,7 @@ class InfinityScroll {
 
     this.wrapperEl.addEventListener('scroll', (e) => {
       const diffTime = Date.now() - startDate;
-      if (diffTime < 100) {
+      if (diffTime < 100 && this.domMngr !== undefined) {
         this.domMngr.avrTimeArr.push(diffTime);
       }
       this.calcCurrentDOMRender(e);
@@ -705,6 +716,9 @@ class InfinityScroll {
   }
 
   getAllSizes(): void {
+    if (this.domMngr === undefined) {
+      throw new Error('Your DomManager is undefined');
+    }
     console.log('GET SIZES');
     const listWrp = this.wrapperEl;
     const list = this.listEl;
@@ -802,7 +816,7 @@ class InfinityScroll {
         this.chunk.startRenderIndex
       );
 
-      if (isAllowRender) {
+      if (isAllowRender && this.domMngr) {
         /* Список используемых переменных
          *  chunk.startRenderIndex
          *  chunk.amount
@@ -828,6 +842,7 @@ class InfinityScroll {
   clearTimerIfNeeded(): void {
     if (
       this.timerIdRefreshList !== null &&
+      this.domMngr &&
       this.domMngr.isWaitRender === false
     ) {
       clearTimeout(this.timerIdRefreshList);
@@ -841,10 +856,16 @@ class InfinityScroll {
       this.list.tailingElementsAmount
     );
 
-    if (isBigDiff && this.domMngr.isWaitRender === false) {
+    if (isBigDiff && this.domMngr && this.domMngr.isWaitRender === false) {
       this.domMngr.isWaitRender = true;
       this.timerIdRefreshList = window.setTimeout(() => {
-        this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
+        if (this.domMngr) {
+          this.domMngr.resetAllList(
+            this.chunk,
+            this.list,
+            this.scroll.direction
+          );
+        }
       }, 30);
     }
   }
