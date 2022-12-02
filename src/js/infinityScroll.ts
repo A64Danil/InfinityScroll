@@ -18,6 +18,11 @@ const nameToTag: NameToTagObj = {
   table: 'TABLE',
 };
 
+function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
+  const keys = Object.keys(obj);
+  return keys.some((key) => !obj[key]);
+}
+
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
 2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
@@ -704,6 +709,9 @@ class InfinityScroll {
       chunkAmount: this.chunk.amount,
       tailingElementsAmount: this.list.tailingElementsAmount,
     };
+    if (isPropsUndefined(renderProps)) {
+      throw new Error('Some of props for RenderController is undefined');
+    }
     this.render = new RenderController(renderProps);
     this.domMngr.fillList(this.list);
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
