@@ -23,6 +23,19 @@ function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   return keys.some((key) => !obj[key]);
 }
 
+function getRemoteData(url: URL): Promise<unknown> {
+  console.log('try to get data from', url);
+
+  return fetch(url).then((response) =>
+    response
+      .json()
+      .then((data) => data)
+      .catch((err) => {
+        console.log(err);
+      })
+  );
+}
+
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
 2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
@@ -701,7 +714,6 @@ class InfinityScroll {
       // return;
     }
     this.getAllSizes();
-    // TODO: проверить все пропсы на undefined
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
@@ -895,20 +907,6 @@ class InfinityScroll {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getRemoteData(url: URL): Promise<unknown> {
-    console.log('try to get data from', url);
-
-    return fetch(url).then((response) =>
-      response
-        .json()
-        .then((data) => data)
-        .catch((err) => {
-          console.log(err);
-        })
-    );
-  }
-
   async setListData(listData: object[], dataUrl?: URL) {
     let newLength = null;
     if (this.dataLoadType === 'instant') {
@@ -919,7 +917,7 @@ class InfinityScroll {
       if (dataUrl === undefined) {
         throw new Error('Your dataUrl is undefined');
       }
-      await this.getRemoteData(dataUrl).then((data): void => {
+      await getRemoteData(dataUrl).then((data): void => {
         if (!Array.isArray(data)) {
           throw new Error('Your fetched data does not have Array type');
         }
