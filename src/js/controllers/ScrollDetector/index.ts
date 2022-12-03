@@ -1,5 +1,4 @@
 import { IScrollDirection } from '../../types/IScrollDirection';
-import { ChunkController } from '../Chunk';
 
 export class ScrollDetector {
   public direction: IScrollDirection = 'down';
@@ -21,7 +20,6 @@ export class ScrollDetector {
     }
   }
 
-  // TODO: говорит, нужен this
   // eslint-disable-next-line class-methods-use-this
   isSmallDiff(renderIndexDiff: number, tailingElementsAmount: number): boolean {
     if (renderIndexDiff !== 0 && renderIndexDiff <= tailingElementsAmount) {
@@ -30,15 +28,16 @@ export class ScrollDetector {
     return false;
   }
 
-  setGoingFromBottom(chunk: ChunkController, chunkOrderNumber: number): void {
-    if (
-      this.direction === 'down' &&
-      chunkOrderNumber <= chunk.firstOrderNumber
-    ) {
+  setGoingFromBottom(
+    firstOrderNumber: number,
+    lastOrderNumber: number,
+    chunkOrderNumber: number
+  ): void {
+    if (this.direction === 'down' && chunkOrderNumber <= firstOrderNumber) {
       this.isGoingFromBottom = false;
     } else if (
       this.direction === 'up' &&
-      chunkOrderNumber >= chunk.lastOrderNumber - 1
+      chunkOrderNumber >= lastOrderNumber - 1
     ) {
       this.isGoingFromBottom = true;
     }

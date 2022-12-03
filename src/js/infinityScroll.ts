@@ -6,13 +6,15 @@ import {
   DomManager,
 } from './controllers';
 
-console.log('TS file loaded');
+import {
+  checkChildrenAmount,
+  isPropsUndefined,
+  getRemoteData,
+} from './helpers';
 
-const checkChildrenAmount = (length: number, fullSize: number): void => {
-  if (length !== fullSize) {
-    console.error('%cКоличесвто деток: ', 'color: tomato', length);
-  }
-};
+import { TemplateStringFunction } from './types/TemplateStringFunction';
+
+console.log('Main TS file loaded');
 
 type NameToTagObj = {
   [key: string]: string;
@@ -22,25 +24,6 @@ const nameToTag: NameToTagObj = {
   list: 'UL',
   table: 'TABLE',
 };
-
-// HELPER FUNCTIONS
-function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
-  const keys = Object.keys(obj);
-  return keys.some((key) => !obj[key]);
-}
-
-function getRemoteData(url: URL): Promise<unknown> {
-  console.log('try to get data from', url);
-
-  return fetch(url).then((response) =>
-    response
-      .json()
-      .then((data) => data)
-      .catch((err) => {
-        console.log(err);
-      })
-  );
-}
 
 /* Давайте посчитаем все промежуточные переменные:
 1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
@@ -56,8 +39,6 @@ function getRemoteData(url: URL): Promise<unknown> {
 --- до рефакторинга было 450 строк кода
 
  */
-
-type TemplateStringFunction = (element: object, listLength?: number) => string;
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 interface InfinityScrollPropTypes {
@@ -266,8 +247,11 @@ class InfinityScroll {
 
     this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
-    // TODO: передавать цифры, а не целый чанк
-    this.scroll.setGoingFromBottom(this.chunk, chunkOrderNumber);
+    this.scroll.setGoingFromBottom(
+      this.chunk.firstOrderNumber,
+      this.chunk.lastOrderNumber,
+      chunkOrderNumber
+    );
     // Если скролл слишком большой - рисуем всё заново
     this.checkBigDiffToResetList(renderIndexDiff);
 
