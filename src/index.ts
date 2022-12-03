@@ -5,9 +5,9 @@ import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
 
-import { InfinityScrollPropTypes } from './js/types/InfinityScrollPropTypes';
-
-import { instantListProps } from './demoScripts/sync_simple_100item';
+import { SYNC_SIMPLE_100ITEMS_PROPS } from './demoScripts/sync_simple_100item';
+import { ASYNC_SIMPLE_500ITEMS_PROPS } from './demoScripts/async_simple_500item';
+import { SYNC_PURE_100ITEMS_PROPS } from './demoScripts/sync_pure_100item';
 
 console.log('Entry point');
 
@@ -24,34 +24,28 @@ const BigJson1 = BigDataList100.data;
 //   number: number;
 // }
 
-const lazyListProps: InfinityScrollPropTypes = {
-  data: BigJson1,
-  dataLoadType: 'lazy',
-  dataUrl: 'https://jsonplaceholder.typicode.com/comments',
-  name: 'my scroll list name',
-  selectorId: 'lazyInfinityScrollWrapper',
-  listType: 'list',
-  listWrapperHeight: '290px',
-  templateString: (element: object, listLength?: number): string => `<li 
-        class="infinityScrollList__listItem" 
-        aria-setsize="${listLength}" 
-        aria-posinset="${element.id}"
-        >
-            ${element.email} ${element.id}
-    </li>`,
-};
-
-const instantList = document.getElementById(instantListProps.selectorId);
+const instantList = document.getElementById(
+  SYNC_SIMPLE_100ITEMS_PROPS.selectorId
+);
 if (instantList !== null) {
   console.log('Instant list Started');
-  const myInstantScroll = new InfinityScroll(instantListProps);
+  const myInstantScroll = new InfinityScroll(SYNC_SIMPLE_100ITEMS_PROPS);
 }
 
-const lazyList = document.getElementById(lazyListProps.selectorId);
+const lazyList = document.getElementById(
+  ASYNC_SIMPLE_500ITEMS_PROPS.selectorId
+);
 
 if (lazyList !== null) {
   console.log('Lazy list Started');
-  const myLazyScroll = new InfinityScroll(lazyListProps);
+  const myLazyScroll = new InfinityScroll(ASYNC_SIMPLE_500ITEMS_PROPS);
+}
+
+const pureList = document.getElementById(SYNC_PURE_100ITEMS_PROPS.selectorId);
+
+if (pureList !== null) {
+  console.log('Lazy list Started');
+  const myLazyScroll = new InfinityScroll(SYNC_PURE_100ITEMS_PROPS);
 }
 
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(

@@ -123,6 +123,7 @@ class InfinityScroll {
       console.log(this.list.data);
       // return;
     }
+    this.setDefaultStyles();
     this.getAllSizes();
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
@@ -150,6 +151,11 @@ class InfinityScroll {
     });
   }
 
+  setDefaultStyles() {
+    this.wrapperEl.style.height = this.listWrapperHeight;
+    this.wrapperEl.style.overflowY = 'scroll';
+  }
+
   createInnerList(): HTMLElement {
     const newEl = document.createElement(nameToTag[this.listType]);
     // ID-то наверное и не нужен вообще, если есть доступ к списку итак?
@@ -158,7 +164,7 @@ class InfinityScroll {
       this.listType.charAt(0).toUpperCase() +
       this.listType.slice(1);
     newEl.setAttribute('id', newElID);
-    newEl.setAttribute('class', 'Demo_infinityScrollList');
+    // newEl.setAttribute('class', 'Demo_infinityScrollList');
     return this.wrapperEl.appendChild(newEl);
   }
 
@@ -171,10 +177,6 @@ class InfinityScroll {
     const list = this.listEl;
     const listWrpStyles = window.getComputedStyle(listWrp);
     let listItem = list.firstChild as HTMLElement;
-
-    listWrp.style.height = this.listWrapperHeight;
-
-    console.log(listWrp);
 
     this.list.wrapperHeight =
       parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
