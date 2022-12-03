@@ -8,12 +8,16 @@
     <section class="container">
       <%= _.template(require('html-loader!./html/includes/header.html'))(data)
       %>
-      <h1>1111SASS TEST</h1>
-      <p>oih</p>
-      <h3></h3>
       <img src="./assets/images/torin.gif" alt="" />
       <!--   работает-->
       <p><%= htmlWebpackPlugin.options.info %></p>
+
+      <ul class="listOfDemoLink">
+        <li class="demoLinkItem">
+          <a href="/demo.html" class="demoLink">Sync List (100 items)</a>
+        </li>
+      </ul>
+
       <%= _.template(require('html-loader!./html/includes/list.html'))(data) %>
     </section>
   </body>

@@ -1,0 +1,42 @@
+/* Demo styles */
+.Demo_infinityScroll_btn {
+  padding: 8px 30px;
+  font-size: 20px;
+  background-color: #fad513;
+  font-weight: bold;
+  color: #585858;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.Demo_infinityScroll {
+  position: relative;
+  padding: 10px 0;
+  border: 2px solid #444;
+  border-radius: 8px;
+}
+.Demo_infinityScrollWrp {
+  height: 350px;
+  //height: 310px;
+  overflow-y: scroll;
+}
+
+.Demo_infinityScrollList {
+  color: #555;
+  margin: 0;
+
+  &__listItem {
+    padding: 8px 10px;
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px;
+    //transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background: #efefef;
+    }
+    &:before {
+      content: attr(aria-posinset) ')';
+    }
+  }
+}
