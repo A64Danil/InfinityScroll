@@ -12,7 +12,7 @@ import {
   getRemoteData,
 } from './helpers';
 
-import { TemplateStringFunction } from './types/TemplateStringFunction';
+import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 
 console.log('Main TS file loaded');
 
@@ -41,17 +41,6 @@ const nameToTag: NameToTagObj = {
  */
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
-// TODO: вынести в отедьный файл
-interface InfinityScrollPropTypes {
-  data: object[];
-  dataLoadType: 'instant' | 'lazy';
-  dataUrl?: URL;
-  name: string;
-  selectorId: string;
-  listType: 'list' | 'table';
-  listWrapperHeight: string;
-  templateString: TemplateStringFunction;
-}
 
 class InfinityScroll {
   // хранит в себе id сетТаймаута
