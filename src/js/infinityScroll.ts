@@ -41,15 +41,16 @@ const nameToTag: NameToTagObj = {
  */
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
+// TODO: вынести в отедьный файл
 interface InfinityScrollPropTypes {
-  templateString: TemplateStringFunction;
   data: object[];
   dataLoadType: 'instant' | 'lazy';
   dataUrl?: URL;
   name: string;
   selectorId: string;
   listType: 'list' | 'table';
-  // templateString: TplStringFn;
+  listWrapperHeight: string;
+  templateString: TemplateStringFunction;
 }
 
 class InfinityScroll {
@@ -67,6 +68,9 @@ class InfinityScroll {
 
   // Тип списка (список или таблица)
   private readonly listType: string;
+
+  // Тип списка (список или таблица)
+  private readonly listWrapperHeight: string;
 
   // Тип загрузки (список доступен сразу или надо качать с интернета)
   private readonly dataLoadType: 'instant' | 'lazy';
@@ -95,6 +99,8 @@ class InfinityScroll {
     this.wrapperEl = wrapper;
 
     this.listType = props.listType;
+
+    this.listWrapperHeight = props.listWrapperHeight;
 
     this.listEl = this.createInnerList();
 
@@ -177,11 +183,15 @@ class InfinityScroll {
     const listWrpStyles = window.getComputedStyle(listWrp);
     let listItem = list.firstChild as HTMLElement;
 
+    listWrp.style.height = this.listWrapperHeight;
+
+    console.log(listWrp);
+
     this.list.wrapperHeight =
       parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
 
     if (this.list.wrapperHeight < 2) {
-      console.error('You must set height to your list-wrapper!');
+      console.error('You must set height to your list-wrapper more than 10px!');
       return;
     }
 

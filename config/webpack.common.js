@@ -46,7 +46,7 @@ module.exports = {
             title: 'Demo',
             info: 'some test data',
             // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/demo.html', // шаблон
+            template: paths.src + '/demoList_sync_simple_100item.html', // шаблон
             filename: 'demo.html', // название выходного файла
         }),
 

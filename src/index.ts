@@ -5,6 +5,8 @@ import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
 
+import { TemplateStringFunction } from './js/types/TemplateStringFunction';
+
 console.log('Entry point');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,20 +16,20 @@ const BigJson1 = BigDataList100.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // const BigJson3 = BigDataList100k.data;
 
-type TemplateStringFunction = (element: object, listLength?: number) => string;
-
-interface ListData {
-  name: string;
-  number: number;
-}
+//
+// interface ListData {
+//   name: string;
+//   number: number;
+// }
 
 interface InfinityScrollPropTypes {
-  data?: Array<ListData>;
+  data: object[];
   dataLoadType: 'instant' | 'lazy';
-  dataUrl?: string;
+  dataUrl?: URL;
   name: string;
   selectorId: string;
   listType: 'list' | 'table';
+  listWrapperHeight: string;
   templateString: TemplateStringFunction;
 }
 
@@ -37,6 +39,7 @@ const instantListProps: InfinityScrollPropTypes = {
   name: 'my scroll list name',
   selectorId: 'instantInfinityScrollWrapper',
   listType: 'list',
+  listWrapperHeight: '350px',
   templateString: (element: object, listLength?: number): string => `<li 
         class="Demo_infinityScrollList__listItem" 
         aria-setsize="${listLength}" 
@@ -53,6 +56,7 @@ const lazyListProps: InfinityScrollPropTypes = {
   name: 'my scroll list name',
   selectorId: 'lazyInfinityScrollWrapper',
   listType: 'list',
+  listWrapperHeight: '290px',
   templateString: (element: object, listLength?: number): string => `<li 
         class="infinityScrollList__listItem" 
         aria-setsize="${listLength}" 
