@@ -20,7 +20,9 @@
         </li>
       </ul>
 
-      <%= _.template(require('html-loader!./html/includes/list.html'))(data) %>
+      <%=
+      _.template(require('html-loader!./html/includes/demoLists/async_simple_500items.html'))(data)
+      %>
     </section>
   </body>
 </html>

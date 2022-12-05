@@ -9,11 +9,11 @@ export const ASYNC_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   dataLoadType: 'lazy',
   dataUrl: 'https://jsonplaceholder.typicode.com/comments',
   name: 'my scroll list name',
-  selectorId: 'lazyInfinityScrollWrapper',
+  selectorId: 'ASYNC_SIMPLE_500ITEM',
   listType: 'list',
   listWrapperHeight: '290px',
   templateString: (element: object, listLength?: number): string => `<li 
-        class="infinityScrollList__listItem" 
+        class="ASYNC_SIMPLE_500ITEM_List__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element.id}"
         >

@@ -1,9 +1,8 @@
-@import 'scroll/style';
 @import 'demo/common';
+@import 'demo/async_simple_500item';
 @import 'demo/sync_simple_100item';
 
 $font-size: 1rem;
-//$font-color: lch(53 105 40);
 $font-color: #333;
 
 html {
