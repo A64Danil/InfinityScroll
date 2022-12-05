@@ -159,12 +159,11 @@ class InfinityScroll {
   createInnerList(): HTMLElement {
     const newEl = document.createElement(nameToTag[this.listType]);
     // ID-то наверное и не нужен вообще, если есть доступ к списку итак?
-    const newElID =
-      this.selectorId +
-      this.listType.charAt(0).toUpperCase() +
-      this.listType.slice(1);
-    newEl.setAttribute('id', newElID);
-    // newEl.setAttribute('class', 'Demo_infinityScrollList');
+    const newElClass = `${this.selectorId}_${this.listType
+      .charAt(0)
+      .toUpperCase()}${this.listType.slice(1)}`;
+    // newEl.setAttribute('id', newElID);
+    newEl.setAttribute('class', newElClass);
     return this.wrapperEl.appendChild(newEl);
   }
 

@@ -1,25 +1,14 @@
 /* Demo styles */
-.Demo_infinityScroll_btn {
-  padding: 8px 30px;
-  font-size: 20px;
-  background-color: #fad513;
-  font-weight: bold;
-  color: #585858;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
 
-.Demo_infinityScroll {
+.SYNC_SIMPLE_100ITEMS_Border {
   position: relative;
   padding: 10px 0;
   border: 2px solid #444;
   border-radius: 8px;
-}
-.Demo_infinityScrollWrp {
-  overflow-y: scroll;
+  margin-bottom: 20px;
 }
 
-.Demo_infinityScrollList {
+.SYNC_SIMPLE_100ITEMS_List {
   color: #555;
   margin: 0;
 
@@ -28,7 +17,6 @@
     font-weight: normal;
     border-radius: 4px;
     font-size: 18px;
-    //transition: background-color 0.3s ease-in-out;
 
     &:hover {
       background: #efefef;

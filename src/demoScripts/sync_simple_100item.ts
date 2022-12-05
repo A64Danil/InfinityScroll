@@ -7,11 +7,11 @@ export const SYNC_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   dataLoadType: 'instant',
   name: 'my scroll list name',
-  selectorId: 'instantInfinityScrollWrapper',
+  selectorId: 'SYNC_SIMPLE_100ITEMS',
   listType: 'list',
   listWrapperHeight: '350px',
   templateString: (element: object, listLength?: number): string => `<li 
-        class="Demo_infinityScrollList__listItem" 
+        class="SYNC_SIMPLE_100ITEMS_List__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element.number + 1}"
         >
