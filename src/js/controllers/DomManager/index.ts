@@ -171,11 +171,11 @@ export class DomManager {
 
   // TODO: вынести в хелпер?
   // eslint-disable-next-line class-methods-use-this
-  recalcSequence(precalcSequence: number, startIndexOfLastPart: number) {
-    const newSequence =
-      precalcSequence > startIndexOfLastPart
-        ? startIndexOfLastPart
-        : precalcSequence;
+  recalcSequence(sequence: number, startIndexOfLastPart: number) {
+    let newSequence =
+      sequence > startIndexOfLastPart ? startIndexOfLastPart : sequence;
+
+    if (newSequence < 0) newSequence = 0;
 
     return newSequence;
   }
@@ -185,14 +185,10 @@ export class DomManager {
     list: ListController,
     direction: IScrollDirection
   ): void {
-    const precalcSequence = this.calcSequenceByDirection(
-      direction,
-      list.halfOfExistingSizeInDOM,
-      chunk.startRenderIndex,
-      chunk.amount
-    );
+    const calculatedSequence = chunk.startRenderIndex - chunk.amount;
+
     const sequenceNumber = this.recalcSequence(
-      precalcSequence,
+      calculatedSequence,
       list.startIndexOfLastPart
     );
 
