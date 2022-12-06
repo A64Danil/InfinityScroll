@@ -7,11 +7,11 @@ export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   dataLoadPlace: 'local',
   name: 'my scroll list name',
-  selectorId: 'SYNC_SIMPLE_100ITEMS',
+  selectorId: 'LOCAL_SIMPLE_100ITEMS',
   listType: 'list',
   listWrapperHeight: '350px',
   templateString: (element: object, listLength?: number): string => `<li 
-        class="SYNC_SIMPLE_100ITEMS_List__listItem" 
+        class="LOCAL_SIMPLE_100ITEMS_List__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element.number + 1}"
         >

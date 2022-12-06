@@ -7,7 +7,7 @@ export const LOCAL_PURE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   dataLoadPlace: 'local',
   name: 'my scroll list name',
-  selectorId: 'SYNC_PURE_100ITEMS',
+  selectorId: 'LOCAL_PURE_100ITEMS',
   listType: 'list',
   listWrapperHeight: '350px',
   templateString: (element: object, listLength?: number): string => `<li  

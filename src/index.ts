@@ -8,6 +8,7 @@ import { InfinityScroll } from './js/infinityScroll';
 import { LOCAL_PURE_100ITEMS_PROPS } from './demoScripts/local_pure_100item';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
 import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
+import { REMOTE_LAZY_000ITEMS_PROPS } from './demoScripts/remote_lazy_000item';
 
 console.log('Entry point');
 
@@ -21,7 +22,7 @@ const BigJson1 = BigDataList100.data;
 const pureList = document.getElementById(LOCAL_PURE_100ITEMS_PROPS.selectorId);
 
 if (pureList !== null) {
-  console.log('Lazy list Started');
+  console.log('Pure list Started');
   const myLazyScroll = new InfinityScroll(LOCAL_PURE_100ITEMS_PROPS);
 }
 
@@ -33,13 +34,20 @@ if (instantList !== null) {
   const myInstantScroll = new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
 }
 
-const lazyList = document.getElementById(
+const remoteList = document.getElementById(
   REMOTE_SIMPLE_500ITEMS_PROPS.selectorId
 );
 
+if (remoteList !== null) {
+  console.log('Remote list Started');
+  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+}
+
+const lazyList = document.getElementById(REMOTE_LAZY_000ITEMS_PROPS.selectorId);
+
 if (lazyList !== null) {
   console.log('Lazy list Started');
-  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+  const myLazyScroll = new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
 }
 
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
