@@ -49,6 +49,13 @@ module.exports = {
             template: paths.src + '/demoList_local_simple_100item.html', // шаблон
             filename: 'demoList_local_simple_100item.html', // название выходного файла
         }),
+        new HtmlWebpackPlugin({
+            title: 'Demo',
+            info: 'some test data',
+            // favicon: paths.src + '/images/favicon.png',
+            template: paths.src + '/demoList_remote_simple_500item.html', // шаблон
+            filename: 'demoList_remote_simple_500item.html', // название выходного файла
+        }),
 
         // ESLint configuration
         new ESLintPlugin({
