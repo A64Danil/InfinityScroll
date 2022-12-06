@@ -3,7 +3,7 @@ import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes'; /
 
 const BigJson1 = BigDataList100.data;
 
-export const SYNC_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
+export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   dataLoadPlace: 'local',
   name: 'my scroll list name',

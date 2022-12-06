@@ -46,8 +46,8 @@ module.exports = {
             title: 'Demo',
             info: 'some test data',
             // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/demoList_sync_simple_100item.html', // шаблон
-            filename: 'demoList_sync_simple_100item.html', // название выходного файла
+            template: paths.src + '/demoList_local_simple_100item.html', // шаблон
+            filename: 'demoList_local_simple_100item.html', // название выходного файла
         }),
 
         // ESLint configuration

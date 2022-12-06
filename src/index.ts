@@ -5,9 +5,9 @@ import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
 
-import { SYNC_SIMPLE_100ITEMS_PROPS } from './demoScripts/sync_simple_100item';
-import { ASYNC_SIMPLE_500ITEMS_PROPS } from './demoScripts/async_simple_500item';
-import { SYNC_PURE_100ITEMS_PROPS } from './demoScripts/sync_pure_100item';
+import { LOCAL_PURE_100ITEMS_PROPS } from './demoScripts/local_pure_100item';
+import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
+import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
 
 console.log('Entry point');
 
@@ -18,34 +18,28 @@ const BigJson1 = BigDataList100.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // const BigJson3 = BigDataList100k.data;
 
-//
-// interface ListData {
-//   name: string;
-//   number: number;
-// }
+const pureList = document.getElementById(LOCAL_PURE_100ITEMS_PROPS.selectorId);
+
+if (pureList !== null) {
+  console.log('Lazy list Started');
+  const myLazyScroll = new InfinityScroll(LOCAL_PURE_100ITEMS_PROPS);
+}
 
 const instantList = document.getElementById(
-  SYNC_SIMPLE_100ITEMS_PROPS.selectorId
+  LOCAL_SIMPLE_100ITEMS_PROPS.selectorId
 );
 if (instantList !== null) {
   console.log('Instant list Started');
-  const myInstantScroll = new InfinityScroll(SYNC_SIMPLE_100ITEMS_PROPS);
+  const myInstantScroll = new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
 }
 
 const lazyList = document.getElementById(
-  ASYNC_SIMPLE_500ITEMS_PROPS.selectorId
+  REMOTE_SIMPLE_500ITEMS_PROPS.selectorId
 );
 
 if (lazyList !== null) {
   console.log('Lazy list Started');
-  const myLazyScroll = new InfinityScroll(ASYNC_SIMPLE_500ITEMS_PROPS);
-}
-
-const pureList = document.getElementById(SYNC_PURE_100ITEMS_PROPS.selectorId);
-
-if (pureList !== null) {
-  console.log('Lazy list Started');
-  const myLazyScroll = new InfinityScroll(SYNC_PURE_100ITEMS_PROPS);
+  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
 }
 
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
