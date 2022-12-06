@@ -2,8 +2,9 @@ import { TemplateStringFunction } from './TemplateStringFunction';
 
 export interface InfinityScrollPropTypes {
   data: object[];
-  dataLoadType: 'instant' | 'lazy';
+  dataLoadPlace: 'local' | 'remote';
   dataUrl?: URL;
+  dataLoadSpeed?: 'instant' | 'lazy';
   name: string;
   selectorId: string;
   listType: 'list' | 'table';

@@ -5,7 +5,7 @@ const BigJson1 = BigDataList100.data;
 
 export const SYNC_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
-  dataLoadType: 'instant',
+  dataLoadPlace: 'local',
   name: 'my scroll list name',
   selectorId: 'SYNC_SIMPLE_100ITEMS',
   listType: 'list',

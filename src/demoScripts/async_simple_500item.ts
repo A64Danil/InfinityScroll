@@ -6,7 +6,7 @@ const BigJson1 = BigDataList100.data;
 export const ASYNC_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   // TODO: data не нжна если loadType - lazy
   data: BigJson1,
-  dataLoadType: 'lazy',
+  dataLoadPlace: 'remote',
   dataUrl: 'https://jsonplaceholder.typicode.com/comments',
   name: 'my scroll list name',
   selectorId: 'ASYNC_SIMPLE_500ITEM',

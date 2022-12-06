@@ -61,8 +61,11 @@ class InfinityScroll {
   // Тип списка (список или таблица)
   private readonly listWrapperHeight: string;
 
-  // Тип загрузки (список доступен сразу или надо качать с интернета)
-  private readonly dataLoadType: 'instant' | 'lazy';
+  // Тип загрузки (список доступен локально или надо качать с интернета)
+  private readonly dataLoadPlace: 'local' | 'remote';
+
+  // Скорость загрузки при асинхронном типе (сразу всё или по частям)
+  private readonly dataLoadSpeed: 'instant' | 'lazy';
 
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
@@ -105,7 +108,8 @@ class InfinityScroll {
       template: props.templateString,
     };
 
-    this.dataLoadType = props.dataLoadType;
+    this.dataLoadPlace = props.dataLoadPlace;
+    // this.dataLoadSpeed = props.dataLoadSpeed;
 
     this.setListData(props.data, props.dataUrl).then(() => {
       domChangerProps.listLength = this.list.length;
@@ -119,7 +123,7 @@ class InfinityScroll {
       throw new Error('Your DomManager is undefined');
     }
     console.log(this);
-    if (this.dataLoadType === 'lazy') {
+    if (this.dataLoadPlace === 'remote') {
       console.log(this.list.data);
       // return;
     }
@@ -342,7 +346,7 @@ class InfinityScroll {
 
   async setListData(listData: object[], dataUrl?: URL) {
     let newLength = null;
-    if (this.dataLoadType === 'instant') {
+    if (this.dataLoadPlace === 'local') {
       this.list.data = listData;
       newLength = listData && listData.length;
     } else {
