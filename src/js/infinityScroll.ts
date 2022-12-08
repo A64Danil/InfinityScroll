@@ -14,6 +14,8 @@ import {
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 
+// http://localhost:3000/data?_page=1&_limit=20
+
 console.log('Main TS file loaded');
 
 type NameToTagObj = {
