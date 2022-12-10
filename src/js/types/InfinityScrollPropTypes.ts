@@ -4,7 +4,7 @@ export interface InfinityScrollPropTypes {
   data: object[];
   dataLoadPlace: 'local' | 'remote';
   dataUrl?: URL;
-  dataLoadSpeed?: 'instant' | 'lazy';
+  dataLoadSpeed: 'instant' | 'lazy';
   name: string;
   selectorId: string;
   listType: 'list' | 'table';

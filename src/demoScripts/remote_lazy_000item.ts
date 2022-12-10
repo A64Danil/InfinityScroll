@@ -7,8 +7,8 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   // TODO: data не нжна если loadType - lazy
   data: BigJson1,
   dataLoadPlace: 'remote',
-  dataUrl: 'https://jsonplaceholder.typicode.com/comments',
   dataLoadSpeed: 'lazy',
+  dataUrl: 'https://jsonplaceholder.typicode.com/comments',
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
   listType: 'list',

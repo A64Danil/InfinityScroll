@@ -111,7 +111,8 @@ class InfinityScroll {
     };
 
     this.dataLoadPlace = props.dataLoadPlace;
-    // this.dataLoadSpeed = props.dataLoadSpeed;
+
+    this.dataLoadSpeed = props.dataLoadSpeed;
 
     this.setListData(props.data, props.dataUrl).then(() => {
       domChangerProps.listLength = this.list.length;
@@ -356,13 +357,18 @@ class InfinityScroll {
       if (dataUrl === undefined) {
         throw new Error('Your dataUrl is undefined');
       }
-      await getRemoteData(dataUrl).then((data): void => {
-        if (!Array.isArray(data)) {
-          throw new Error('Your fetched data does not have Array type');
-        }
-        this.list.data = data;
-        newLength = data && data.length;
-      });
+
+      if (this.dataLoadSpeed === 'instant') {
+        await getRemoteData(dataUrl).then((data): void => {
+          if (!Array.isArray(data)) {
+            throw new Error('Your fetched data does not have Array type');
+          }
+          this.list.data = data;
+          newLength = data && data.length;
+        });
+      } else {
+        console.log('Будущий функционал для лейзи');
+      }
     }
     if (!Array.isArray(this.list.data)) {
       throw new Error('Your list does not have Array type');

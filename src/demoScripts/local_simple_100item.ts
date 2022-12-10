@@ -6,6 +6,7 @@ const BigJson1 = BigDataList100.data;
 export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   dataLoadPlace: 'local',
+  dataLoadSpeed: 'instant',
   name: 'my scroll list name',
   selectorId: 'LOCAL_SIMPLE_100ITEMS',
   listType: 'list',
