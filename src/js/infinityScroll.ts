@@ -384,6 +384,7 @@ class InfinityScroll {
           this.list.data = data;
 
           if (this.forcedListLength) {
+            // TODO: не забыть написать функцию для определения длины списка
             newLength =
               this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
           } else {
