@@ -13,6 +13,7 @@ import {
 } from './helpers';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
+import { DataURLType } from './types/DataURL';
 
 // http://localhost:3000/data?_page=1&_limit=20
 
@@ -57,6 +58,8 @@ class InfinityScroll {
   // хранит ссылку на корневой html-элеент
   private readonly wrapperEl: HTMLElement;
 
+  private readonly forcedListLength: number | 'auto';
+
   // Тип списка (список или таблица)
   private readonly listType: string;
 
@@ -91,6 +94,8 @@ class InfinityScroll {
       throw new Error(`Object ${props.selectorId} does not exist in DOM`);
     }
     this.wrapperEl = wrapper;
+
+    this.forcedListLength = props.forcedListLength || 'auto';
 
     this.listType = props.listType;
 
@@ -347,7 +352,7 @@ class InfinityScroll {
     }
   }
 
-  async setListData(listData: object[], dataUrl?: URL) {
+  async setListData(listData: object[], dataUrl?: DataURLType) {
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
       this.list.data = listData;
@@ -368,6 +373,23 @@ class InfinityScroll {
         });
       } else {
         console.log('Будущий функционал для лейзи');
+        console.log(this.list.existingSizeInDOM);
+        const fetchURL = dataUrl(0, 100);
+        console.log(this.list.data);
+        await getRemoteData(fetchURL).then((data): void => {
+          if (!Array.isArray(data)) {
+            throw new Error('Your fetched data does not have Array type');
+          }
+          console.log(data);
+          this.list.data = data;
+
+          if (this.forcedListLength) {
+            newLength =
+              this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
+          } else {
+            newLength = data && data.length;
+          }
+        });
       }
     }
     if (!Array.isArray(this.list.data)) {
