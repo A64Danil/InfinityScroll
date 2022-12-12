@@ -285,23 +285,16 @@ class InfinityScroll {
       );
 
       if (isAllowRender && this.domMngr) {
-        /* Список используемых переменных
-         *  chunk.startRenderIndex
-         *  chunk.amount
-         *  chunk.htmlHeight
-         *
-         * list.halfOfExistingSizeInDOM
-         * list.tailingElementsAmount
-         * list.length
-         * list.data
-         * list.startIndexOfLastPart
-         * list.itemHeight
-         * */
         const mainChunkProps = {
           startRenderIndex: this.chunk.startRenderIndex,
           amount: this.chunk.amount,
           htmlHeight: this.chunk.htmlHeight,
         };
+        console.log(
+          'mainChunkProps.startRenderIndex',
+          mainChunkProps.startRenderIndex
+        );
+        console.log('mainChunkProps.amount', mainChunkProps.amount);
         const mainListProps = {
           existingSizeInDOM: this.list.existingSizeInDOM,
           halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
