@@ -6,7 +6,7 @@ export const checkChildrenAmount = (length: number, fullSize: number): void => {
 
 export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   const keys = Object.keys(obj);
-  return keys.some((key) => !obj[key]);
+  return keys.some((key) => !obj[key] && obj[key] !== 0);
 }
 
 export function getRemoteData(url: URL): Promise<unknown> {

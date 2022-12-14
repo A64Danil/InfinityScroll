@@ -13,7 +13,10 @@ import {
   getListDataLazy,
 } from './helpers';
 
-import { calcSequenceByDirection } from './helpers/calcSequence';
+import {
+  calcSequenceByDirection,
+  recalcSequence,
+} from './helpers/calcSequence';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
@@ -317,30 +320,7 @@ class InfinityScroll {
         console.log('mainChunkProps.amount', mainChunkProps.amount);
         // TODO: донастроить правильный фетч
         // Fetch new DATA
-        if (this.dataLoadSpeed === 'lazy') {
-          const newSequence = calcSequenceByDirection(
-            this.scroll.direction,
-            this.list.halfOfExistingSizeInDOM,
-            this.chunk.startRenderIndex,
-            this.chunk.amount
-          );
-          const [startFetchIndex, endFetchIndex] = [
-            newSequence,
-            newSequence + this.chunk.amount,
-          ];
-          console.log(`${startFetchIndex} - ${endFetchIndex}`);
-          await getRemoteData(
-            this.dataUrl(startFetchIndex, endFetchIndex)
-          ).then((data): void => {
-            if (!Array.isArray(data)) {
-              throw new Error('Your fetched data does not have Array type');
-            }
-            // console.log(data);
-            // TODO: написать правильный сеттер для даты списка
-            this.list.data = this.list.data?.concat(data);
-            console.log(this.list.data);
-          });
-        }
+        await this.lazyOrderedFetch();
         // END Fetch new DATA
 
         const mainListProps = {
@@ -435,6 +415,37 @@ class InfinityScroll {
       throw new Error('Your list does not have length or length is 0');
     }
     this.list.length = newLength;
+  }
+
+  async lazyOrderedFetch() {
+    if (this.dataLoadSpeed === 'lazy') {
+      const newSequence = calcSequenceByDirection(
+        this.scroll.direction,
+        this.list.halfOfExistingSizeInDOM,
+        this.chunk.startRenderIndex,
+        this.chunk.amount
+      );
+      const lastStartIndex = this.list.length - this.chunk.amount;
+      const lastEndIndex = this.list.length;
+      // console.log('lastStartIndex', lastStartIndex);
+      const [startFetchIndex, endFetchIndex] =
+        newSequence < lastStartIndex
+          ? [newSequence, newSequence + this.chunk.amount]
+          : [lastStartIndex, lastEndIndex];
+      console.log(`${startFetchIndex} - ${endFetchIndex}`);
+      await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
+        (data): void => {
+          if (!Array.isArray(data)) {
+            throw new Error('Your fetched data does not have Array type');
+          }
+          // console.log(data);
+          // TODO: написать правильный сеттер для даты списка
+          console.log(this.list.data);
+          this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+          console.log(this.list.data);
+        }
+      );
+    }
   }
 }
 
