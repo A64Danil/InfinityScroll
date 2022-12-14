@@ -21,3 +21,14 @@ export function getRemoteData(url: URL): Promise<unknown> {
       })
   );
 }
+
+export async function getListDataLazy(dataUrl, start = 0, end = 1) {
+  const fetchURL = dataUrl(start, end);
+  const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
+    if (!Array.isArray(data)) {
+      throw new Error('Your fetched data does not have Array type');
+    }
+    return data;
+  });
+  return fetchedData;
+}

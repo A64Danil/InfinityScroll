@@ -10,7 +10,10 @@ import {
   checkChildrenAmount,
   isPropsUndefined,
   getRemoteData,
+  getListDataLazy,
 } from './helpers';
+
+import { calcSequenceByDirection } from './helpers/calcSequence';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
@@ -72,6 +75,8 @@ class InfinityScroll {
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
   private readonly dataLoadSpeed: 'instant' | 'lazy';
 
+  private readonly dataUrl: DataURLType;
+
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
@@ -119,6 +124,8 @@ class InfinityScroll {
 
     this.dataLoadSpeed = props.dataLoadSpeed;
 
+    this.dataUrl = props.dataUrl;
+
     this.setListData(props.data, props.dataUrl).then(() => {
       domChangerProps.listLength = this.list.length;
       this.domMngr = new DomManager(domChangerProps);
@@ -126,7 +133,7 @@ class InfinityScroll {
     });
   }
 
-  start() {
+  async start() {
     if (this.domMngr === undefined) {
       throw new Error('Your DomManager is undefined');
     }
@@ -137,6 +144,19 @@ class InfinityScroll {
     }
     this.setDefaultStyles();
     this.getAllSizes();
+
+    if (this.dataLoadSpeed === 'lazy') {
+      console.log('Заполняем первичный раз');
+      console.log(this.list.data);
+      await getListDataLazy(this.dataUrl, 1, this.list.existingSizeInDOM).then(
+        (data): void => {
+          console.log('Вот что стянули');
+          console.log(data);
+          this.list.data = this.list.data?.concat(data);
+        }
+      );
+    }
+
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
@@ -234,7 +254,7 @@ class InfinityScroll {
     }
   }
 
-  calcCurrentDOMRender(e: Event): void {
+  async calcCurrentDOMRender(e: Event): void {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
@@ -295,6 +315,34 @@ class InfinityScroll {
           mainChunkProps.startRenderIndex
         );
         console.log('mainChunkProps.amount', mainChunkProps.amount);
+        // TODO: донастроить правильный фетч
+        // Fetch new DATA
+        if (this.dataLoadSpeed === 'lazy') {
+          const newSequence = calcSequenceByDirection(
+            this.scroll.direction,
+            this.list.halfOfExistingSizeInDOM,
+            this.chunk.startRenderIndex,
+            this.chunk.amount
+          );
+          const [startFetchIndex, endFetchIndex] = [
+            newSequence,
+            newSequence + this.chunk.amount,
+          ];
+          console.log(`${startFetchIndex} - ${endFetchIndex}`);
+          await getRemoteData(
+            this.dataUrl(startFetchIndex, endFetchIndex)
+          ).then((data): void => {
+            if (!Array.isArray(data)) {
+              throw new Error('Your fetched data does not have Array type');
+            }
+            // console.log(data);
+            // TODO: написать правильный сеттер для даты списка
+            this.list.data = this.list.data?.concat(data);
+            console.log(this.list.data);
+          });
+        }
+        // END Fetch new DATA
+
         const mainListProps = {
           existingSizeInDOM: this.list.existingSizeInDOM,
           halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
@@ -365,17 +413,11 @@ class InfinityScroll {
           newLength = data && data.length;
         });
       } else {
-        console.log('Будущий функционал для лейзи');
-        console.log(this.list.existingSizeInDOM);
-        const fetchURL = dataUrl(0, 100);
-        console.log(this.list.data);
-        await getRemoteData(fetchURL).then((data): void => {
-          if (!Array.isArray(data)) {
-            throw new Error('Your fetched data does not have Array type');
-          }
+        await getListDataLazy(dataUrl).then((data) => {
           console.log(data);
+          console.log('Будущий функционал для лейзи');
+          console.log(this.list.existingSizeInDOM);
           this.list.data = data;
-
           if (this.forcedListLength) {
             // TODO: не забыть написать функцию для определения длины списка
             newLength =

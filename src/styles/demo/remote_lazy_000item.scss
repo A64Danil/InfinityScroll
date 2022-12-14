@@ -1,0 +1,17 @@
+.REMOTE_LAZY_000ITEM_List {
+  color: #333;
+
+  &__listItem {
+    padding: 5px 10px;
+    font-size: 24px;
+    font-weight: normal;
+    //transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background: #eee;
+    }
+    &:before {
+      content: attr(aria-posinset) ')';
+    }
+  }
+}
