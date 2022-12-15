@@ -287,8 +287,9 @@ class InfinityScroll {
       this.chunk.lastOrderNumber,
       chunkOrderNumber
     );
+    // TODO: разделить на 2 функции
     // Если скролл слишком большой - рисуем всё заново
-    this.checkBigDiffToResetList(renderIndexDiff);
+    await this.checkBigDiffToResetList(renderIndexDiff);
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== newRenderIndex) {
@@ -317,7 +318,6 @@ class InfinityScroll {
           'mainChunkProps.startRenderIndex',
           mainChunkProps.startRenderIndex
         );
-        console.log('mainChunkProps.amount', mainChunkProps.amount);
         // TODO: донастроить правильный фетч
         // Fetch new DATA
         await this.lazyOrderedFetch();
@@ -352,7 +352,7 @@ class InfinityScroll {
     }
   }
 
-  checkBigDiffToResetList(scrollDiff: number): void {
+  async checkBigDiffToResetList(scrollDiff: number): Promise<void> {
     const isBigDiff: boolean = this.scroll.isBigDiff(
       scrollDiff,
       this.chunk.amount,
@@ -361,8 +361,13 @@ class InfinityScroll {
 
     if (isBigDiff && this.domMngr && this.domMngr.isWaitRender === false) {
       this.domMngr.isWaitRender = true;
-      this.timerIdRefreshList = window.setTimeout(() => {
+
+      this.timerIdRefreshList = window.setTimeout(async () => {
         if (this.domMngr) {
+          // Fetch new DATA
+          console.log('before fetch in bigDiff');
+          await this.lazyOrderedFetch();
+          // END Fetch new DATA
           this.domMngr.resetAllList(
             this.chunk,
             this.list,
@@ -433,6 +438,7 @@ class InfinityScroll {
           ? [newSequence, newSequence + this.chunk.amount]
           : [lastStartIndex, lastEndIndex];
       console.log(`${startFetchIndex} - ${endFetchIndex}`);
+      // TODO: старт и енд отличаются для resetAllList и для обычной прокрутки
       await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
         (data): void => {
           if (!Array.isArray(data)) {
@@ -440,8 +446,24 @@ class InfinityScroll {
           }
           // console.log(data);
           // TODO: написать правильный сеттер для даты списка
-          console.log(this.list.data);
-          this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+          const dataLength = this.list.data?.length;
+          console.log('this.list.data.length', dataLength);
+          console.log('startFetchIndex', startFetchIndex);
+          if (startFetchIndex <= dataLength) {
+            console.log('всё ок, добавим дату в текущий массив');
+            this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+          } else {
+            console.log('надо генерировать новые пустые ячейки');
+            // TODO: начинаем тут
+            const emptyArrayLength = startFetchIndex - dataLength;
+            console.log('data Arr', data);
+            const emptyArray = new Array(emptyArrayLength);
+            const dataArray = emptyArray.concat(data);
+            // console.log(dataArray);
+            this.list.data = this.list.data?.concat(dataArray);
+            // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+          }
+
           console.log(this.list.data);
         }
       );

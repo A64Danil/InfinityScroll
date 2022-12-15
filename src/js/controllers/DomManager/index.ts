@@ -87,7 +87,6 @@ export class DomManager {
      * list.startIndexOfLastPart
      * list.itemHeight
      * */
-    console.log('chunk.startRenderIndex', chunk.startRenderIndex);
 
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
