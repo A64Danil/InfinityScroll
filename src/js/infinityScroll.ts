@@ -372,7 +372,7 @@ class InfinityScroll {
         // Fetch new DATA
         console.log('before fetch in bigDiff');
         if (this.dataLoadSpeed === 'lazy') {
-          await this.lazyOrderedFetch();
+          await this.lazyOrderedFetch(true);
         }
         // END Fetch new DATA
         this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
@@ -424,19 +424,36 @@ class InfinityScroll {
     this.list.length = newLength;
   }
 
-  async lazyOrderedFetch() {
-    const newSequence = calcSequenceByDirection(
-      this.scroll.direction,
-      this.list.halfOfExistingSizeInDOM,
-      this.chunk.startRenderIndex,
-      this.chunk.amount
-    );
+  async lazyOrderedFetch(isFetchToReset = false) {
+    let [startFetchIndex, endFetchIndex] = [0, 1];
     const lastStartIndex = this.list.length - this.chunk.amount;
     const lastEndIndex = this.list.length;
+    let sequenceStart;
+    let sequenceEnd;
     // console.log('lastStartIndex', lastStartIndex);
-    const [startFetchIndex, endFetchIndex] =
-      newSequence < lastStartIndex
-        ? [newSequence, newSequence + this.chunk.amount]
+    if (!isFetchToReset) {
+      sequenceStart = calcSequenceByDirection(
+        this.scroll.direction,
+        this.list.halfOfExistingSizeInDOM,
+        this.chunk.startRenderIndex,
+        this.chunk.amount
+      );
+      sequenceEnd = sequenceStart + this.chunk.amount;
+    } else {
+      const baseStyles = [
+        'color: #fff',
+        'background-color: #444',
+        'padding: 2px 4px',
+        'border-radius: 2px',
+      ].join(';');
+      console.log('%c============= Фетч всего списка', baseStyles);
+      sequenceStart = this.chunk.startRenderIndex - this.chunk.amount;
+      sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
+    }
+    console.log('sequenceStart', sequenceStart, sequenceEnd);
+    [startFetchIndex, endFetchIndex] =
+      sequenceStart < lastStartIndex
+        ? [sequenceStart, sequenceEnd]
         : [lastStartIndex, lastEndIndex];
     console.log(`${startFetchIndex} - ${endFetchIndex}`);
     // TODO: старт и енд отличаются для resetAllList и для обычной прокрутки
@@ -447,27 +464,31 @@ class InfinityScroll {
         }
         // console.log(data);
         // TODO: написать правильный сеттер для даты списка
-        const dataLength = this.list.data?.length;
-        console.log('this.list.data.length', dataLength);
         console.log('startFetchIndex', startFetchIndex);
-        if (startFetchIndex <= dataLength) {
-          console.log('всё ок, добавим дату в текущий массив');
-          this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
-        } else {
-          console.log('надо генерировать новые пустые ячейки');
-          // TODO: начинаем тут
-          const emptyArrayLength = startFetchIndex - dataLength;
-          console.log('data Arr', data);
-          const emptyArray = new Array(emptyArrayLength);
-          const dataArray = emptyArray.concat(data);
-          // console.log(dataArray);
-          this.list.data = this.list.data?.concat(dataArray);
-          // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
-        }
-
+        this.addNewItemsToDataList(startFetchIndex, data);
         console.log(this.list.data);
       }
     );
+  }
+
+  // TODO: переделать на правильное добавление в массив
+  addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
+    const dataLength = this.list.data?.length;
+    console.log('this.list.data.length', dataLength);
+    if (startFetchIndex <= dataLength) {
+      console.log('всё ок, добавим дату в текущий массив');
+      this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+    } else {
+      console.log('надо генерировать новые пустые ячейки');
+      // TODO: начинаем тут
+      const emptyArrayLength = startFetchIndex - dataLength;
+      // console.log('data Arr', data);
+      const emptyArray = new Array(emptyArrayLength);
+      const dataArray = emptyArray.concat(data);
+      // console.log(dataArray);
+      this.list.data = this.list.data?.concat(dataArray);
+      // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+    }
   }
 }
 

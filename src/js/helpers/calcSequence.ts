@@ -12,7 +12,6 @@ export function calcSequenceByDirection(
       : startRenderIndex - chunkAmount;
 
   if (precalcSequence < 0) precalcSequence = 0;
-  console.log('precalcSequence', precalcSequence);
   return precalcSequence;
 }
 
