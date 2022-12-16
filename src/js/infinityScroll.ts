@@ -287,9 +287,12 @@ class InfinityScroll {
       this.chunk.lastOrderNumber,
       chunkOrderNumber
     );
-    // TODO: разделить на 2 функции
     // Если скролл слишком большой - рисуем всё заново
-    await this.checkBigDiffToResetList(renderIndexDiff);
+    const isBigDiff = this.checkBigDiff(renderIndexDiff);
+    if (isBigDiff && this.domMngr && this.domMngr.isWaitRender === false) {
+      this.domMngr.isWaitRender = true;
+      this.setTimerToRefreshList();
+    }
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== newRenderIndex) {
@@ -352,30 +355,25 @@ class InfinityScroll {
     }
   }
 
-  async checkBigDiffToResetList(scrollDiff: number): Promise<void> {
+  checkBigDiff(scrollDiff: number): boolean {
     const isBigDiff: boolean = this.scroll.isBigDiff(
       scrollDiff,
       this.chunk.amount,
       this.list.tailingElementsAmount
     );
+    return isBigDiff;
+  }
 
-    if (isBigDiff && this.domMngr && this.domMngr.isWaitRender === false) {
-      this.domMngr.isWaitRender = true;
-
-      this.timerIdRefreshList = window.setTimeout(async () => {
-        if (this.domMngr) {
-          // Fetch new DATA
-          console.log('before fetch in bigDiff');
-          await this.lazyOrderedFetch();
-          // END Fetch new DATA
-          this.domMngr.resetAllList(
-            this.chunk,
-            this.list,
-            this.scroll.direction
-          );
-        }
-      }, 30);
-    }
+  setTimerToRefreshList() {
+    this.timerIdRefreshList = window.setTimeout(async () => {
+      if (this.domMngr) {
+        // Fetch new DATA
+        console.log('before fetch in bigDiff');
+        await this.lazyOrderedFetch();
+        // END Fetch new DATA
+        this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
+      }
+    }, 30);
   }
 
   async setListData(listData: object[], dataUrl?: DataURLType) {
