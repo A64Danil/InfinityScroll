@@ -442,7 +442,7 @@ class InfinityScroll {
     } else {
       const baseStyles = [
         'color: #fff',
-        'background-color: #444',
+        'background-color: #900',
         'padding: 2px 4px',
         'border-radius: 2px',
       ].join(';');
@@ -456,14 +456,11 @@ class InfinityScroll {
         ? [sequenceStart, sequenceEnd]
         : [lastStartIndex, lastEndIndex];
     console.log(`${startFetchIndex} - ${endFetchIndex}`);
-    // TODO: старт и енд отличаются для resetAllList и для обычной прокрутки
     await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
       (data): void => {
         if (!Array.isArray(data)) {
           throw new Error('Your fetched data does not have Array type');
         }
-        // console.log(data);
-        // TODO: написать правильный сеттер для даты списка
         console.log('startFetchIndex', startFetchIndex);
         this.addNewItemsToDataList(startFetchIndex, data);
         console.log(this.list.data);
@@ -471,23 +468,13 @@ class InfinityScroll {
     );
   }
 
-  // TODO: переделать на правильное добавление в массив
+  // TODO: выяснить почему не все данные берутся из массива
   addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
-    const dataLength = this.list.data?.length;
-    console.log('this.list.data.length', dataLength);
-    if (startFetchIndex <= dataLength) {
-      console.log('всё ок, добавим дату в текущий массив');
-      this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
-    } else {
-      console.log('надо генерировать новые пустые ячейки');
-      // TODO: начинаем тут
-      const emptyArrayLength = startFetchIndex - dataLength;
-      // console.log('data Arr', data);
-      const emptyArray = new Array(emptyArrayLength);
-      const dataArray = emptyArray.concat(data);
-      // console.log(dataArray);
-      this.list.data = this.list.data?.concat(dataArray);
-      // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+    const loopLength = data.length;
+    for (let i = 0; i < loopLength; i++) {
+      const currentIndex = startFetchIndex + i;
+      console.log(currentIndex);
+      this.list.data[currentIndex] = data[i];
     }
   }
 }
