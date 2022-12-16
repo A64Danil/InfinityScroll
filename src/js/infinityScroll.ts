@@ -323,7 +323,9 @@ class InfinityScroll {
         );
         // TODO: донастроить правильный фетч
         // Fetch new DATA
-        await this.lazyOrderedFetch();
+        if (this.dataLoadSpeed === 'lazy') {
+          await this.lazyOrderedFetch();
+        }
         // END Fetch new DATA
 
         const mainListProps = {
@@ -369,7 +371,9 @@ class InfinityScroll {
       if (this.domMngr) {
         // Fetch new DATA
         console.log('before fetch in bigDiff');
-        await this.lazyOrderedFetch();
+        if (this.dataLoadSpeed === 'lazy') {
+          await this.lazyOrderedFetch();
+        }
         // END Fetch new DATA
         this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
       }
@@ -421,51 +425,49 @@ class InfinityScroll {
   }
 
   async lazyOrderedFetch() {
-    if (this.dataLoadSpeed === 'lazy') {
-      const newSequence = calcSequenceByDirection(
-        this.scroll.direction,
-        this.list.halfOfExistingSizeInDOM,
-        this.chunk.startRenderIndex,
-        this.chunk.amount
-      );
-      const lastStartIndex = this.list.length - this.chunk.amount;
-      const lastEndIndex = this.list.length;
-      // console.log('lastStartIndex', lastStartIndex);
-      const [startFetchIndex, endFetchIndex] =
-        newSequence < lastStartIndex
-          ? [newSequence, newSequence + this.chunk.amount]
-          : [lastStartIndex, lastEndIndex];
-      console.log(`${startFetchIndex} - ${endFetchIndex}`);
-      // TODO: старт и енд отличаются для resetAllList и для обычной прокрутки
-      await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
-        (data): void => {
-          if (!Array.isArray(data)) {
-            throw new Error('Your fetched data does not have Array type');
-          }
-          // console.log(data);
-          // TODO: написать правильный сеттер для даты списка
-          const dataLength = this.list.data?.length;
-          console.log('this.list.data.length', dataLength);
-          console.log('startFetchIndex', startFetchIndex);
-          if (startFetchIndex <= dataLength) {
-            console.log('всё ок, добавим дату в текущий массив');
-            this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
-          } else {
-            console.log('надо генерировать новые пустые ячейки');
-            // TODO: начинаем тут
-            const emptyArrayLength = startFetchIndex - dataLength;
-            console.log('data Arr', data);
-            const emptyArray = new Array(emptyArrayLength);
-            const dataArray = emptyArray.concat(data);
-            // console.log(dataArray);
-            this.list.data = this.list.data?.concat(dataArray);
-            // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
-          }
-
-          console.log(this.list.data);
+    const newSequence = calcSequenceByDirection(
+      this.scroll.direction,
+      this.list.halfOfExistingSizeInDOM,
+      this.chunk.startRenderIndex,
+      this.chunk.amount
+    );
+    const lastStartIndex = this.list.length - this.chunk.amount;
+    const lastEndIndex = this.list.length;
+    // console.log('lastStartIndex', lastStartIndex);
+    const [startFetchIndex, endFetchIndex] =
+      newSequence < lastStartIndex
+        ? [newSequence, newSequence + this.chunk.amount]
+        : [lastStartIndex, lastEndIndex];
+    console.log(`${startFetchIndex} - ${endFetchIndex}`);
+    // TODO: старт и енд отличаются для resetAllList и для обычной прокрутки
+    await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
+      (data): void => {
+        if (!Array.isArray(data)) {
+          throw new Error('Your fetched data does not have Array type');
         }
-      );
-    }
+        // console.log(data);
+        // TODO: написать правильный сеттер для даты списка
+        const dataLength = this.list.data?.length;
+        console.log('this.list.data.length', dataLength);
+        console.log('startFetchIndex', startFetchIndex);
+        if (startFetchIndex <= dataLength) {
+          console.log('всё ок, добавим дату в текущий массив');
+          this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+        } else {
+          console.log('надо генерировать новые пустые ячейки');
+          // TODO: начинаем тут
+          const emptyArrayLength = startFetchIndex - dataLength;
+          console.log('data Arr', data);
+          const emptyArray = new Array(emptyArrayLength);
+          const dataArray = emptyArray.concat(data);
+          // console.log(dataArray);
+          this.list.data = this.list.data?.concat(dataArray);
+          // this.list.data?.splice(startFetchIndex, this.chunk.amount, ...data);
+        }
+
+        console.log(this.list.data);
+      }
+    );
   }
 }
 
