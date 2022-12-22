@@ -181,10 +181,13 @@ export class DomManager {
 
   resetAllList(
     chunk: ChunkController,
+    startRenderIndex: number,
+    chunkAmount: number,
     list: ListController,
     direction: IScrollDirection
   ): void {
-    const calculatedSequence = chunk.startRenderIndex - chunk.amount;
+    console.log('=====RESET LIST=====');
+    const calculatedSequence = startRenderIndex - chunkAmount;
 
     const sequenceNumber = this.recalcSequence(
       calculatedSequence,
@@ -195,10 +198,12 @@ export class DomManager {
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
+      console.log(elemNum);
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
       }
       const elemData = list.data[elemNum];
+      console.log(elemData);
       templateFragments += this.createItem(elemData);
     }
 
