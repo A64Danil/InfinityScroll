@@ -13,7 +13,7 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
     `http://localhost:3000/data?_start=${start}&_end=${end}`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
-  forcedListLength: 300,
+  forcedListLength: 500,
   listType: 'list',
   listWrapperHeight: '290px',
   templateString: (element: object, listLength?: number): string => `<li 
