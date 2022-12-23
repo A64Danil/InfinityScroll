@@ -17,7 +17,7 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   listType: 'list',
   listWrapperHeight: '290px',
   templateString: (element: object, listLength?: number): string => `<li 
-        class="REMOTE_LAZY_000ITEM_List__listItem" 
+        class="REMOTE_LAZY_000ITEM_List__listItem big" 
         aria-setsize="${listLength}" 
         aria-posinset="${element?.number}"
         >

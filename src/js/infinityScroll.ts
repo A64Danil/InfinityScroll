@@ -280,7 +280,7 @@ class InfinityScroll {
       return;
     }
 
-    this.clearTimerIfNeeded();
+    // this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
       this.chunk.firstOrderNumber,
@@ -289,18 +289,23 @@ class InfinityScroll {
     );
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
-    if (isBigDiff && this.domMngr && this.domMngr.isWaitRender === false) {
-      this.domMngr.isWaitRender = true;
+    if (isBigDiff) {
+      clearTimeout(this.timerIdRefreshList);
+      // TODO: функция для тестов
+      // await this.sleep(50000);
+      // TODO: найти баг из-за которого ломается оффсет списка
       this.setTimerToRefreshList();
     }
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== newRenderIndex) {
-      console.warn('====== this.chunk.startRenderIndex поменялся ======');
       this.chunk.setRenderIndex(
         newRenderIndex,
         this.scroll.isGoingFromBottom,
         this.list.tailingElementsAmount
+      );
+      console.warn(
+        `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
 
       if (!this.render) {
@@ -321,10 +326,10 @@ class InfinityScroll {
           'mainChunkProps.startRenderIndex',
           mainChunkProps.startRenderIndex
         );
-        // TODO: донастроить правильный фетч
+        // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy') {
-          await this.lazyOrderedFetch();
+          await this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
 
@@ -347,15 +352,15 @@ class InfinityScroll {
     }
   }
 
-  clearTimerIfNeeded(): void {
-    if (
-      this.timerIdRefreshList !== null &&
-      this.domMngr &&
-      this.domMngr.isWaitRender === false
-    ) {
-      clearTimeout(this.timerIdRefreshList);
-    }
-  }
+  // clearTimerIfNeeded(): void {
+  //   if (
+  //     this.timerIdRefreshList !== null &&
+  //     this.domMngr &&
+  //     this.domMngr.isWaitRender === false
+  //   ) {
+  //     clearTimeout(this.timerIdRefreshList);
+  //   }
+  // }
 
   checkBigDiff(scrollDiff: number): boolean {
     const isBigDiff: boolean = this.scroll.isBigDiff(
@@ -366,18 +371,29 @@ class InfinityScroll {
     return isBigDiff;
   }
 
+  sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
   setTimerToRefreshList() {
     this.timerIdRefreshList = window.setTimeout(async () => {
       if (this.domMngr) {
         // Fetch new DATA
-        console.log('before fetch in bigDiff');
+        const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
-          await this.lazyOrderedFetch(true);
+          console.log('Ждём когда дата зафетчится');
+          await this.lazyOrderedFetch(renderIndex, true);
+          console.log('Дата зафетчилась');
         }
         // END Fetch new DATA
-        this.domMngr.resetAllList(this.chunk, this.list, this.scroll.direction);
+        this.domMngr.resetAllList(
+          this.chunk,
+          renderIndex,
+          this.chunk.amount,
+          this.list,
+          this.scroll.direction
+        );
       }
     }, 30);
+    console.log('Timer started by id', this.timerIdRefreshList);
   }
 
   async setListData(listData: object[], dataUrl?: DataURLType) {
@@ -424,18 +440,29 @@ class InfinityScroll {
     this.list.length = newLength;
   }
 
-  async lazyOrderedFetch(isFetchToReset = false) {
+  /*
+  Проблема:
+    из-за быстрого скролла происходит рваный рендер (т.к. список рендерит новые элементы не ориентируясь на предыдущие).
+      из-за "рваного" рендера не по порядку в DOM попадают чанки, которые не соответствуют порядку следования друг за другом
+
+  Пример:
+  был рендер элементов с позиции 260 (261-265).
+  Следующий шли элементы с позиции 280 (281-285).
+  Получилось ...264-265-281-282..
+
+  Вопрос - почему не происходит bigDiff? Потому что рендер бигДиффа был отменен из-за последовательности 260-275-280.
+   */
+  async lazyOrderedFetch(renderIndex: number, isFetchToReset = false) {
     let [startFetchIndex, endFetchIndex] = [0, 1];
-    const lastStartIndex = this.list.length - this.chunk.amount;
+    const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
     const lastEndIndex = this.list.length;
     let sequenceStart;
     let sequenceEnd;
-    // console.log('lastStartIndex', lastStartIndex);
     if (!isFetchToReset) {
       sequenceStart = calcSequenceByDirection(
         this.scroll.direction,
         this.list.halfOfExistingSizeInDOM,
-        this.chunk.startRenderIndex,
+        renderIndex,
         this.chunk.amount
       );
       sequenceEnd = sequenceStart + this.chunk.amount;
@@ -447,10 +474,12 @@ class InfinityScroll {
         'border-radius: 2px',
       ].join(';');
       console.log('%c============= Фетч всего списка', baseStyles);
-      sequenceStart = this.chunk.startRenderIndex - this.chunk.amount;
+      console.log('renderIndex', renderIndex);
+      sequenceStart = renderIndex - this.chunk.amount;
+      console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
-    console.log('sequenceStart', sequenceStart, sequenceEnd);
+    // console.log('sequenceStart', sequenceStart, sequenceEnd);
     [startFetchIndex, endFetchIndex] =
       sequenceStart < lastStartIndex
         ? [sequenceStart, sequenceEnd]
@@ -463,7 +492,10 @@ class InfinityScroll {
         }
         console.log('startFetchIndex', startFetchIndex);
         this.addNewItemsToDataList(startFetchIndex, data);
-        console.log(this.list.data);
+        const dataObj = {
+          data: this.list.data?.slice(),
+        };
+        console.log(dataObj);
       }
     );
   }
@@ -473,7 +505,7 @@ class InfinityScroll {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = startFetchIndex + i;
-      console.log(currentIndex);
+      // console.log(currentIndex);
       this.list.data[currentIndex] = data[i];
     }
   }

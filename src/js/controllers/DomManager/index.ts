@@ -10,7 +10,8 @@ import {
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
-  public isWaitRender = false;
+  // Нужен на случай, чтобы таймаут не чистился из-за маленького скролла в конце эвента
+  // public isWaitRender = false;
 
   // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
   private delay = 0;
@@ -198,12 +199,12 @@ export class DomManager {
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
-      console.log(elemNum);
+      // console.log(elemNum);
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
       }
       const elemData = list.data[elemNum];
-      console.log(elemData);
+      // console.log(elemData);
       templateFragments += this.createItem(elemData);
     }
 
@@ -216,7 +217,7 @@ export class DomManager {
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
     console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
-    this.isWaitRender = false;
+    // this.isWaitRender = false;
   }
 
   // eslint-disable-next-line class-methods-use-this
