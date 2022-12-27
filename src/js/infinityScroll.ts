@@ -258,6 +258,11 @@ class InfinityScroll {
   }
 
   async calcCurrentDOMRender(e: Event): void {
+    if (this.domMngr?.isStopRender) {
+      this.domMngr.isStopRender = false;
+      return;
+    }
+
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
@@ -290,10 +295,8 @@ class InfinityScroll {
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff) {
+      // console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
       clearTimeout(this.timerIdRefreshList);
-      // TODO: функция для тестов
-      // await this.sleep(50000);
-      // TODO: найти баг из-за которого ломается оффсет списка
       this.setTimerToRefreshList();
     }
 
@@ -328,7 +331,7 @@ class InfinityScroll {
         );
         // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
-        if (this.dataLoadSpeed === 'lazy') {
+        if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
           await this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
@@ -374,15 +377,27 @@ class InfinityScroll {
   sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   setTimerToRefreshList() {
-    this.timerIdRefreshList = window.setTimeout(async () => {
+    const timerID = window.setTimeout(async () => {
       if (this.domMngr) {
         // Fetch new DATA
         const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
-          console.log('Ждём когда дата зафетчится');
+          console.log(
+            `Ждём когда дата зафетчится, rednerIndex: ${renderIndex}, timerID: ${timerID}`
+          );
+          // TODO: функция для тестов
+          await this.sleep(1000);
           await this.lazyOrderedFetch(renderIndex, true);
-          console.log('Дата зафетчилась');
+          console.log(
+            `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
+          );
         }
+        if (timerID !== this.timerIdRefreshList) {
+          console.log('ID не равны');
+          return;
+        }
+        console.log('id равны (перед ресетом)');
+
         // END Fetch new DATA
         this.domMngr.resetAllList(
           this.chunk,
@@ -393,6 +408,7 @@ class InfinityScroll {
         );
       }
     }, 30);
+    this.timerIdRefreshList = timerID;
     console.log('Timer started by id', this.timerIdRefreshList);
   }
 
@@ -473,10 +489,10 @@ class InfinityScroll {
         'padding: 2px 4px',
         'border-radius: 2px',
       ].join(';');
-      console.log('%c============= Фетч всего списка', baseStyles);
-      console.log('renderIndex', renderIndex);
+      // console.log('%c============= Фетч всего списка', baseStyles);
+      // console.log('renderIndex', renderIndex);
       sequenceStart = renderIndex - this.chunk.amount;
-      console.log('sequenceStart', sequenceStart);
+      // console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
     // console.log('sequenceStart', sequenceStart, sequenceEnd);
@@ -490,12 +506,12 @@ class InfinityScroll {
         if (!Array.isArray(data)) {
           throw new Error('Your fetched data does not have Array type');
         }
-        console.log('startFetchIndex', startFetchIndex);
+        // console.log('startFetchIndex', startFetchIndex);
         this.addNewItemsToDataList(startFetchIndex, data);
         const dataObj = {
           data: this.list.data?.slice(),
         };
-        console.log(dataObj);
+        // console.log(dataObj);
       }
     );
   }

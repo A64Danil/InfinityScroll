@@ -10,8 +10,9 @@ import {
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
-  // Нужен на случай, чтобы таймаут не чистился из-за маленького скролла в конце эвента
-  // public isWaitRender = false;
+  // private scrollTemp = 0;
+
+  public isStopRender = false;
 
   // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
   private delay = 0;
@@ -75,6 +76,7 @@ export class DomManager {
 
   setOffsetToList(
     chunk: ChunkPropsToModifyDom,
+    startRenderIndex: number,
     list: ListPropsToModifyDom,
     direction: IScrollDirection,
     forcedOffset: number | undefined = undefined
@@ -91,6 +93,7 @@ export class DomManager {
 
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
+      this.setEvenScrollToList(forcedOffset);
       this.setPaddingToList(list, chunk.htmlHeight, forcedOffset);
       return;
     }
@@ -105,6 +108,26 @@ export class DomManager {
 
     this.targetElem.style.transform = `translate(0,${offset}px)`;
     this.setPaddingToList(list, chunk.htmlHeight, offset);
+  }
+
+  // TODO: сделать условия чтобы в крайних точках оффсет не выставлялся
+  setEvenScrollToList(offset: number) {
+    const parent = this.targetElem.parentElement;
+    if (parent) {
+      const scroll = parent.scrollTop;
+      console.log('Реальный скролл', scroll);
+      // TODO: делать правильные рассчеты из размера чанка
+      const calc = offset + 360;
+      console.log('Примерный скролл', calc);
+      // if (this.scrollTemp !== 0 && this.scrollTemp === calc) {
+      //   console.warn('== Calc равен прерыдущему значению! ==');
+      // } else {
+      //   console.warn('== Calc не равен прерыдущему значению (все ок) ==');
+      // }
+      // this.scrollTemp = calc;
+      this.isStopRender = true;
+      parent.scrollTop = calc;
+    }
   }
 
   createItem(elemData: object): string {
@@ -187,7 +210,7 @@ export class DomManager {
     list: ListController,
     direction: IScrollDirection
   ): void {
-    console.log('=====RESET LIST=====');
+    console.log('=====RESET LIST=====', startRenderIndex);
     const calculatedSequence = startRenderIndex - chunkAmount;
 
     const sequenceNumber = this.recalcSequence(
@@ -211,11 +234,12 @@ export class DomManager {
     const newOffset = sequenceNumber * list.itemHeight;
 
     this.targetElem.innerHTML = templateFragments;
-    this.setOffsetToList(chunk, list, direction, newOffset);
+    console.log('before setOffset', startRenderIndex, newOffset);
+    this.setOffsetToList(chunk, startRenderIndex, list, direction, newOffset);
 
     // TODO: убрать после тестов
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
-    console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
+    // console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
     // this.isWaitRender = false;
   }
@@ -366,7 +390,7 @@ export class DomManager {
      * list.startIndexOfLastPart
      * list.itemHeight
      * */
-    this.setOffsetToList(chunk, list, direction);
+    this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
 
     checkChildrenAmount(
       this.targetElem.childNodes.length,
