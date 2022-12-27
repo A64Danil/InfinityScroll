@@ -26,6 +26,7 @@ export class RenderController {
     console.log(this);
   }
 
+  // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям
   isBeginOfListFromTop(startRenderIndex: number): boolean {
     return startRenderIndex < this.halfOfExistingSizeInDOM;
   }
@@ -39,7 +40,7 @@ export class RenderController {
   }
 
   isEndOfListFromBottom(startRenderIndex: number): boolean {
-    return startRenderIndex < this.tailingElementsAmount;
+    return startRenderIndex <= this.tailingElementsAmount;
   }
 
   isAllowRenderNearBorder(

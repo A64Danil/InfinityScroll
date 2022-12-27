@@ -398,13 +398,18 @@ class InfinityScroll {
         }
         console.log('id равны (перед ресетом)');
 
+        const isAllowRenderNearBorder = this.render.isAllowRenderNearBorder(
+          this.scroll.direction,
+          renderIndex
+        );
         // END Fetch new DATA
         this.domMngr.resetAllList(
           this.chunk,
           renderIndex,
           this.chunk.amount,
           this.list,
-          this.scroll.direction
+          this.scroll.direction,
+          isAllowRenderNearBorder
         );
       }
     }, 30);

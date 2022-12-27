@@ -79,7 +79,8 @@ export class DomManager {
     startRenderIndex: number,
     list: ListPropsToModifyDom,
     direction: IScrollDirection,
-    forcedOffset: number | undefined = undefined
+    forcedOffset: number | undefined = undefined,
+    isAllowRenderNearBorder = false
   ): void {
     /* Список используемых переменных
      *  chunk.startRenderIndex
@@ -93,7 +94,9 @@ export class DomManager {
 
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
-      this.setEvenScrollToList(forcedOffset);
+      if (isAllowRenderNearBorder) {
+        this.setEvenScrollToList(forcedOffset);
+      }
       this.setPaddingToList(list, chunk.htmlHeight, forcedOffset);
       return;
     }
@@ -208,7 +211,8 @@ export class DomManager {
     startRenderIndex: number,
     chunkAmount: number,
     list: ListController,
-    direction: IScrollDirection
+    direction: IScrollDirection,
+    isAllowRenderNearBorder: boolean
   ): void {
     console.log('=====RESET LIST=====', startRenderIndex);
     const calculatedSequence = startRenderIndex - chunkAmount;
@@ -235,7 +239,14 @@ export class DomManager {
 
     this.targetElem.innerHTML = templateFragments;
     console.log('before setOffset', startRenderIndex, newOffset);
-    this.setOffsetToList(chunk, startRenderIndex, list, direction, newOffset);
+    this.setOffsetToList(
+      chunk,
+      startRenderIndex,
+      list,
+      direction,
+      newOffset,
+      isAllowRenderNearBorder
+    );
 
     // TODO: убрать после тестов
     const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
