@@ -95,7 +95,7 @@ export class DomManager {
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
       if (isAllowRenderNearBorder) {
-        this.setEvenScrollToList(forcedOffset);
+        this.setEvenScrollToList(forcedOffset, chunk.htmlHeight);
       }
       this.setPaddingToList(list, chunk.htmlHeight, forcedOffset);
       return;
@@ -114,13 +114,13 @@ export class DomManager {
   }
 
   // TODO: сделать условия чтобы в крайних точках оффсет не выставлялся
-  setEvenScrollToList(offset: number) {
+  setEvenScrollToList(offset: number, height: number) {
     const parent = this.targetElem.parentElement;
     if (parent) {
       const scroll = parent.scrollTop;
       console.log('Реальный скролл', scroll);
       // TODO: делать правильные рассчеты из размера чанка
-      const calc = offset + 360;
+      const calc = offset + height;
       console.log('Примерный скролл', calc);
       // if (this.scrollTemp !== 0 && this.scrollTemp === calc) {
       //   console.warn('== Calc равен прерыдущему значению! ==');
