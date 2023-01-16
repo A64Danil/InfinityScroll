@@ -382,9 +382,6 @@ class InfinityScroll {
         // Fetch new DATA
         const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
-          console.log(
-            `Ждём когда дата зафетчится, rednerIndex: ${renderIndex}, timerID: ${timerID}`
-          );
           // TODO: функция для тестов
           await this.sleep(1000);
           await this.lazyOrderedFetch(renderIndex, true);
@@ -393,10 +390,13 @@ class InfinityScroll {
           );
         }
         if (timerID !== this.timerIdRefreshList) {
-          console.log('ID не равны');
           return;
         }
-        console.log('id равны (перед ресетом)');
+        console.log('Восстанавливаем значение this.chunk.startRenderIndex');
+        this.chunk.startRenderIndex = renderIndex;
+        console.warn(
+          `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
+        );
 
         const isAllowRenderNearBorder = this.render.isAllowRenderNearBorder(
           this.scroll.direction,
