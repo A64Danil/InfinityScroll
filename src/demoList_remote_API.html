@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Infinity Scroll - Demo Title</title>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./html/includes/header.html'))(data)
+      %> <%=
+      _.template(require('html-loader!./html/includes/demoLists/remote_lazy_api.html'))(data)
+      %>
+    </section>
+  </body>
+</html>
