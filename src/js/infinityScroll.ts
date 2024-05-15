@@ -226,6 +226,7 @@ class InfinityScroll {
         throw new Error('You does not have list.data');
       }
       const elemData = this.list.data[0];
+      // TODO: кажется мы забываем удалить лишний элемент после рендера
       this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData);
       listItem = list.firstChild as HTMLElement;
     }
@@ -285,6 +286,7 @@ class InfinityScroll {
       return;
     }
 
+    // TODO: где-тоо тут надо искать момент - если мы движемся вверх от самого низа списка, то иногда получаем лишннее смещение размером в 1 чанк
     // this.clearTimerIfNeeded();
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
