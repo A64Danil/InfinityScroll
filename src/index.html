@@ -5,12 +5,22 @@
     <title>Infinity Scroll - <%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
-    <section class="container">
-      <%= _.template(require('html-loader!./html/includes/header.html'))(data)
-      %>
-      <img src="./assets/images/torin.gif" alt="" />
-      <!--   работает-->
-      <p><%= htmlWebpackPlugin.options.info %></p>
+    <%= _.template(require('html-loader!./html/includes/header.html'))() %>
+
+    <section>
+      <h2>What is it?</h2>
+
+      <p class="codeDescription">
+        This is a script to create really infinity scroll list (or another any
+        scrollable entity). Unfortunately, web-browsers has limitation to show
+        list of any height, so we have a limited presentation of list. This
+        limit is 33554400px in height. But, working in progress and in version
+        2.0 we will solve this problem!
+      </p>
+    </section>
+
+    <section>
+      <h2>Demo list</h2>
 
       <ul class="listOfDemoLink">
         <li class="demoLinkItem">
@@ -29,6 +39,40 @@
           >
         </li>
       </ul>
+    </section>
+
+    <section>
+      <h2>How to use it:</h2>
+
+      <p class="codeDescription">Description in progress:</p>
+      <pre class="code">
+const REMOTE_LAZY_000ITEMS_PROPS = {
+  data: BigJson1,
+  dataLoadPlace: 'remote',
+  dataLoadSpeed: 'lazy',
+  dataUrl: (start?: number, end?: number, page?: number, limit?: number) =>
+    `http://localhost:3000/data?_start=${start}&_end=${end}`,
+  name: 'my scroll list name',
+  selectorId: 'REMOTE_LAZY_000ITEM',
+  forcedListLength: 500,
+  listType: 'list',
+  listWrapperHeight: '290px',
+  templateString: (element: object, listLength?: number): string => `&lt;li
+              class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;
+              aria-setsize=&quot;${listLength}&quot;
+              aria-posinset=&quot;${element?.number}&quot;
+      &gt;
+            ${element?.number} ${element?.name}
+    &lt;/li&gt;`,
+};
+
+new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
+      </pre>
+    </section>
+
+    <section>
+      <!--   работает-->
+      <!--      <p><%= htmlWebpackPlugin.options.info %></p>-->
 
       <%=
       _.template(require('html-loader!./html/includes/demoLists/remote_lazy_000items.html'))(data)

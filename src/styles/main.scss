@@ -7,21 +7,71 @@
 $font-size: 1rem;
 $font-color: #333;
 
+body {
+  width: 75%;
+  margin: 40px auto;
+  background-color: aliceblue;
+  max-width: 1024px;
+  font-family: monospace;
+  font-size: 20px;
+}
+
 html {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: $font-size;
-  color: $font-color;
-  padding-bottom: 400px;
+  //font-family: Arial, Helvetica, sans-serif;
+  //font-size: $font-size;
+  //color: $font-color;
+  //padding-bottom: 400px;
 }
 
-header h1 {
-  font-size: 40px;
+section {
+  margin-bottom: 60px;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  //color: green;
-  font-weight: bold;
-  //display: flex;
+section > div {
+  margin-bottom: 30px;
+}
+
+p {
+  margin: 0;
+}
+
+pre {
+  margin: 0;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.mainLogo {
+  margin-bottom: var(--mb);
+}
+
+.codeDescription {
+  margin-bottom: 10px;
+}
+
+.code {
+  display: block;
+  white-space: pre;
+  /*padding: 0 1em 1em 1em;*/
+  padding: 1em;
+  color: #fff;
+  background: #000;
+  margin-bottom: var(--mb);
+  overflow-x: scroll;
+}
+
+.attention {
+  margin-top: calc((var(--mb) - 4px) * -1);
+}
+
+.code + .attention {
+  margin-bottom: var(--mb);
 }
