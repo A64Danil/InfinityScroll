@@ -5,6 +5,27 @@ const PrettierPlugin = require('prettier-webpack-plugin')
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
+const path = require('path')
+const fs = require('fs');
+
+function generateHtmlPlugins(templateDir) {
+    const templateFiles = fs.readdirSync(path.resolve(__dirname, templateDir));
+    return templateFiles.map(item => {
+        const parts = item.split('.');
+        const name = parts[0];
+        const namedTitle = name.split('_');
+        const extension = parts[1];
+        // console.log(path.resolve(__dirname, `${templateDir}/${name}.${extension}`))
+        return new HtmlWebpackPlugin({
+            title: namedTitle,
+            filename: `${name}.html`,
+            template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`),
+            // inject: false,
+        })
+    })
+}
+
+const htmlPlugins = generateHtmlPlugins('./../src/html/views');
 
 module.exports = {
     entry: {
@@ -35,33 +56,6 @@ module.exports = {
                 },
             ],
         }),
-        new HtmlWebpackPlugin({
-            title: 'webpack Boilerplate',
-            info: 'some test data',
-            // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/index.html', // шаблон
-            filename: 'index.html', // название выходного файла
-        }),
-        new HtmlWebpackPlugin({
-            title: 'Demo',
-            info: 'some test data',
-            // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/demoList_local_simple_100item.html', // шаблон
-            filename: 'demoList_local_simple_100item.html', // название выходного файла
-        }),
-        new HtmlWebpackPlugin({
-            title: 'Demo',
-            info: 'some test data',
-            // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/demoList_remote_simple_500item.html', // шаблон
-            filename: 'demoList_remote_simple_500item.html', // название выходного файла
-        }),new HtmlWebpackPlugin({
-            title: 'Demo',
-            info: 'some test data',
-            // favicon: paths.src + '/images/favicon.png',
-            template: paths.src + '/demoList_remote_API.html', // шаблон
-            filename: 'demoList_remote_API.html', // название выходного файла
-        }),
 
         // ESLint configuration
         new ESLintPlugin({
@@ -71,7 +65,7 @@ module.exports = {
 
         // Prettier configuration
         new PrettierPlugin(),
-    ],
+    ].concat(htmlPlugins),
     module: {
         rules: [
             // JavaScript

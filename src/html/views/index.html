@@ -1,11 +1,12 @@
+<% var data = { title: htmlWebpackPlugin.options.title, author: "Danil X" }; %>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Infinity Scroll - <%= htmlWebpackPlugin.options.title %></title>
+    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
-    <%= _.template(require('html-loader!./html/includes/header.html'))() %>
+    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
 
     <section>
       <h2>What is it?</h2>
@@ -75,7 +76,7 @@ new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
       <!--      <p><%= htmlWebpackPlugin.options.info %></p>-->
 
       <%=
-      _.template(require('html-loader!./html/includes/demoLists/remote_lazy_000items.html'))(data)
+      _.template(require('html-loader!./../includes/demoLists/remote_lazy_000items.html'))(data)
       %>
     </section>
   </body>
