@@ -5,7 +5,7 @@ import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
 
-import { LOCAL_PURE_100ITEMS_PROPS } from './demoScripts/local_pure_100item';
+import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000items';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
 import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
 import { REMOTE_LAZY_000ITEMS_PROPS } from './demoScripts/remote_lazy_000item';
@@ -20,11 +20,13 @@ const BigJson1 = BigDataList100.data;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // const BigJson3 = BigDataList100k.data;
 
-const pureList = document.getElementById(LOCAL_PURE_100ITEMS_PROPS.selectorId);
+const pureList = document.getElementById(
+  LOCAL_BASIC_10000ITEMS_PROPS.selectorId
+);
 
 if (pureList !== null) {
-  console.log('Pure list Started');
-  const myLazyScroll = new InfinityScroll(LOCAL_PURE_100ITEMS_PROPS);
+  console.log('Basic list Started');
+  const myLazyScroll = new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
 }
 
 const instantList = document.getElementById(
