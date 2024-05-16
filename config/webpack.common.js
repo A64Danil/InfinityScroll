@@ -13,7 +13,7 @@ function generateHtmlPlugins(templateDir) {
     return templateFiles.map(item => {
         const parts = item.split('.');
         const name = parts[0];
-        const namedTitle = name.split('_');
+        const namedTitle = name.split('_').join(' ');
         const extension = parts[1];
         // console.log(path.resolve(__dirname, `${templateDir}/${name}.${extension}`))
         return new HtmlWebpackPlugin({

@@ -53,6 +53,10 @@ pre {
   margin-bottom: var(--mb);
 }
 
+.pageTitle {
+  text-transform: capitalize;
+}
+
 .codeDescription {
   margin-bottom: 10px;
 }
