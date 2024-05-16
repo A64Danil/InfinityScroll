@@ -12,5 +12,33 @@
       _.template(require('html-loader!./../includes/demoLists/local_basic_10000items.html'))(data)
       %>
     </section>
+
+    <section>
+      <h2>How to use it:</h2>
+
+      <p class="codeDescription">
+        Configure list and start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code">
+const LOCAL_BASIC_10000ITEMS_PROPS = {
+  data: BigJson1,
+  dataLoadPlace: 'local',
+  dataLoadSpeed: 'instant',
+  name: 'my scroll list name',
+  selectorId: 'LOCAL_BASIC_10000ITEMS',
+  listType: 'list',
+  listWrapperHeight: '350px',
+  templateString: (element: object, listLength?: number): string => `&lt;li
+              aria-setsize=&quot;${listLength}&quot;
+              aria-posinset=&quot;${element.number + 1}&quot;
+      &gt;
+            ${element.name} ${element.number + 1}
+    &lt;/li&gt;`,
+};,
+};
+
+new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS)
+      </pre>
+    </section>
   </body>
 </html>
