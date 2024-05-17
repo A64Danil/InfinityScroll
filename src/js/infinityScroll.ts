@@ -105,7 +105,7 @@ class InfinityScroll {
 
     this.forcedListLength = props.forcedListLength || 'auto';
 
-    this.listType = props.listType;
+    this.listType = props.listType || 'list';
 
     this.listWrapperHeight = props.listWrapperHeight;
 
@@ -123,9 +123,9 @@ class InfinityScroll {
       template: props.templateString,
     };
 
-    this.dataLoadPlace = props.dataLoadPlace;
+    this.dataLoadPlace = props.dataLoadPlace || 'local';
 
-    this.dataLoadSpeed = props.dataLoadSpeed;
+    this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
 
     this.dataUrl = props.dataUrl;
 
