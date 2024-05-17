@@ -5,11 +5,7 @@ const BigJson1 = BigDataList10000.data;
 
 export const LOCAL_BASIC_10000ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
-  dataLoadPlace: 'local',
-  dataLoadSpeed: 'instant',
-  name: 'my scroll list name',
   selectorId: 'LOCAL_BASIC_10000ITEMS',
-  listType: 'list',
   listWrapperHeight: '350px',
   templateString: (element: object, listLength?: number): string => `<li  
         aria-setsize="${listLength}" 
