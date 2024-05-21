@@ -1,16 +1,33 @@
 import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
 
-export interface InfinityScrollPropTypes {
-  // TODO: сделать так чтобы был только один параметр - data или dataUrl
-  data: object[];
-  dataLoadPlace?: 'local' | 'remote';
-  dataUrl?: DataURLType;
-  dataLoadSpeed?: 'instant' | 'lazy';
-  name?: string; // лишнее поле
+// type Xor<BaseType, A, B> = (BaseType & A) | (BaseType & B);
+//
+// export type InfinityScroll = Xor
+// <
+//     BaseInfinityScrollPropType,
+//     { data: object[]; },
+// { dataUrl: DataURLType; }
+// >;
+
+type BaseInfinityScrollPropTypes = {
   selectorId: string;
+  listWrapperHeight: string;
+  name?: string;
+  dataLoadPlace?: 'local' | 'remote';
+  dataLoadSpeed?: 'instant' | 'lazy';
   forcedListLength?: number | 'auto';
   listType?: 'list' | 'table';
-  listWrapperHeight: string;
   templateString: TemplateStringFunction;
-}
+};
+
+type InfinityScrollDataPropTypes = BaseInfinityScrollPropTypes & {
+  data: object[];
+};
+type InfinityScrollDataUrlPropTypes = BaseInfinityScrollPropTypes & {
+  dataUrl: DataURLType;
+};
+
+export type InfinityScroll =
+  | InfinityScrollDataPropTypes
+  | InfinityScrollDataUrlPropTypes;
