@@ -72,6 +72,7 @@ class InfinityScroll {
   // Тип списка (список или таблица)
   private readonly listWrapperHeight: string;
 
+  // TODO: кажется это лишний параметр, можно смотреть на data|dataURL
   // Тип загрузки (список доступен локально или надо качать с интернета)
   private readonly dataLoadPlace: 'local' | 'remote';
 
@@ -127,6 +128,7 @@ class InfinityScroll {
 
     this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
 
+    // TODO: сделать проверку на то что передаётся ссылка, а не просто стринг
     this.dataUrl = props.dataUrl;
 
     this.setListData(props.data, props.dataUrl).then(() => {
