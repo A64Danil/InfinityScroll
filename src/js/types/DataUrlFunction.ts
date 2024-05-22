@@ -3,4 +3,4 @@ export type DataUrlFunction = (
   end?: number,
   page?: number,
   limit?: number
-) => URL;
+) => string;
