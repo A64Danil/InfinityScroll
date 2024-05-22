@@ -23,8 +23,10 @@ type BaseInfinityScrollPropTypes = {
 
 type InfinityScrollDataPropTypes = BaseInfinityScrollPropTypes & {
   data: object[];
+  dataUrl?: never;
 };
 type InfinityScrollDataUrlPropTypes = BaseInfinityScrollPropTypes & {
+  data?: never;
   dataUrl: DataURLType;
 };
 
