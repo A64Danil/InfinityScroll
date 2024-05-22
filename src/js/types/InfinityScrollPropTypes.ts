@@ -1,6 +1,8 @@
 import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
 
+// TODO: вынести ХОР в утилити тайпс
+
 // type Xor<BaseType, A, B> = (BaseType & A) | (BaseType & B);
 //
 // export type InfinityScroll = Xor
@@ -30,6 +32,6 @@ type InfinityScrollDataUrlPropTypes = BaseInfinityScrollPropTypes & {
   dataUrl: DataURLType;
 };
 
-export type InfinityScroll =
+export type InfinityScrollPropTypes =
   | InfinityScrollDataPropTypes
   | InfinityScrollDataUrlPropTypes;
