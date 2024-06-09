@@ -8,7 +8,7 @@ export const REMOTE_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   selectorId: 'REMOTE_SIMPLE_500ITEM',
   listType: 'list',
   listWrapperHeight: '290px',
-  templateString: (element: object, listLength?: number): string => `<li 
+  templateString: (element, listLength) => `<li 
         class="REMOTE_SIMPLE_500ITEM_List__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element.id}"

@@ -11,7 +11,7 @@ export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   selectorId: 'LOCAL_SIMPLE_100ITEMS',
   listType: 'list',
   listWrapperHeight: '350px',
-  templateString: (element: object, listLength?: number): string => `<li 
+  templateString: (element, listLength) => `<li 
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element.number + 1}"

@@ -7,7 +7,7 @@ export const LOCAL_BASIC_10000ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   selectorId: 'LOCAL_BASIC_10000ITEMS',
   listWrapperHeight: '350px',
-  templateString: (element: object, listLength?: number): string => `<li  
+  templateString: (element, listLength) => `<li  
         aria-setsize="${listLength}" 
         aria-posinset="${element.number + 1}"
         >
