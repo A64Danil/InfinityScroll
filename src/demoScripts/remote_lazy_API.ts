@@ -14,7 +14,7 @@ export const REMOTE_LAZY_API_PROPS: InfinityScrollPropTypes = {
   // forcedListLength: 5000000, //    padding-bottom: 5.6445e+07px; transform: translate(0px, 3.35538e+07px);
   listType: 'list',
   listWrapperHeight: '290px',
-  templateString: (element: object, listLength?: number): string => `<li 
+  templateString: (element, listLength) => `<li 
         class="REMOTE_LAZY_API__listItem" 
         aria-setsize="${listLength}" 
         aria-posinset="${element?.id}"
