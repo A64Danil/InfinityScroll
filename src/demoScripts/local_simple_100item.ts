@@ -5,11 +5,7 @@ const BigJson1 = BigDataList100.data;
 
 export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
-  dataLoadPlace: 'local',
-  dataLoadSpeed: 'instant',
-  name: 'my scroll list name',
   selectorId: 'LOCAL_SIMPLE_100ITEMS',
-  listType: 'list',
   listWrapperHeight: '350px',
   templateString: (element, listLength) => `<li 
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" 

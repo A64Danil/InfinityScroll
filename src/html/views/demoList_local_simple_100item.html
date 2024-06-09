@@ -12,5 +12,60 @@
       _.template(require('html-loader!./../includes/demoLists/local_simple_100item.html'))(data)
       %>
     </section>
+
+    <section>
+      <h2>How to use it:</h2>
+
+      <p class="codeDescription">
+        1. Place any tag with your unique ID into your html-code:
+      </p>
+      <pre class="code">
+&lt;div id=&quot;LOCAL_SIMPLE_100ITEMS&quot;&gt;&lt;/div&gt;
+      </pre>
+      <p class="codeDescription">
+        2. Configure list and start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code">
+import BigDataList100 from '../../mocks/bigList100.json';
+
+const BigJson1 = BigDataList100.data;
+
+const LOCAL_SIMPLE_100ITEMS_PROPS = {
+  data: BigJson1,
+  selectorId: 'LOCAL_SIMPLE_100ITEMS',
+  listWrapperHeight: '350px',
+  templateString: (element: object, listLength?: number): string => `&lt;li
+              aria-setsize=&quot;${listLength}&quot;
+              aria-posinset=&quot;${element.number + 1}&quot;
+               class="LOCAL_SIMPLE_100ITEMS_List__listItem"
+      &gt;
+            ${element.name} ${element.number + 1}
+    &lt;/li&gt;`,
+};,
+
+new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS)
+      </pre>
+    </section>
+
+    <section>
+      <h2>Setup your list:</h2>
+      <p>You need to configure only 4 required parameters:</p>
+      <ol>
+        <li>Data - link to your *.json file or simple js-array</li>
+        <li>SelectorId - ID of tag, where list will be placed</li>
+        <li>ListWrapperHeight - define height of your list</li>
+        <li>
+          TemplateString - your template. You can style your items adding only 1
+          class to items
+        </li>
+      </ol>
+
+      <p class="codeDescription">
+        Use aria-attributes to set correct list-index for items: <br />
+        - "aria-setsize" to set correct list length (because you don't have all
+        element per time in a list) <br />
+        - "aria-posinset" to set correct item index
+      </p>
+    </section>
   </body>
 </html>

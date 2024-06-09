@@ -49,6 +49,8 @@ const nameToTag: NameToTagObj = {
 
  */
 
+// TODO: Везде есть проблемы с рендерингом первой части части ПОСЛЕ того как мы поднялись наверх от самого низа
+
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 class InfinityScroll {
