@@ -40,7 +40,7 @@ export class RenderController {
   }
 
   isEndOfListFromBottom(startRenderIndex: number): boolean {
-    return startRenderIndex <= this.tailingElementsAmount;
+    return startRenderIndex < this.tailingElementsAmount;
   }
 
   isAllowRenderNearBorder(
