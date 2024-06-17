@@ -1,3 +1,5 @@
+import { DataURLType } from '../types/DataURL';
+
 export const checkChildrenAmount = (length: number, fullSize: number): void => {
   if (length !== fullSize) {
     console.error('%cКоличесвто деток: ', 'color: tomato', length);
@@ -9,7 +11,7 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   return keys.some((key) => !obj[key] && obj[key] !== 0);
 }
 
-export function getRemoteData(url: URL): Promise<unknown> {
+export function getRemoteData(url: string): Promise<unknown> {
   console.log('try to get data from', url);
 
   return fetch(url).then((response) =>
@@ -22,8 +24,16 @@ export function getRemoteData(url: URL): Promise<unknown> {
   );
 }
 
-export async function getListDataLazy(dataUrl, start = 0, end = 1) {
-  const fetchURL = dataUrl(start, end);
+export async function getListDataLazy(
+  dataUrl: DataURLType,
+  start = 1,
+  end = 1
+) {
+  // TODO: улучшить использование dataUrl?
+  let fetchURL = dataUrl as string;
+  if (typeof dataUrl !== 'string') {
+    fetchURL = dataUrl(start, end);
+  }
   const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
     if (!Array.isArray(data)) {
       throw new Error('Your fetched data does not have Array type');
