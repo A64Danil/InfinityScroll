@@ -10,6 +10,7 @@ import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item'
 import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
 import { REMOTE_LAZY_000ITEMS_PROPS } from './demoScripts/remote_lazy_000item';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
+import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_100items';
 
 console.log('Entry point');
 
@@ -58,6 +59,15 @@ const lazyAPIList = document.getElementById(REMOTE_LAZY_API_PROPS.selectorId);
 if (lazyAPIList !== null) {
   console.log('Lazy API list Started');
   const myLazyAPIScroll = new InfinityScroll(REMOTE_LAZY_API_PROPS);
+}
+
+const lazyAPIList100 = document.getElementById(
+  REMOTE_LAZY_API_PROPS_100ITEMS.selectorId
+);
+
+if (lazyAPIList100 !== null) {
+  console.log('Lazy API list Started');
+  const myLazyAPIScroll100 = new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS);
 }
 
 const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
