@@ -155,7 +155,7 @@ class InfinityScroll {
     if (this.dataLoadSpeed === 'lazy') {
       console.log('Заполняем первичный раз');
       console.log(this.list.data);
-      await getListDataLazy(this.dataUrl, 1, this.list.existingSizeInDOM).then(
+      await getListDataLazy(this.dataUrl, 2, this.list.existingSizeInDOM).then(
         (data): void => {
           console.log('Вот что стянули');
           console.log(data);
@@ -494,15 +494,17 @@ class InfinityScroll {
       );
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
-      const baseStyles = [
-        'color: #fff',
-        'background-color: #900',
-        'padding: 2px 4px',
-        'border-radius: 2px',
-      ].join(';');
+      // const baseStyles = [
+      //   'color: #fff',
+      //   'background-color: #900',
+      //   'padding: 2px 4px',
+      //   'border-radius: 2px',
+      // ].join(';');
       // console.log('%c============= Фетч всего списка', baseStyles);
       // console.log('renderIndex', renderIndex);
-      sequenceStart = renderIndex - this.chunk.amount;
+      // TODO: это место надо проверить, действительно ли нужно вот так...
+      // sequenceStart = renderIndex - this.chunk.amount;
+      sequenceStart = renderIndex;
       // console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
