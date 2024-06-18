@@ -272,6 +272,7 @@ class InfinityScroll {
     const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
+    // TODO: На списке из 500 элементов, при обычном скролле, в конце есть проблемы после индексе 468
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.existingSizeInDOM
