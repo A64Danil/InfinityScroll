@@ -29,11 +29,7 @@ export async function getListDataLazy(
   start = 1,
   end = 1
 ) {
-  // TODO: улучшить использование dataUrl?
-  let fetchURL = dataUrl as string;
-  if (typeof dataUrl !== 'string') {
-    fetchURL = dataUrl(start, end);
-  }
+  const fetchURL = typeof dataUrl !== 'string' ? dataUrl(start, end) : dataUrl;
   const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
     if (!Array.isArray(data)) {
       throw new Error('Your fetched data does not have Array type');
