@@ -1,16 +1,6 @@
 import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
-
-// TODO: вынести ХОР в утилити тайпс
-
-// type Xor<BaseType, A, B> = (BaseType & A) | (BaseType & B);
-//
-// export type InfinityScroll = Xor
-// <
-//     BaseInfinityScrollPropType,
-//     { data: object[]; },
-// { dataUrl: DataURLType; }
-// >;
+import { XOR } from './utils';
 
 type BaseInfinityScrollPropTypes = {
   selectorId: string;
@@ -23,15 +13,17 @@ type BaseInfinityScrollPropTypes = {
   templateString: TemplateStringFunction;
 };
 
-type InfinityScrollDataPropTypes = BaseInfinityScrollPropTypes & {
+type DataLikeArr = {
   data: object[];
   dataUrl?: never;
 };
-type InfinityScrollDataUrlPropTypes = BaseInfinityScrollPropTypes & {
+type DataLikeUrl = {
   data?: never;
   dataUrl: DataURLType;
 };
 
-export type InfinityScrollPropTypes =
-  | InfinityScrollDataPropTypes
-  | InfinityScrollDataUrlPropTypes;
+export type InfinityScrollPropTypes = XOR<
+  BaseInfinityScrollPropTypes,
+  DataLikeArr,
+  DataLikeUrl
+>;
