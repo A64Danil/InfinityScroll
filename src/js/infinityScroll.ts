@@ -11,6 +11,7 @@ import {
   isPropsUndefined,
   getRemoteData,
   getListDataLazy,
+  isValidUrl,
 } from './helpers';
 
 import {
@@ -130,8 +131,23 @@ class InfinityScroll {
 
     this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
 
-    // TODO: сделать проверку на то что передаётся ссылка, а не просто стринг
-    this.dataUrl = props.dataUrl;
+    const isDataUrlString =
+      props.dataUrl &&
+      typeof props.dataUrl === 'string' &&
+      isValidUrl(props.dataUrl);
+
+    const isDataUrlReturnString =
+      props.dataUrl &&
+      typeof props.dataUrl === 'function' &&
+      isValidUrl(props.dataUrl(1, 1));
+
+    if (isDataUrlString || isDataUrlReturnString) {
+      this.dataUrl = props.dataUrl;
+    } else {
+      throw new Error(
+        'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
+      );
+    }
 
     this.setListData(props.data, props.dataUrl).then(() => {
       domChangerProps.listLength = this.list.length;
@@ -426,6 +442,7 @@ class InfinityScroll {
 
   async setListData(listData: object[], dataUrl?: DataURLType) {
     let newLength = null;
+    // TODO: ждёт переделки чтобы избавить от this.dataLoadPlace
     if (this.dataLoadPlace === 'local') {
       this.list.data = listData;
       newLength = listData && listData.length;
