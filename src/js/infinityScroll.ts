@@ -131,22 +131,24 @@ class InfinityScroll {
 
     this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
 
-    const isDataUrlString =
-      props.dataUrl &&
-      typeof props.dataUrl === 'string' &&
-      isValidUrl(props.dataUrl);
+    if (!props.data) {
+      const isDataUrlString =
+        props.dataUrl &&
+        typeof props.dataUrl === 'string' &&
+        isValidUrl(props.dataUrl);
 
-    const isDataUrlReturnString =
-      props.dataUrl &&
-      typeof props.dataUrl === 'function' &&
-      isValidUrl(props.dataUrl(1, 1));
+      const isDataUrlReturnString =
+        props.dataUrl &&
+        typeof props.dataUrl === 'function' &&
+        isValidUrl(props.dataUrl(1, 1));
 
-    if (isDataUrlString || isDataUrlReturnString) {
-      this.dataUrl = props.dataUrl;
-    } else {
-      throw new Error(
-        'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
-      );
+      if (isDataUrlString || isDataUrlReturnString) {
+        this.dataUrl = props.dataUrl;
+      } else {
+        throw new Error(
+          'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
+        );
+      }
     }
 
     this.setListData(props.data, props.dataUrl).then(() => {
