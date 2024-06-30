@@ -74,6 +74,9 @@ export class DomManager {
     return startOffsetIndex;
   }
 
+  /**
+   * Set certain scroll to list (transform and padding)
+   */
   setOffsetToList(
     chunk: ChunkPropsToModifyDom,
     startRenderIndex: number,
@@ -82,16 +85,6 @@ export class DomManager {
     forcedOffset: number | undefined = undefined,
     isAllowRenderNearBorder = false
   ): void {
-    /* Список используемых переменных
-     *  chunk.startRenderIndex
-     *  chunk.htmlHeight
-     *  chunk.amount
-     *
-     *
-     * list.startIndexOfLastPart
-     * list.itemHeight
-     * */
-
     if (forcedOffset !== undefined) {
       this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
       if (isAllowRenderNearBorder) {
@@ -114,6 +107,9 @@ export class DomManager {
   }
 
   // TODO: сделать условия чтобы в крайних точках оффсет не выставлялся
+  /**
+   * Set certain scroll when forced offset
+   */
   setEvenScrollToList(offset: number, height: number) {
     const parent = this.targetElem.parentElement;
     if (parent) {
@@ -336,17 +332,6 @@ export class DomManager {
     direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
-    /* Список используемых переменных
-     *  chunk.startRenderIndex
-     *  chunk.amount
-     *
-     *
-     * list.halfOfExistingSizeInDOM
-     * list.tailingElementsAmount
-     * list.length
-     * list.data
-     * */
-
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
 
@@ -375,6 +360,9 @@ export class DomManager {
     this.putElementsToList(direction, templateFragments);
   }
 
+  /**
+   * Change list in DOM, change offset of list
+   */
   modifyCurrentDOM(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
@@ -382,25 +370,7 @@ export class DomManager {
     isGoingFromBottom: boolean
   ): void {
     // TODO: Доделать это №4
-    /* Список используемых переменных
-     *  chunk.startRenderIndex
-     *  chunk.amount
-     *
-     *
-     * list.halfOfExistingSizeInDOM
-     * list.tailingElementsAmount
-     * list.length
-     * list.data
-     * */
     this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
-    /* Список используемых переменных
-     *  chunk.startRenderIndex
-     *  chunk.htmlHeight
-     *  chunk.amount
-     *
-     * list.startIndexOfLastPart
-     * list.itemHeight
-     * */
     this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
 
     checkChildrenAmount(

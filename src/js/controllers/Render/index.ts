@@ -27,18 +27,30 @@ export class RenderController {
   }
 
   // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям
+  /**
+   * Косаемся начала списка двигаясь сверху
+   */
   isBeginOfListFromTop(startRenderIndex: number): boolean {
     return startRenderIndex < this.halfOfExistingSizeInDOM;
   }
 
+  /**
+   * Косаемся конца списка двигаясь сверху
+   */
   isEndOfListFromTop(startRenderIndex: number): boolean {
     return startRenderIndex > this.lastRenderIndex;
   }
 
+  /**
+   * Косаемся начала списка двигаясь снизу
+   */
   isBeginOfListFromBottom(startRenderIndex: number): boolean {
     return startRenderIndex >= this.listLength - this.chunkAmount * 3;
   }
 
+  /**
+   * Косаемся конца списка двигаясь снизу
+   */
   isEndOfListFromBottom(startRenderIndex: number): boolean {
     return startRenderIndex < this.tailingElementsAmount;
   }
