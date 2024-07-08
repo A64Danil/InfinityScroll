@@ -288,6 +288,9 @@ class InfinityScroll {
 
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
+    // TODO: вот это нормальный способ вычислять позицию текущего элемента
+    const currentTopElement = Math.ceil(scroll / this.list.itemHeight);
+    console.log('Верха касается элемент номер', currentTopElement);
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
     // TODO: На списке из 500 элементов, при обычном скролле, в конце есть проблемы после индексе 468

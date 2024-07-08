@@ -13,6 +13,7 @@ export class ListController {
 
   wrapperHeight = 0;
 
+  // TODO: какая-то шляпа, почему размер айтама хранится в контрллере списка?
   itemHeight = 0;
 
   // TODO: перенести в чанк?
