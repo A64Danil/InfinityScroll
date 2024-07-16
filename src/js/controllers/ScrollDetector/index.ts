@@ -18,6 +18,8 @@ export class ScrollDetector {
     } else {
       this.direction = 'up';
     }
+
+    this.prevScroll = scroll;
   }
 
   // eslint-disable-next-line class-methods-use-this

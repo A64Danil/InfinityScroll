@@ -302,8 +302,6 @@ class InfinityScroll {
     const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
     this.scroll.setScrollDirection(scroll);
 
-    this.scroll.prevScroll = scroll;
-
     const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
     // Если скролл слишком маленький - не делаем ничего
     if (
