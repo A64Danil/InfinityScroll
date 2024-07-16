@@ -268,7 +268,7 @@ export class DomManager {
       i + sequenceNumber >= tailingElementsAmount;
 
     const isReachBottomLimit =
-      direction === 'down' && i + sequenceNumber > listLength;
+      direction === 'down' && i + sequenceNumber >= listLength;
 
     const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
 
