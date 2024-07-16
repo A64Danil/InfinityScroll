@@ -5,7 +5,7 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   dataLoadSpeed: 'lazy',
   dataUrl: (start?: number, end?: number, page?: number, limit?: number) =>
     // return `http://localhost:3000/data?_page=1&_limit=20`;
-    `http://localhost:3000/data?_start=${start}&_end=${end}`,
+    `https://jsonplaceholder.typicode.com/comments?_start=${start}&_end=${end}`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
   forcedListLength: 500,
@@ -14,8 +14,8 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   templateString: (element, listLength) => `<li 
         class="REMOTE_LAZY_000ITEM_List__listItem big" 
         aria-setsize="${listLength}" 
-        aria-posinset="${element?.number}"
+        aria-posinset="${element?.id}"
         >
-            ${element?.number} ${element?.name}
+            ${element?.id} ${element?.email}
     </li>`,
 };
