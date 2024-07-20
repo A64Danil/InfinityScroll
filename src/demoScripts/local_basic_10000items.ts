@@ -9,8 +9,8 @@ export const LOCAL_BASIC_10000ITEMS_PROPS: InfinityScrollPropTypes = {
   listWrapperHeight: '350px',
   templateString: (element, listLength) => `<li  
         aria-setsize="${listLength}" 
-        aria-posinset="${element.number + 1}"
+        aria-posinset="${element.number}"
         >
-            ${element.name} ${element.number + 1}
+            ${element.name} ${element.number}
     </li>`,
 };

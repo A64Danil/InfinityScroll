@@ -10,8 +10,8 @@ export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   templateString: (element, listLength) => `<li 
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" 
         aria-setsize="${listLength}" 
-        aria-posinset="${element.number + 1}"
+        aria-posinset="${element.number}"
         >
-            ${element.name} ${element.number + 1}
+            ${element.name} ${element.number}
     </li>`,
 };
