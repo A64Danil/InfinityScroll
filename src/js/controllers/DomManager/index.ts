@@ -270,6 +270,7 @@ export class DomManager {
     const isReachBottomLimit =
       direction === 'down' && i + sequenceNumber >= listLength;
 
+    // console.log(i + sequenceNumber, listLength);
     const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
 
     // TODO: убрать после тестов
@@ -307,6 +308,7 @@ export class DomManager {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
+        // console.log('elemNum', elemNum);
         const elemData = data[elemNum];
         templateFragments += this.createItem(elemData);
         // remove items
