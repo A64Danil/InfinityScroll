@@ -308,7 +308,7 @@ export class DomManager {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        // console.log('elemNum', elemNum);
+        console.log('elemNum', elemNum);
         const elemData = data[elemNum];
         templateFragments += this.createItem(elemData);
         // remove items

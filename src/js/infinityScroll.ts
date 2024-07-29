@@ -355,6 +355,20 @@ class InfinityScroll {
           'mainChunkProps.startRenderIndex',
           mainChunkProps.startRenderIndex
         );
+        const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
+        const lastEndIndex = this.list.length;
+        const sequenceStart = calcSequenceByDirection(
+          this.scroll.direction,
+          this.list.halfOfExistingSizeInDOM,
+          mainChunkProps.startRenderIndex,
+          this.chunk.amount
+        );
+        const sequenceEnd = sequenceStart + this.chunk.amount;
+        const [startFetchIndex, endFetchIndex] =
+          sequenceStart < lastStartIndex
+            ? [sequenceStart, sequenceEnd]
+            : [lastStartIndex, lastEndIndex];
+        console.log(`${startFetchIndex} - ${endFetchIndex}`);
         // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
