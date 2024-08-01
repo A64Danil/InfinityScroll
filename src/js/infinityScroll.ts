@@ -11,6 +11,8 @@ import {
   isPropsUndefined,
   getRemoteData,
   getListDataLazy,
+  checkIncludeEnd,
+  checkBaseIndex,
   isValidUrl,
 } from './helpers';
 
@@ -21,6 +23,7 @@ import {
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
+import { DataUrlFunction } from './types/DataUrlFunction';
 
 // http://localhost:3000/data?_page=1&_limit=20
 
@@ -84,6 +87,10 @@ class InfinityScroll {
 
   private readonly dataUrl: DataURLType;
 
+  private includeEnd: boolean;
+
+  private basedIndex: 0 | 1;
+
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
@@ -131,6 +138,11 @@ class InfinityScroll {
 
     this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
 
+    this.includeEnd = false;
+
+    this.basedIndex = 1;
+
+    console.log(props.data);
     if (!props.data) {
       const isDataUrlString =
         props.dataUrl &&
@@ -141,21 +153,28 @@ class InfinityScroll {
         props.dataUrl &&
         typeof props.dataUrl === 'function' &&
         isValidUrl(props.dataUrl(1, 1));
-
+      //
+      // console.log('isDataUrlString', isDataUrlString);
+      // console.log('isDataUrlReturnString', isDataUrlReturnString);
       if (isDataUrlString || isDataUrlReturnString) {
         this.dataUrl = props.dataUrl;
+        console.log(this.dataUrl);
       } else {
         throw new Error(
           'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
         );
       }
-    }
 
-    this.setListData(props.data, props.dataUrl).then(() => {
-      domChangerProps.listLength = this.list.length;
-      this.domMngr = new DomManager(domChangerProps);
-      this.start();
-    });
+      if (isDataUrlReturnString) {
+        this.checkApiSettings()
+          .then(() => this.setListData(props.data, props.dataUrl))
+          .then(() => {
+            domChangerProps.listLength = this.list.length;
+            this.domMngr = new DomManager(domChangerProps);
+            this.start();
+          });
+      }
+    }
   }
 
   async start() {
@@ -372,7 +391,8 @@ class InfinityScroll {
         // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
-          await this.lazyOrderedFetch(this.chunk.startRenderIndex);
+          // await this.lazyOrderedFetch(this.chunk.startRenderIndex); // было так
+          this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
 
@@ -457,7 +477,18 @@ class InfinityScroll {
     console.log('Timer started by id', this.timerIdRefreshList);
   }
 
+  async checkApiSettings() {
+    this.includeEnd = await checkIncludeEnd(this.dataUrl as DataUrlFunction);
+    this.basedIndex = await checkBaseIndex(
+      this.dataUrl as DataUrlFunction,
+      this.includeEnd
+    );
+  }
+
   async setListData(listData: object[], dataUrl?: DataURLType) {
+    console.log('Конечный индекс includeEnd? ', this.includeEnd);
+    console.log('Индекс считается с ', this.basedIndex);
+
     let newLength = null;
     // TODO: ждёт переделки чтобы избавить от this.dataLoadPlace
     if (this.dataLoadPlace === 'local') {
@@ -478,19 +509,18 @@ class InfinityScroll {
           newLength = data && data.length;
         });
       } else {
-        await getListDataLazy(dataUrl).then((data) => {
-          console.log(data);
-          console.log('Будущий функционал для лейзи');
-          console.log(this.list.existingSizeInDOM);
-          this.list.data = data;
-          if (this.forcedListLength) {
-            // TODO: не забыть написать функцию для определения длины списка
-            newLength =
-              this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
-          } else {
-            newLength = data && data.length;
-          }
-        });
+        const data = await getListDataLazy(dataUrl);
+        console.log(data);
+        console.log('Будущий функционал для лейзи');
+        console.log(this.list.existingSizeInDOM);
+        this.list.data = data;
+        if (this.forcedListLength) {
+          // TODO: не забыть написать функцию для определения длины списка
+          newLength =
+            this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
+        } else {
+          newLength = data && data.length;
+        }
       }
     }
     if (!Array.isArray(this.list.data)) {
@@ -569,7 +599,7 @@ class InfinityScroll {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = startFetchIndex + i;
-      // console.log(currentIndex);
+      console.log(this.list.data[currentIndex]);
       this.list.data[currentIndex] = data[i];
     }
   }

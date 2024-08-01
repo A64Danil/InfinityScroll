@@ -1,4 +1,5 @@
 import { DataURLType } from '../types/DataURL';
+import { DataUrlFunction } from '../types/DataUrlFunction';
 
 export const checkChildrenAmount = (length: number, fullSize: number): void => {
   if (length !== fullSize) {
@@ -11,7 +12,7 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   return keys.some((key) => !obj[key] && obj[key] !== 0);
 }
 
-export function getRemoteData(url: string): Promise<unknown> {
+export function getRemoteData(url: string): Promise<[]> {
   console.log('try to get data from', url);
 
   return fetch(url).then((response) =>
@@ -24,9 +25,61 @@ export function getRemoteData(url: string): Promise<unknown> {
   );
 }
 
+export function getRemoteDataByRange(
+  dataUrl: DataUrlFunction,
+  start = 0,
+  end = 1
+) {
+  const fetchURL = dataUrl(start, end);
+  return getRemoteData(fetchURL);
+}
+
+// TODO: значал проверяем, захватывается ли хвостовой индекс
+export async function checkIncludeEnd(dataUrl: DataUrlFunction): boolean {
+  const data = await getRemoteDataByRange(dataUrl, 1, 2);
+
+  if (data.length === 2) {
+    return true;
+  }
+
+  if (data.length === 1) {
+    return false;
+  }
+
+  throw new Error("Can't define indlude end of range");
+}
+
+export async function checkBaseIndex(
+  dataUrl: DataUrlFunction,
+  includeEnd: boolean
+): 0 | 1 {
+  console.log();
+  const endIndex = Number(!includeEnd);
+  const nullBasedIndexes = [0, 0 + endIndex];
+  const oneBasedIndexes = [1, 1 + endIndex];
+  // console.log('nullBasedIndexes', nullBasedIndexes);
+  // console.log('oneBasedIndexes', oneBasedIndexes);
+
+  // if not include 0 - 1 and 1 - 2
+  // if incldude 0 - 0 and 1 - 1
+
+  const nullBased = await getRemoteDataByRange(dataUrl, 0, endIndex); // 0 - 1 || 0 - 0
+  const oneBased = await getRemoteDataByRange(dataUrl, 1, 1 + endIndex); // 1 - 2 || 1 - 1
+
+  if (nullBased.length === 1) {
+    return 0;
+  }
+  if (oneBased.length === 1) {
+    return 1;
+  }
+
+  throw new Error("Can't define base index");
+}
+
+// TODO: следующий шаг - переделать дефолтные параметры на основе того что приходит
 export async function getListDataLazy(
   dataUrl: DataURLType,
-  start = 1,
+  start = 0,
   end = 1
 ) {
   const fetchURL = typeof dataUrl !== 'string' ? dataUrl(start, end) : dataUrl;
