@@ -192,13 +192,16 @@ class InfinityScroll {
     if (this.dataLoadSpeed === 'lazy') {
       console.log('Заполняем первичный раз');
       console.log(this.list.data);
-      await getListDataLazy(this.dataUrl, 2, this.list.existingSizeInDOM).then(
-        (data): void => {
-          console.log('Вот что стянули');
-          console.log(data);
-          this.list.data = this.list.data?.concat(data);
-        }
-      );
+      const startIdx = this.basedIndex + 1;
+      await getListDataLazy(
+        this.dataUrl,
+        startIdx,
+        this.list.existingSizeInDOM
+      ).then((data): void => {
+        console.log('Вот что стянули');
+        console.log(data);
+        this.list.data = this.list.data?.concat(data);
+      });
     }
 
     const renderProps = {
@@ -509,9 +512,12 @@ class InfinityScroll {
           newLength = data && data.length;
         });
       } else {
-        const data = await getListDataLazy(dataUrl);
-        console.log(data);
         console.log('Будущий функционал для лейзи');
+        // TODO: вынести в хелпер?
+        const startIdx = this.basedIndex;
+        const endIdx = this.basedIndex + Number(!this.includeEnd);
+        const data = await getListDataLazy(dataUrl, startIdx, endIdx);
+        console.log(data);
         console.log(this.list.existingSizeInDOM);
         this.list.data = data;
         if (this.forcedListLength) {
