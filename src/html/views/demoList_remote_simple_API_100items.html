@@ -1,0 +1,16 @@
+<% var data = { title: htmlWebpackPlugin.options.title, author: "Danil X" }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+      <%=
+      _.template(require('html-loader!./../includes/demoLists/remote_simple_api_100items.html'))(data)
+      %>
+    </section>
+  </body>
+</html>

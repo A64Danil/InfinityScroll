@@ -8,6 +8,7 @@ import { InfinityScroll } from './js/infinityScroll';
 import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000items';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
 import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
+import { REMOTE_SIMPLE_API_100ITEMS_PROPS } from './demoScripts/remote_simple_API_100items';
 import { REMOTE_LAZY_000ITEMS_PROPS } from './demoScripts/remote_lazy_000item';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
 import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_100items';
@@ -45,6 +46,15 @@ const remoteList = document.getElementById(
 if (remoteList !== null) {
   console.log('Remote list Started');
   const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+}
+
+const remoteListApi = document.getElementById(
+  REMOTE_SIMPLE_API_100ITEMS_PROPS.selectorId
+);
+
+if (remoteListApi !== null) {
+  console.log('Remote Api_100_items list Started');
+  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
 }
 
 const lazyList = document.getElementById(REMOTE_LAZY_000ITEMS_PROPS.selectorId);
