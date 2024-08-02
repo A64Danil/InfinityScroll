@@ -129,8 +129,9 @@ export class DomManager {
     }
   }
 
-  createItem(elemData: object): string {
-    return this.template(elemData, this.listLength);
+  // TODO: переработать приём elemNum
+  createItem(elemData: object, elemNum: number): string {
+    return this.template(elemData, this.listLength, elemNum);
   }
 
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
@@ -162,7 +163,7 @@ export class DomManager {
         throw new Error('Your list.data is undefined');
       }
       const elemData = list.data[this.GLOBAL_ITEM_COUNTER];
-      templateFragments += this.createItem(elemData);
+      templateFragments += this.createItem(elemData, this.GLOBAL_ITEM_COUNTER);
       this.GLOBAL_ITEM_COUNTER++;
     }
 
@@ -228,7 +229,7 @@ export class DomManager {
       }
       const elemData = list.data[elemNum];
       // console.log(elemData);
-      templateFragments += this.createItem(elemData);
+      templateFragments += this.createItem(elemData, elemNum);
     }
 
     const newOffset = sequenceNumber * list.itemHeight;
@@ -308,9 +309,9 @@ export class DomManager {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        console.log('elemNum', elemNum);
+        // console.log('elemNum', elemNum);
         const elemData = data[elemNum];
-        templateFragments += this.createItem(elemData);
+        templateFragments += this.createItem(elemData, elemNum);
         // remove items
         this.removeItem(childPosition);
       }

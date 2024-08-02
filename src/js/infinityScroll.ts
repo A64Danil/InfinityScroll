@@ -254,7 +254,7 @@ class InfinityScroll {
       }
       const elemData = this.list.data[0];
       // TODO: кажется мы забываем удалить лишний элемент после рендера
-      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData);
+      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData, 0);
       listItem = list.firstChild as HTMLElement;
     }
 
@@ -430,7 +430,7 @@ class InfinityScroll {
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           await this.sleep(1000);
-          await this.lazyOrderedFetch(renderIndex, true);
+          this.lazyOrderedFetch(renderIndex, true);
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
           );
@@ -551,6 +551,8 @@ class InfinityScroll {
   Вопрос - почему не происходит bigDiff? Потому что рендер бигДиффа был отменен из-за последовательности 260-275-280.
    */
   async lazyOrderedFetch(renderIndex: number, isFetchToReset = false) {
+    // имитируем медленный интернет
+    await this.sleep(4000);
     let [startFetchIndex, endFetchIndex] = [0, 1];
     const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
     const lastEndIndex = this.list.length;
@@ -590,6 +592,7 @@ class InfinityScroll {
         if (!Array.isArray(data)) {
           throw new Error('Your fetched data does not have Array type');
         }
+        console.log(data);
         // console.log('startFetchIndex', startFetchIndex);
         this.addNewItemsToDataList(startFetchIndex, data);
         const dataObj = {
@@ -603,11 +606,28 @@ class InfinityScroll {
   // TODO: выяснить почему не все данные берутся из массива
   addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
     const loopLength = data.length;
+    console.log('loopLength', loopLength);
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = startFetchIndex + i;
-      console.log(this.list.data[currentIndex]);
       this.list.data[currentIndex] = data[i];
+      // if baseIdx = 0 ===> currentIndex  + 0
+      // if baseIdx = 1 ===> currentIndex  - 1
+      const dataIndex = currentIndex - this.basedIndex;
+      const searchSelector = `[data-id="${dataIndex}"]`;
+      const element = this.domMngr.targetElem.querySelector(searchSelector);
+      console.log(searchSelector, dataIndex, currentIndex);
+      console.log(element);
+      if (element) this.updateElement(element, data[i], dataIndex);
+      console.log(this.list.data[currentIndex]);
     }
+  }
+
+  // TODO: доработать
+  updateElement(element, data, dataIndex) {
+    const res = this.domMngr.template(data, this.list.length, dataIndex);
+    console.log(res);
+    element.insertAdjacentHTML('beforebegin', res);
+    element.remove();
   }
 }
 
