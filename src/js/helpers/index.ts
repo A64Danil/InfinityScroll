@@ -100,3 +100,12 @@ export function isValidUrl(string: string): boolean {
     return false;
   }
 }
+
+export function checkDataUrl(dataUrl: DataURLType): boolean[] {
+  const isDataUrlString = typeof dataUrl === 'string' && isValidUrl(dataUrl);
+
+  const isDataUrlReturnString =
+    typeof dataUrl === 'function' && isValidUrl(dataUrl(1, 1));
+
+  return [isDataUrlString, isDataUrlReturnString];
+}
