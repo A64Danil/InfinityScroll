@@ -13,7 +13,7 @@ import {
   getListDataLazy,
   checkIncludeEnd,
   checkBaseIndex,
-  isValidUrl,
+  checkDataUrl,
 } from './helpers';
 
 import {
@@ -62,7 +62,7 @@ class InfinityScroll {
   private timerIdRefreshList: number | undefined;
 
   // ввёл, но пока не использовал
-  private name: string;
+  private name: string | undefined;
 
   // хранит html-id главного корневого элемента
   private readonly selectorId: string;
@@ -85,7 +85,7 @@ class InfinityScroll {
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
   private readonly dataLoadSpeed: 'instant' | 'lazy';
 
-  private readonly dataUrl: DataURLType;
+  private readonly dataUrl: DataURLType | undefined;
 
   private includeEnd: boolean;
 
@@ -143,37 +143,20 @@ class InfinityScroll {
     this.basedIndex = 1;
 
     console.log(props.data);
-    if (!props.data) {
-      const isDataUrlString =
-        props.dataUrl &&
-        typeof props.dataUrl === 'string' &&
-        isValidUrl(props.dataUrl);
+    if (props.data) {
+      this.setListData(props.data, null);
+      domChangerProps.listLength = this.list.length;
+      this.domMngr = new DomManager(domChangerProps);
+      this.start();
+    } else {
+      this.dataUrl = props.dataUrl;
+      console.log(this.dataUrl);
 
-      const isDataUrlReturnString =
-        props.dataUrl &&
-        typeof props.dataUrl === 'function' &&
-        isValidUrl(props.dataUrl(1, 1));
-      //
-      // console.log('isDataUrlString', isDataUrlString);
-      // console.log('isDataUrlReturnString', isDataUrlReturnString);
-      if (isDataUrlString || isDataUrlReturnString) {
-        this.dataUrl = props.dataUrl;
-        console.log(this.dataUrl);
-      } else {
-        throw new Error(
-          'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
-        );
-      }
-
-      if (isDataUrlReturnString) {
-        this.checkApiSettings()
-          .then(() => this.setListData(props.data, props.dataUrl))
-          .then(() => {
-            domChangerProps.listLength = this.list.length;
-            this.domMngr = new DomManager(domChangerProps);
-            this.start();
-          });
-      }
+      this.setListData(null, this.dataUrl).then(() => {
+        domChangerProps.listLength = this.list.length;
+        this.domMngr = new DomManager(domChangerProps);
+        this.start();
+      });
     }
   }
 
@@ -488,9 +471,26 @@ class InfinityScroll {
     );
   }
 
-  async setListData(listData: object[], dataUrl?: DataURLType) {
-    console.log('Конечный индекс includeEnd? ', this.includeEnd);
-    console.log('Индекс считается с ', this.basedIndex);
+  async setListData(listData: object[] | null, dataUrl?: DataURLType | null) {
+    if (this.dataUrl) {
+      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(
+        this.dataUrl
+      );
+
+      // console.log('isDataUrlString', isDataUrlString);
+      // console.log('isDataUrlReturnString', isDataUrlReturnString);
+      if (!isDataUrlString && !isDataUrlReturnString) {
+        throw new Error(
+          'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
+        );
+      }
+
+      if (isDataUrlReturnString) {
+        await this.checkApiSettings();
+        console.log('Конечный индекс includeEnd? ', this.includeEnd);
+        console.log('Индекс считается с ', this.basedIndex);
+      }
+    }
 
     let newLength = null;
     // TODO: ждёт переделки чтобы избавить от this.dataLoadPlace
