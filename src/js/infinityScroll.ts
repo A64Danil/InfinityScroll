@@ -4,6 +4,7 @@ import {
   ChunkController,
   ListController,
   DomManager,
+  Skeleton,
 } from './controllers';
 
 import {
@@ -104,6 +105,8 @@ class InfinityScroll {
 
   private render: RenderController | undefined;
 
+  private skeleton: Skeleton;
+
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
     this.selectorId = props.selectorId;
@@ -127,6 +130,10 @@ class InfinityScroll {
     this.chunk = new ChunkController();
 
     this.list = new ListController();
+
+    this.skeleton = new Skeleton({
+      template: props.templateString,
+    });
 
     const domChangerProps = {
       targetElem: this.listEl,
@@ -625,7 +632,13 @@ class InfinityScroll {
       const element = this.domMngr.targetElem.querySelector(searchSelector);
       console.log(searchSelector, dataIndex, currentIndex);
       console.log(element);
-      if (element) this.updateElement(element, data[i], dataIndex);
+      if (element)
+        this.skeleton.updateElement(
+          element,
+          data[i],
+          dataIndex,
+          this.list.length
+        );
       console.log(this.list.data[currentIndex]);
     }
   }

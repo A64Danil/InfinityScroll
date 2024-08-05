@@ -3,6 +3,7 @@ import { ScrollDetector } from './ScrollDetector';
 import { ChunkController } from './Chunk';
 import { ListController } from './List';
 import { DomManager } from './DomManager';
+import { Skeleton } from './Skeleton';
 
 export {
   RenderController,
@@ -10,4 +11,5 @@ export {
   ChunkController,
   ListController,
   DomManager,
+  Skeleton,
 };
