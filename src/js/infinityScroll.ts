@@ -176,15 +176,22 @@ class InfinityScroll {
       console.log('Заполняем первичный раз');
       console.log(this.list.data);
       const startIdx = this.basedIndex + 1;
-      await getListDataLazy(
-        this.dataUrl,
-        startIdx,
-        this.list.existingSizeInDOM
-      ).then((data): void => {
-        console.log('Вот что стянули');
-        console.log(data);
-        this.list.data = this.list.data?.concat(data);
-      });
+
+      const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
+        id: i,
+        name: `test name ${i}`,
+      }));
+      console.log(emptyList);
+      this.list.data = emptyList;
+      // await getListDataLazy(
+      //   this.dataUrl,
+      //   startIdx,
+      //   this.list.existingSizeInDOM
+      // ).then((data): void => {
+      //   console.log('Вот что стянули');
+      //   console.log(data);
+      //   this.list.data = this.list.data?.concat(data);
+      // });
     }
 
     const renderProps = {
@@ -373,12 +380,13 @@ class InfinityScroll {
           sequenceStart < lastStartIndex
             ? [sequenceStart, sequenceEnd]
             : [lastStartIndex, lastEndIndex];
-        console.log(`${startFetchIndex} - ${endFetchIndex}`);
+        // console.log(`${startFetchIndex} - ${endFetchIndex}`);
+
         // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
           // await this.lazyOrderedFetch(this.chunk.startRenderIndex); // было так
-          this.lazyOrderedFetch(this.chunk.startRenderIndex);
+          // this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
 
