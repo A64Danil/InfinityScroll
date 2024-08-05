@@ -386,7 +386,7 @@ class InfinityScroll {
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
           // await this.lazyOrderedFetch(this.chunk.startRenderIndex); // было так
-          // this.lazyOrderedFetch(this.chunk.startRenderIndex);
+          this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
 
@@ -631,11 +631,19 @@ class InfinityScroll {
   }
 
   // TODO: доработать
-  updateElement(element, data, dataIndex) {
-    const res = this.domMngr.template(data, this.list.length, dataIndex);
-    console.log(res);
-    element.insertAdjacentHTML('beforebegin', res);
-    element.remove();
+  updateElement(skeleton, data, dataIndex) {
+    const tempContainer = document.createElement('div');
+    const itemFromStrTpl = this.domMngr.template(
+      data,
+      this.list.length,
+      dataIndex
+    );
+    tempContainer.innerHTML = itemFromStrTpl;
+    const itemHTML = tempContainer.firstElementChild;
+    console.log(itemHTML);
+    // skeleton.insertAdjacentHTML('beforebegin', res);
+    // skeleton.remove();
+    skeleton.replaceWith(itemHTML);
   }
 }
 
