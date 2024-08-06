@@ -1,5 +1,6 @@
 import { ListController } from '../List';
 import { ChunkController } from '../Chunk';
+import { Skeleton } from '../Skeleton';
 import { IScrollDirection } from '../../types/IScrollDirection';
 import { TemplateStringFunction } from '../../types/TemplateStringFunction';
 import {
@@ -32,12 +33,16 @@ export class DomManager {
 
   private readonly listLength: number;
 
+  private readonly skeleton: Skeleton;
+
   constructor(props: {
+    skeleton: Skeleton;
     template: TemplateStringFunction;
     targetElem: HTMLElement;
     listLength: number;
   }) {
     // this.data = props.data;
+    this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
     this.template = props.template;
     this.listLength = props.listLength;
@@ -131,6 +136,11 @@ export class DomManager {
 
   // TODO: переработать приём elemNum
   createItem(elemData: object, elemNum: number): string {
+    this.skeleton.createElement({
+      data: elemData,
+      listLength: this.listLength,
+      dataIndex: elemNum,
+    });
     return this.template(elemData, this.listLength, elemNum);
   }
 

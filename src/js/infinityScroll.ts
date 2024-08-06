@@ -136,6 +136,7 @@ class InfinityScroll {
     });
 
     const domChangerProps = {
+      skeleton: this.skeleton,
       targetElem: this.listEl,
       listLength: 0,
       template: props.templateString,
