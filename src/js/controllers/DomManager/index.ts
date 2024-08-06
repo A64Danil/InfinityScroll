@@ -135,13 +135,11 @@ export class DomManager {
   }
 
   // TODO: переработать приём elemNum
-  createItem(elemData: object, elemNum: number): string {
-    this.skeleton.createElement({
+  createItem(elemData: object, elemNum: number): HTMLElement {
+    return this.skeleton.createElement({
       data: elemData,
-      listLength: this.listLength,
       dataIndex: elemNum,
     });
-    return this.template(elemData, this.listLength, elemNum);
   }
 
   removeItem(childPosition: 'firstChild' | 'lastChild'): void {
@@ -160,7 +158,7 @@ export class DomManager {
     )
       return;
 
-    let templateFragments = '';
+    const templateFragment = document.createDocumentFragment();
     for (
       let i = 0;
       i < 1000 &&
@@ -173,11 +171,13 @@ export class DomManager {
         throw new Error('Your list.data is undefined');
       }
       const elemData = list.data[this.GLOBAL_ITEM_COUNTER];
-      templateFragments += this.createItem(elemData, this.GLOBAL_ITEM_COUNTER);
+      templateFragment.append(
+        this.createItem(elemData, this.GLOBAL_ITEM_COUNTER)
+      );
       this.GLOBAL_ITEM_COUNTER++;
     }
 
-    this.targetElem.innerHTML += templateFragments;
+    this.targetElem.append(templateFragment);
 
     this.fillListTimerId = window.setTimeout(
       () => this.fillList(list),
@@ -229,7 +229,7 @@ export class DomManager {
       list.startIndexOfLastPart
     );
 
-    let templateFragments = '';
+    const templateFragment = document.createDocumentFragment();
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
@@ -239,12 +239,12 @@ export class DomManager {
       }
       const elemData = list.data[elemNum];
       // console.log(elemData);
-      templateFragments += this.createItem(elemData, elemNum);
+      templateFragment.append(this.createItem(elemData, elemNum));
     }
 
     const newOffset = sequenceNumber * list.itemHeight;
 
-    this.targetElem.innerHTML = templateFragments;
+    this.targetElem.append(templateFragment);
     console.log('before setOffset', startRenderIndex, newOffset);
     this.setOffsetToList(
       chunk,
@@ -303,8 +303,8 @@ export class DomManager {
     listLength: number,
     data: Array<object>,
     childPosition: 'firstChild' | 'lastChild'
-  ): string {
-    let templateFragments = '';
+  ): DocumentFragment {
+    const templateFragment = document.createDocumentFragment();
 
     for (let i = 0; i < 1000 && i < chunkAmount; i++) {
       const allowToChange = this.checkAllowToChangeList(
@@ -321,20 +321,23 @@ export class DomManager {
         const elemNum = i + sequenceNumber;
         // console.log('elemNum', elemNum);
         const elemData = data[elemNum];
-        templateFragments += this.createItem(elemData, elemNum);
+        templateFragment.append(this.createItem(elemData, elemNum));
         // remove items
         this.removeItem(childPosition);
       }
     }
 
-    return templateFragments;
+    return templateFragment;
   }
 
-  putElementsToList(direction: IScrollDirection, htmlString: string) {
+  putElementsToList(
+    direction: IScrollDirection,
+    htmlFragment: DocumentFragment
+  ) {
     if (direction === 'down') {
-      this.targetElem.innerHTML += htmlString;
+      this.targetElem.append(htmlFragment);
     } else {
-      this.targetElem.innerHTML = htmlString + this.targetElem.innerHTML;
+      this.targetElem.prepend(htmlFragment);
     }
   }
 

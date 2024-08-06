@@ -268,8 +268,7 @@ class InfinityScroll {
         throw new Error('You does not have list.data');
       }
       const elemData = this.list.data[0];
-      // TODO: кажется мы забываем удалить лишний элемент после рендера
-      this.domMngr.targetElem.innerHTML += this.domMngr.createItem(elemData, 0);
+      this.domMngr.targetElem.append(this.domMngr.createItem(elemData, 0));
       listItem = list.firstChild as HTMLElement;
     }
 

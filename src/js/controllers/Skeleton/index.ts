@@ -37,18 +37,18 @@ export class Skeleton {
     srcElem.replaceWith(itemHTML);
   }
 
-  createElement({ data, dataIndex }) {
+  createElement({ data, dataIndex }): HTMLElement {
     console.log('create from skeleton');
     const tempContainer = document.createElement('div');
     const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
     tempContainer.innerHTML = itemFromStrTpl;
-    const itemHTML = tempContainer.firstElementChild;
+    const itemHTML = tempContainer.firstElementChild as HTMLElement;
     this.setRequiredAttrs({
       element: itemHTML,
       id: data.id,
       dataIndex,
     });
-    console.log(itemHTML);
+    // console.log(itemHTML);
     return itemHTML;
   }
 }
