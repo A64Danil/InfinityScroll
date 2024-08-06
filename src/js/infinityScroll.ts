@@ -552,6 +552,7 @@ class InfinityScroll {
       throw new Error('Your list does not have length or length is 0');
     }
     this.list.length = newLength;
+    this.skeleton.setListHeight(this.list.length);
   }
 
   /*
