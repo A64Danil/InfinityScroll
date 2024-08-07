@@ -184,22 +184,25 @@ class InfinityScroll {
       console.log('Заполняем первичный раз');
       console.log(this.list.data);
       const startIdx = this.basedIndex + 1;
+      //
+      // const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
+      //   id: i,
+      //   name: `test name ${i}`,
+      // }));
+      // console.log(emptyList);
+      // this.list.data = emptyList;
+      await getListDataLazy(
+        this.dataUrl,
+        startIdx,
+        this.list.existingSizeInDOM
+      ).then((data): void => {
+        console.log('Вот что стянули');
+        console.log(data);
+        this.list.data = this.list.data?.concat(data);
 
-      const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
-        id: i,
-        name: `test name ${i}`,
-      }));
-      console.log(emptyList);
-      this.list.data = emptyList;
-      // await getListDataLazy(
-      //   this.dataUrl,
-      //   startIdx,
-      //   this.list.existingSizeInDOM
-      // ).then((data): void => {
-      //   console.log('Вот что стянули');
-      //   console.log(data);
-      //   this.list.data = this.list.data?.concat(data);
-      // });
+        console.log('Вот что получилось');
+        console.log(this.list.data);
+      });
     }
 
     const renderProps = {
@@ -600,7 +603,7 @@ class InfinityScroll {
     // console.log('sequenceStart', sequenceStart, sequenceEnd);
     [startFetchIndex, endFetchIndex] =
       sequenceStart < lastStartIndex
-        ? [sequenceStart, sequenceEnd]
+        ? [sequenceStart + this.basedIndex, sequenceEnd]
         : [lastStartIndex, lastEndIndex];
     console.log(`${startFetchIndex} - ${endFetchIndex}`);
     await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
@@ -619,45 +622,26 @@ class InfinityScroll {
     );
   }
 
-  // TODO: выяснить почему не все данные берутся из массива
+  // 0 - 31 (32 всего)
+  // 32 - 39 (40 всего)
+  // 32 - 40 (41 всего)
   addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
     const loopLength = data.length;
     console.log('loopLength', loopLength);
     for (let i = 0; i < loopLength; i++) {
-      const currentIndex = startFetchIndex + i;
+      const currentIndex = startFetchIndex - this.basedIndex + i;
       this.list.data[currentIndex] = data[i];
       // if baseIdx = 0 ===> currentIndex  + 0
       // if baseIdx = 1 ===> currentIndex  - 1
-      const dataIndex = currentIndex - this.basedIndex;
-      const searchSelector = `[data-id="${dataIndex}"]`;
+      const dataIndex = currentIndex + 1;
+      const searchSelector = `[aria-posinset="${dataIndex}"]`;
       const element = this.domMngr.targetElem.querySelector(searchSelector);
       console.log(searchSelector, dataIndex, currentIndex);
-      console.log(element);
-      if (element)
-        this.skeleton.updateElement(
-          element,
-          data[i],
-          dataIndex,
-          this.list.length
-        );
-      console.log(this.list.data[currentIndex]);
+      // console.log(element);
+      if (element) this.skeleton.updateElement(element, data[i], dataIndex);
+      // console.log(this.list.data[currentIndex]);
     }
-  }
-
-  // TODO: доработать
-  updateElement(skeleton, data, dataIndex) {
-    const tempContainer = document.createElement('div');
-    const itemFromStrTpl = this.domMngr.template(
-      data,
-      this.list.length,
-      dataIndex
-    );
-    tempContainer.innerHTML = itemFromStrTpl;
-    const itemHTML = tempContainer.firstElementChild;
-    console.log(itemHTML);
-    // skeleton.insertAdjacentHTML('beforebegin', res);
-    // skeleton.remove();
-    skeleton.replaceWith(itemHTML);
+    console.log(this.list.data);
   }
 }
 

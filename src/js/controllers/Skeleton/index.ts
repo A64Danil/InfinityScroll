@@ -16,21 +16,18 @@ export class Skeleton {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  setRequiredAttrs({ element, id, dataIndex }) {
+  setRequiredAttrs({ element, dataIndex }) {
     element.setAttribute('aria-setsize', this.listLength);
-    element.setAttribute('aria-posinset', id);
-    element.setAttribute('data-id', dataIndex);
+    element.setAttribute('aria-posinset', dataIndex);
   }
 
   updateElement(srcElem, data, dataIndex) {
-    console.log('log from skeleton');
     const tempContainer = document.createElement('div');
     const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
     tempContainer.innerHTML = itemFromStrTpl;
     const itemHTML = tempContainer.firstElementChild;
     this.setRequiredAttrs({
       element: itemHTML,
-      id: data.id,
       dataIndex,
     });
     console.log(itemHTML);
@@ -45,7 +42,6 @@ export class Skeleton {
     const itemHTML = tempContainer.firstElementChild as HTMLElement;
     this.setRequiredAttrs({
       element: itemHTML,
-      id: data.id,
       dataIndex,
     });
     // console.log(itemHTML);

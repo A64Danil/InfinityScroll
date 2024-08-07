@@ -138,7 +138,7 @@ export class DomManager {
   createItem(elemData: object, elemNum: number): HTMLElement {
     return this.skeleton.createElement({
       data: elemData,
-      dataIndex: elemNum,
+      dataIndex: elemNum + 1,
     });
   }
 
