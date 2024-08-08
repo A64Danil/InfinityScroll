@@ -618,6 +618,7 @@ class InfinityScroll {
         console.log(data);
         // console.log('startFetchIndex', startFetchIndex);
         this.addNewItemsToDataList(startFetchIndex, data);
+        this.updateSkeletonItems(startFetchIndex, data);
         const dataObj = {
           data: this.list.data?.slice(),
         };
@@ -631,22 +632,25 @@ class InfinityScroll {
   // 32 - 40 (41 всего)
   addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
     const loopLength = data.length;
-    console.log('loopLength', loopLength);
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = startFetchIndex - this.basedIndex + i;
       this.list.data[currentIndex] = data[i];
+    }
+    console.log(this.list.data);
+  }
+
+  updateSkeletonItems(startFetchIndex: number, data: Array<object>) {
+    const loopLength = data.length;
+    for (let i = 0; i < loopLength; i++) {
       // if baseIdx = 0 ===> currentIndex  + 0
       // if baseIdx = 1 ===> currentIndex  - 1
-      // TODO: то что ниже - в отдельную функцию?
+      const currentIndex = startFetchIndex - this.basedIndex + i;
       const dataIndex = currentIndex + 1;
       const searchSelector = `[aria-posinset="${dataIndex}"]`;
       const element = this.domMngr.targetElem.querySelector(searchSelector);
       console.log(searchSelector, dataIndex, currentIndex);
-      // console.log(element);
       if (element) this.skeleton.updateElement(element, data[i], dataIndex);
-      // console.log(this.list.data[currentIndex]);
     }
-    console.log(this.list.data);
   }
 
   // eslint-disable-next-line class-methods-use-this
