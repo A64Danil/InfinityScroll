@@ -14,4 +14,8 @@ export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
         >
             ${element.name} ${element.number}
     </li>`,
+  // templateStringNew: (element, listLength, number) => `<li
+  //       class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+  //           ${element.name} ${element.number} - ${number}
+  //   </li>`,
 };
