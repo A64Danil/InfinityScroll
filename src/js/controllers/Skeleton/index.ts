@@ -30,12 +30,11 @@ export class Skeleton {
       element: itemHTML,
       dataIndex,
     });
-    console.log(itemHTML);
+    // console.log(itemHTML);
     srcElem.replaceWith(itemHTML);
   }
 
   createElement({ data, dataIndex }): HTMLElement {
-    console.log('create from skeleton');
     const tempContainer = document.createElement('div');
     const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
     tempContainer.innerHTML = itemFromStrTpl;
