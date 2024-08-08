@@ -584,6 +584,8 @@ class InfinityScroll {
         renderIndex,
         this.chunk.amount
       );
+
+      console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
       // const baseStyles = [
@@ -606,6 +608,8 @@ class InfinityScroll {
         ? [sequenceStart + this.basedIndex, sequenceEnd]
         : [lastStartIndex, lastEndIndex];
     console.log(`${startFetchIndex} - ${endFetchIndex}`);
+
+    this.checkItemForLoad(startFetchIndex, endFetchIndex);
     await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
       (data): void => {
         if (!Array.isArray(data)) {
@@ -633,6 +637,7 @@ class InfinityScroll {
       this.list.data[currentIndex] = data[i];
       // if baseIdx = 0 ===> currentIndex  + 0
       // if baseIdx = 1 ===> currentIndex  - 1
+      // TODO: то что ниже - в отдельную функцию?
       const dataIndex = currentIndex + 1;
       const searchSelector = `[aria-posinset="${dataIndex}"]`;
       const element = this.domMngr.targetElem.querySelector(searchSelector);
@@ -642,6 +647,14 @@ class InfinityScroll {
       // console.log(this.list.data[currentIndex]);
     }
     console.log(this.list.data);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  checkItemForLoad(startFetchIndex, endFetchIndex) {
+    console.log(startFetchIndex, endFetchIndex);
+    // for (let i = 0; i < this.chunk.amount; i++) {
+    //   console.log('Check ' + i);
+    // }
   }
 }
 
