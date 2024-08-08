@@ -244,6 +244,7 @@ export class DomManager {
 
     const newOffset = sequenceNumber * list.itemHeight;
 
+    this.targetElem.innerHTML = '';
     this.targetElem.append(templateFragment);
     console.log('before setOffset', startRenderIndex, newOffset);
     this.setOffsetToList(
