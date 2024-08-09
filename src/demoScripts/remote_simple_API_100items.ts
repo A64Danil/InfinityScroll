@@ -11,6 +11,6 @@ export const REMOTE_SIMPLE_API_100ITEMS_PROPS: InfinityScrollPropTypes = {
   templateString: (element, listLength, elemNum: number) => `<li 
         class="REMOTE_simple_API_100ITEMS__listItem" 
         >
-           ${element?.name} (elemNum - ${elemNum + 1})
+           ${element?.name} (elemNum - ${elemNum})
     </li>`,
 };
