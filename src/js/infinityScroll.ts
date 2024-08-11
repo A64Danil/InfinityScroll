@@ -415,6 +415,7 @@ class InfinityScroll {
           this.scroll.direction,
           this.scroll.isGoingFromBottom
         );
+        if (!isBigDiff) this.checkIndexOrdering();
       }
     }
   }
@@ -659,6 +660,28 @@ class InfinityScroll {
     // for (let i = 0; i < this.chunk.amount; i++) {
     //   console.log('Check ' + i);
     // }
+  }
+
+  checkIndexOrdering() {
+    const list = this.domMngr?.targetElem;
+
+    let prevIndex: number | null = null;
+    // console.log('prevIndex', prevIndex);
+    [...list.children].forEach((elem) => {
+      const elemIndex = Number(elem.getAttribute('aria-posinset'));
+      if (prevIndex !== null) {
+        if (prevIndex + 1 !== elemIndex) {
+          console.error(
+            `Индексы поломались на элементе ${elemIndex} (ожидали ${
+              prevIndex + 1
+            })`
+          );
+        }
+        prevIndex = elemIndex;
+      } else {
+        prevIndex = elemIndex;
+      }
+    });
   }
 }
 
