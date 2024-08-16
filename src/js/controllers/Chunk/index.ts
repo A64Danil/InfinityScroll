@@ -24,17 +24,6 @@ export class ChunkController {
     return chunkOrderNumber;
   }
 
-  // setRenderIndex(
-  //   renderIndex: number,
-  //   isGoingFromBottom: boolean,
-  //   tailingElementsAmount: number
-  // ): void {
-  //   this.startRenderIndex = renderIndex;
-  //   // if (isGoingFromBottom) {
-  //   //   this.startRenderIndex += tailingElementsAmount;
-  //   // }
-  // }
-
   getRenderIndexDiff(newRenderIndex: number): number {
     return Math.abs(this.startRenderIndex - newRenderIndex);
   }

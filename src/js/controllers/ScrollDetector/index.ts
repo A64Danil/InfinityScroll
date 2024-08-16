@@ -22,15 +22,6 @@ export class ScrollDetector {
     this.prevScroll = scroll;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  // isSmallDiff(renderIndexDiff: number, tailingElementsAmount: number): boolean {
-  //   // if (renderIndexDiff !== 0 && renderIndexDiff <= tailingElementsAmount) {
-  //   if (renderIndexDiff !== 0 && renderIndexDiff < tailingElementsAmount) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
   setGoingFromBottom(
     firstOrderNumber: number,
     lastOrderNumber: number,

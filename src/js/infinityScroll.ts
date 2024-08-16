@@ -314,12 +314,8 @@ class InfinityScroll {
 
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
-    // TODO: вот это нормальный способ вычислять позицию текущего элемента
-    const currentTopElement = Math.ceil(scroll / this.list.itemHeight);
-    // console.log('Верха касается элемент номер', currentTopElement);
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
-    // TODO: На списке из 500 элементов, при обычном скролле, в конце есть проблемы после индексе 468
     checkChildrenAmount(
       this.listEl.childNodes.length,
       this.list.existingSizeInDOM
@@ -337,33 +333,10 @@ class InfinityScroll {
       chunkOrderNumber
     );
 
-    // TODO: выкинуть
-    // А если вообще убрать то всё ломается. В общем что-то не работает нормальный подсчёт this.chunk.startRenderIndex при движении снизу вверх
-    // Если скролл слишком маленький - не делаем ничего
-    // if (
-    //   this.scroll.isSmallDiff(renderIndexDiff, this.list.tailingElementsAmount)
-    // ) {
-    //   console.warn('Small diff detected');
-    //   console.log('renderIndexDiff', renderIndexDiff);
-    //   return;
-    // } else {
-    //   console.log('Дифф нормальный');
-    // }
-
     const resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
 
-    // console.log(
-    //   // 'chunkOrderNumber',
-    //   // chunkOrderNumber,
-    //   'newRenderIndex',
-    //   newRenderIndex,
-    //   'resultIndex',
-    //   resultIndex
-    // );
-    // TODO: где-тоо тут надо искать момент - если мы движемся вверх от самого низа списка, то иногда получаем лишннее смещение размером в 1 чанк
-    // TODO: когда движемся от самого низа вверх, то, если с середины двигаться снова вниз, то получаем неправильный рачсёт индексов 85 -> 77 -> 69 -> 85
     // this.clearTimerIfNeeded();
 
     // Если скролл слишком большой - рисуем всё заново
@@ -377,11 +350,6 @@ class InfinityScroll {
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
       this.chunk.startRenderIndex = resultIndex;
-      // this.chunk.setRenderIndex(
-      //   resultIndex,
-      //   this.scroll.isGoingFromBottom,
-      //   this.list.tailingElementsAmount
-      // );
       console.warn(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
