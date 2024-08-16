@@ -186,27 +186,27 @@ class InfinityScroll {
       const startIdx = this.basedIndex + 1;
       // Test Data
 
-      const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
-        id: i,
-        name: `test name ${i}`,
-      }));
-      console.log(emptyList);
-      this.list.data = emptyList;
+      // const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
+      //   id: i,
+      //   name: `test name ${i}`,
+      // }));
+      // console.log(emptyList);
+      // this.list.data = emptyList;
 
       // Real data
       //
-      // await getListDataLazy(
-      //   this.dataUrl,
-      //   startIdx,
-      //   this.list.existingSizeInDOM
-      // ).then((data): void => {
-      //   console.log('Вот что стянули');
-      //   console.log(data);
-      //   this.list.data = this.list.data?.concat(data);
-      //
-      //   console.log('Вот что получилось');
-      //   console.log(this.list.data);
-      // });
+      await getListDataLazy(
+        this.dataUrl,
+        startIdx,
+        this.list.existingSizeInDOM
+      ).then((data): void => {
+        console.log('Вот что стянули');
+        console.log(data);
+        this.list.data = this.list.data?.concat(data);
+
+        console.log('Вот что получилось');
+        console.log(this.list.data);
+      });
     }
 
     const renderProps = {
@@ -337,13 +337,31 @@ class InfinityScroll {
       chunkOrderNumber
     );
 
+    // TODO: выкинуть
+    // А если вообще убрать то всё ломается. В общем что-то не работает нормальный подсчёт this.chunk.startRenderIndex при движении снизу вверх
     // Если скролл слишком маленький - не делаем ничего
-    if (
-      this.scroll.isSmallDiff(renderIndexDiff, this.list.tailingElementsAmount)
-    ) {
-      return;
-    }
+    // if (
+    //   this.scroll.isSmallDiff(renderIndexDiff, this.list.tailingElementsAmount)
+    // ) {
+    //   console.warn('Small diff detected');
+    //   console.log('renderIndexDiff', renderIndexDiff);
+    //   return;
+    // } else {
+    //   console.log('Дифф нормальный');
+    // }
 
+    const resultIndex =
+      newRenderIndex +
+      (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
+
+    // console.log(
+    //   // 'chunkOrderNumber',
+    //   // chunkOrderNumber,
+    //   'newRenderIndex',
+    //   newRenderIndex,
+    //   'resultIndex',
+    //   resultIndex
+    // );
     // TODO: где-тоо тут надо искать момент - если мы движемся вверх от самого низа списка, то иногда получаем лишннее смещение размером в 1 чанк
     // TODO: когда движемся от самого низа вверх, то, если с середины двигаться снова вниз, то получаем неправильный рачсёт индексов 85 -> 77 -> 69 -> 85
     // this.clearTimerIfNeeded();
@@ -357,12 +375,13 @@ class InfinityScroll {
     }
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
-    if (this.chunk.startRenderIndex !== newRenderIndex) {
-      this.chunk.setRenderIndex(
-        newRenderIndex,
-        this.scroll.isGoingFromBottom,
-        this.list.tailingElementsAmount
-      );
+    if (this.chunk.startRenderIndex !== resultIndex) {
+      this.chunk.startRenderIndex = resultIndex;
+      // this.chunk.setRenderIndex(
+      //   resultIndex,
+      //   this.scroll.isGoingFromBottom,
+      //   this.list.tailingElementsAmount
+      // );
       console.warn(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
@@ -408,7 +427,7 @@ class InfinityScroll {
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
           // await this.lazyOrderedFetch(this.chunk.startRenderIndex); // было так
-          // this.lazyOrderedFetch(this.chunk.startRenderIndex);
+          this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
 
