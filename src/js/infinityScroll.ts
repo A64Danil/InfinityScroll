@@ -39,23 +39,6 @@ const nameToTag: NameToTagObj = {
   table: 'TABLE',
 };
 
-/* Давайте посчитаем все промежуточные переменные:
-1) Высота всего списка, чтобы понимать "размер" блоков (чанков)
-2) Высота пункта списка, чтобы понимать сколько пунктов влезает в чанк (сколько грузить за раз)
-3) Используем высоту чанка чтобы регулировать отступы
-4) Держим в памяти число, указывающее на начальный пункт списка в чанке
-5) При переходе к след/пред чанку выполняем действия с ДОМ и отступами
-
-// если дифф слишком большой, то делаем фуллРендер
-// для того чтобы подчитать дифф, нужно понять, когда скролл остановился
-
-
---- до рефакторинга было 450 строк кода
-
- */
-
-// TODO: Везде есть проблемы с рендерингом первой части части ПОСЛЕ того как мы поднялись наверх от самого низа
-
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 class InfinityScroll {
@@ -173,6 +156,7 @@ class InfinityScroll {
       throw new Error('Your DomManager is undefined');
     }
     console.log(this);
+    // TODO: зачем тут return?
     if (this.dataLoadPlace === 'remote') {
       console.log(this.list.data);
       // return;
@@ -242,11 +226,9 @@ class InfinityScroll {
 
   createInnerList(): HTMLElement {
     const newEl = document.createElement(nameToTag[this.listType]);
-    // ID-то наверное и не нужен вообще, если есть доступ к списку итак?
     const newElClass = `${this.selectorId}_${this.listType
       .charAt(0)
       .toUpperCase()}${this.listType.slice(1)}`;
-    // newEl.setAttribute('id', newElID);
     newEl.setAttribute('class', newElClass);
     return this.wrapperEl.appendChild(newEl);
   }
@@ -353,10 +335,10 @@ class InfinityScroll {
       console.warn(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
-      console.log(
-        'this.scroll.isGoingFromBottom',
-        this.scroll.isGoingFromBottom
-      );
+      // console.log(
+      //   'this.scroll.isGoingFromBottom',
+      //   this.scroll.isGoingFromBottom
+      // );
 
       if (!this.render) {
         throw new Error('this.render is not exist');
@@ -372,29 +354,9 @@ class InfinityScroll {
           amount: this.chunk.amount,
           htmlHeight: this.chunk.htmlHeight,
         };
-        console.log(
-          'mainChunkProps.startRenderIndex',
-          mainChunkProps.startRenderIndex
-        );
-        const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-        const lastEndIndex = this.list.length;
-        const sequenceStart = calcSequenceByDirection(
-          this.scroll.direction,
-          this.list.halfOfExistingSizeInDOM,
-          mainChunkProps.startRenderIndex,
-          this.chunk.amount
-        );
-        const sequenceEnd = sequenceStart + this.chunk.amount;
-        const [startFetchIndex, endFetchIndex] =
-          sequenceStart < lastStartIndex
-            ? [sequenceStart, sequenceEnd]
-            : [lastStartIndex, lastEndIndex];
-        // console.log(`${startFetchIndex} - ${endFetchIndex}`);
 
-        // TODO: из-за этого места происходит рассинхрон
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
-          // await this.lazyOrderedFetch(this.chunk.startRenderIndex); // было так
           this.lazyOrderedFetch(this.chunk.startRenderIndex);
         }
         // END Fetch new DATA
@@ -495,8 +457,6 @@ class InfinityScroll {
         this.dataUrl
       );
 
-      // console.log('isDataUrlString', isDataUrlString);
-      // console.log('isDataUrlReturnString', isDataUrlReturnString);
       if (!isDataUrlString && !isDataUrlReturnString) {
         throw new Error(
           'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
@@ -557,20 +517,8 @@ class InfinityScroll {
     this.skeleton.setListHeight(this.list.length);
   }
 
-  /*
-  Проблема:
-    из-за быстрого скролла происходит рваный рендер (т.к. список рендерит новые элементы не ориентируясь на предыдущие).
-      из-за "рваного" рендера не по порядку в DOM попадают чанки, которые не соответствуют порядку следования друг за другом
-
-  Пример:
-  был рендер элементов с позиции 260 (261-265).
-  Следующий шли элементы с позиции 280 (281-285).
-  Получилось ...264-265-281-282..
-
-  Вопрос - почему не происходит bigDiff? Потому что рендер бигДиффа был отменен из-за последовательности 260-275-280.
-   */
   async lazyOrderedFetch(renderIndex: number, isFetchToReset = false) {
-    // имитируем медленный интернет
+    // TODO: убрать - имитируем медленный интернет
     await this.sleep(4000);
     let [startFetchIndex, endFetchIndex] = [0, 1];
     const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
@@ -609,7 +557,11 @@ class InfinityScroll {
         : [lastStartIndex, lastEndIndex];
     console.log(`${startFetchIndex} - ${endFetchIndex}`);
 
-    this.checkItemForLoad(startFetchIndex, endFetchIndex);
+    const unfoundedRanges = this.checkItemForLoad(
+      startFetchIndex,
+      endFetchIndex
+    );
+    console.log('Unfounded', unfoundedRanges);
     await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
       (data): void => {
         if (!Array.isArray(data)) {
@@ -655,10 +607,30 @@ class InfinityScroll {
 
   // eslint-disable-next-line class-methods-use-this
   checkItemForLoad(startFetchIndex, endFetchIndex) {
+    // const testArr = [, 34, 5, , 8, , , , , 4, 6, , 3, , , 4, 12];
     console.log(startFetchIndex, endFetchIndex);
-    // for (let i = 0; i < this.chunk.amount; i++) {
-    //   console.log('Check ' + i);
-    // }
+    const unfoundedItems = [];
+    let isUndefined = false;
+    let buffer = [];
+    for (let i = startFetchIndex; i <= endFetchIndex; i++) {
+      // console.log(`Check ${i}`);
+      const currentElem = this.list.data[i];
+      // const currentElem = testArr[i];
+      console.log(currentElem);
+      if (currentElem === undefined && isUndefined === false) {
+        isUndefined = true;
+        buffer.push(i);
+      } else if (
+        (currentElem !== undefined && isUndefined === true) ||
+        i === endFetchIndex
+      ) {
+        buffer.push(i);
+        unfoundedItems.push(buffer.slice());
+        buffer = [];
+        isUndefined = false;
+      }
+    }
+    return unfoundedItems;
   }
 
   checkIndexOrdering() {
