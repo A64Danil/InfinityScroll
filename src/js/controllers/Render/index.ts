@@ -52,7 +52,9 @@ export class RenderController {
    * Косаемся конца списка двигаясь снизу
    */
   isEndOfListFromBottom(startRenderIndex: number): boolean {
-    return startRenderIndex < this.tailingElementsAmount;
+    return (
+      startRenderIndex === 0 || startRenderIndex < this.tailingElementsAmount
+    );
   }
 
   isAllowRenderNearBorder(
