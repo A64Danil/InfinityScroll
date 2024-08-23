@@ -127,7 +127,7 @@ class InfinityScroll {
 
     this.dataLoadPlace = props.dataLoadPlace || 'local';
 
-    this.dataLoadSpeed = props.dataLoadSpeed || 'instant';
+    this.dataLoadSpeed = 'instant';
 
     this.includeEnd = false;
 
@@ -479,6 +479,7 @@ class InfinityScroll {
       }
 
       if (isDataUrlReturnString) {
+        this.dataLoadSpeed = 'lazy';
         await this.checkApiSettings();
         console.log('Конечный индекс includeEnd? ', this.includeEnd);
         console.log('Индекс считается с ', this.basedIndex);
