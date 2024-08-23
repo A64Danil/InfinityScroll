@@ -125,7 +125,7 @@ class InfinityScroll {
       template: props.templateString,
     };
 
-    this.dataLoadPlace = props.dataLoadPlace || 'local';
+    this.dataLoadPlace = 'local';
 
     this.dataLoadSpeed = 'instant';
 
@@ -476,6 +476,8 @@ class InfinityScroll {
         throw new Error(
           'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
         );
+      } else {
+        this.dataLoadPlace = 'remote';
       }
 
       if (isDataUrlReturnString) {
