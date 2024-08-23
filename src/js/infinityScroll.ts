@@ -187,6 +187,10 @@ class InfinityScroll {
         console.log('Вот что стянули');
         console.log(data);
         this.list.data = this.list.data?.concat(data);
+        //
+        this.list.data[34] = { name: 'Fake data 35' };
+        this.list.data[35] = { name: 'Fake data 36' };
+        this.list.data[37] = { name: 'Fake data 38' };
 
         console.log('Вот что получилось');
         console.log(this.list.data);
@@ -357,7 +361,18 @@ class InfinityScroll {
 
         // Fetch new DATA
         if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
-          this.lazyOrderedFetch(this.chunk.startRenderIndex);
+          const [sequenceStart, sequenceEnd] = this.getSequence(
+            this.chunk.startRenderIndex
+          );
+          const unfoundedRanges = this.checkItemForLoad(
+            sequenceStart,
+            sequenceEnd
+          );
+
+          if (unfoundedRanges.length) {
+            console.log('Unfounded', unfoundedRanges);
+            this.lazyOrderedFetch(unfoundedRanges);
+          }
         }
         // END Fetch new DATA
 
@@ -517,12 +532,7 @@ class InfinityScroll {
     this.skeleton.setListHeight(this.list.length);
   }
 
-  async lazyOrderedFetch(renderIndex: number, isFetchToReset = false) {
-    // TODO: убрать - имитируем медленный интернет
-    await this.sleep(4000);
-    let [startFetchIndex, endFetchIndex] = [0, 1];
-    const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-    const lastEndIndex = this.list.length;
+  getSequence(renderIndex: number, isFetchToReset = false): number[] {
     let sequenceStart;
     let sequenceEnd;
     if (!isFetchToReset) {
@@ -532,99 +542,101 @@ class InfinityScroll {
         renderIndex,
         this.chunk.amount
       );
-
-      console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
-      // const baseStyles = [
-      //   'color: #fff',
-      //   'background-color: #900',
-      //   'padding: 2px 4px',
-      //   'border-radius: 2px',
-      // ].join(';');
-      // console.log('%c============= Фетч всего списка', baseStyles);
-      // console.log('renderIndex', renderIndex);
-      // TODO: это место надо проверить, действительно ли нужно вот так...
-      // sequenceStart = renderIndex - this.chunk.amount;
       sequenceStart = renderIndex;
-      // console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
-    // console.log('sequenceStart', sequenceStart, sequenceEnd);
-    [startFetchIndex, endFetchIndex] =
-      sequenceStart < lastStartIndex
-        ? [sequenceStart + this.basedIndex, sequenceEnd]
-        : [lastStartIndex, lastEndIndex];
-    console.log(`${startFetchIndex} - ${endFetchIndex}`);
+    const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
+    const lastEndIndex = this.list.length;
+    if (sequenceStart > lastStartIndex) {
+      console.warn('Случай сложный');
+      [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
+    }
+    console.log('sequenceStart-end', sequenceStart, sequenceEnd); // 32 - 39
+    return [sequenceStart, sequenceEnd];
+  }
 
-    const unfoundedRanges = this.checkItemForLoad(
-      startFetchIndex,
-      endFetchIndex
-    );
-    console.log('Unfounded', unfoundedRanges);
-    await getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
-      (data): void => {
-        if (!Array.isArray(data)) {
-          throw new Error('Your fetched data does not have Array type');
+  async lazyOrderedFetch(unfoundedRanges: number[]) {
+    unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
+      let [startFetchIndex, endFetchIndex] = [0, 1];
+
+      const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
+      const lastEndIndex = this.list.length;
+      [startFetchIndex, endFetchIndex] = [
+        sequenceStart + this.basedIndex,
+        sequenceEnd + this.basedIndex - Boolean(this.includeEnd),
+      ];
+      console.log(
+        `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
+      );
+
+      // 32 33 34 35 36 37 38 39 40 // start from 0, end excluded // 32 - 40
+      // 32 33 34 35 36 37 38 39  // start from 0, end included // 32 - 39
+
+      // 33 34 35 36 37 38 39 40 41 // start from 1, end excluded // 33 - 41
+      // 33 34 35 36 37 38 39 40  // start from 0, end included // 33 - 40
+
+      getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
+        (data): void => {
+          if (!Array.isArray(data)) {
+            throw new Error('Your fetched data does not have Array type');
+          }
+          console.log(data);
+          this.addNewItemsToDataList(sequenceStart, data);
+          this.updateSkeletonItems(sequenceStart, data);
+          const dataObj = {
+            data: this.list.data?.slice(),
+          };
+          // console.log(dataObj);
         }
-        console.log(data);
-        // console.log('startFetchIndex', startFetchIndex);
-        this.addNewItemsToDataList(startFetchIndex, data);
-        this.updateSkeletonItems(startFetchIndex, data);
-        const dataObj = {
-          data: this.list.data?.slice(),
-        };
-        // console.log(dataObj);
-      }
-    );
+      );
+    });
   }
 
   // 0 - 31 (32 всего)
   // 32 - 39 (40 всего)
   // 32 - 40 (41 всего)
-  addNewItemsToDataList(startFetchIndex: number, data: Array<object>) {
+  /// id 33 -> ячейку 32
+  addNewItemsToDataList(sequenceStart: number, data: Array<object>) {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
-      const currentIndex = startFetchIndex - this.basedIndex + i;
+      const currentIndex = sequenceStart + i;
       this.list.data[currentIndex] = data[i];
     }
     console.log(this.list.data);
   }
 
-  updateSkeletonItems(startFetchIndex: number, data: Array<object>) {
+  updateSkeletonItems(sequenceStart: number, data: Array<object>) {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
-      // if baseIdx = 0 ===> currentIndex  + 0
-      // if baseIdx = 1 ===> currentIndex  - 1
-      const currentIndex = startFetchIndex - this.basedIndex + i;
+      const currentIndex = sequenceStart + i;
       const dataIndex = currentIndex + 1;
       const searchSelector = `[aria-posinset="${dataIndex}"]`;
       const element = this.domMngr.targetElem.querySelector(searchSelector);
-      console.log(searchSelector, dataIndex, currentIndex);
+      // console.log(searchSelector, dataIndex, currentIndex);
       if (element) this.skeleton.updateElement(element, data[i], dataIndex);
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  checkItemForLoad(startFetchIndex, endFetchIndex) {
-    // const testArr = [, 34, 5, , 8, , , , , 4, 6, , 3, , , 4, 12];
-    console.log(startFetchIndex, endFetchIndex);
+  checkItemForLoad(sequenceStart, sequenceEnd) {
     const unfoundedItems = [];
     let isUndefined = false;
     let buffer = [];
-    for (let i = startFetchIndex; i <= endFetchIndex; i++) {
-      // console.log(`Check ${i}`);
+    for (let i = sequenceStart; i < sequenceEnd; i++) {
       const currentElem = this.list.data[i];
-      // const currentElem = testArr[i];
-      console.log(currentElem);
+      // console.log(`Check ${i}`, currentElem !== undefined);
       if (currentElem === undefined && isUndefined === false) {
         isUndefined = true;
         buffer.push(i);
       } else if (
-        (currentElem !== undefined && isUndefined === true) ||
-        i === endFetchIndex
+        // TODO: можно оптимизировать
+        (currentElem !== undefined && isUndefined) ||
+        (i === sequenceEnd - 1 && isUndefined)
       ) {
-        buffer.push(i);
+        buffer.push(
+          i === sequenceEnd - 1 && currentElem === undefined ? i + 1 : i
+        );
         unfoundedItems.push(buffer.slice());
         buffer = [];
         isUndefined = false;
