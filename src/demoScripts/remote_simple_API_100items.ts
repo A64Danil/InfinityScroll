@@ -1,7 +1,7 @@
 import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 
 export const REMOTE_SIMPLE_API_100ITEMS_PROPS: InfinityScrollPropTypes = {
-  dataLoadPlace: 'remote',
+  // dataLoadPlace: 'remote',
   dataUrl: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
