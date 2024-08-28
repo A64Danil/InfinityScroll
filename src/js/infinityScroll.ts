@@ -140,7 +140,6 @@ class InfinityScroll {
       this.start();
     } else {
       this.dataUrl = props.data as DataURLType;
-      console.log(this.dataUrl);
       this.setListData(this.dataUrl).then(() => {
         domChangerProps.listLength = this.list.length;
         this.domMngr = new DomManager(domChangerProps);
