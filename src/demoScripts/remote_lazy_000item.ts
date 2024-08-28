@@ -1,8 +1,6 @@
 import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 
 export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
-  // dataLoadPlace: 'remote',
-  // dataLoadSpeed: 'lazy',
   data: (start?: number, end?: number, page?: number, limit?: number) =>
     `https://jsonplaceholder.typicode.com/comments?_start=${start}&_end=${end}`,
   name: 'my scroll list name',
