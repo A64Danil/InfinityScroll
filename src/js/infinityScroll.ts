@@ -62,12 +62,11 @@ class InfinityScroll {
   // Тип списка (список или таблица)
   private readonly listWrapperHeight: string;
 
-  // TODO: кажется это лишний параметр, можно смотреть на data|dataURL
   // Тип загрузки (список доступен локально или надо качать с интернета)
   private readonly dataLoadPlace: 'local' | 'remote';
 
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
-  private readonly dataLoadSpeed: 'instant' | 'lazy';
+  private dataLoadSpeed: 'instant' | 'lazy';
 
   private readonly dataUrl: DataURLType | undefined;
 
@@ -125,7 +124,7 @@ class InfinityScroll {
       template: props.templateString,
     };
 
-    this.dataLoadPlace = 'local';
+    this.dataLoadPlace = Array.isArray(props.data) ? 'local' : 'remote';
 
     this.dataLoadSpeed = 'instant';
 
@@ -135,7 +134,7 @@ class InfinityScroll {
 
     console.log(props.data);
     if (props.data) {
-      this.setListData(props.data, null);
+      this.setListData(props.data);
       domChangerProps.listLength = this.list.length;
       this.domMngr = new DomManager(domChangerProps);
       this.start();
@@ -143,7 +142,7 @@ class InfinityScroll {
       this.dataUrl = props.dataUrl;
       console.log(this.dataUrl);
 
-      this.setListData(null, this.dataUrl).then(() => {
+      this.setListData(this.dataUrl).then(() => {
         domChangerProps.listLength = this.list.length;
         this.domMngr = new DomManager(domChangerProps);
         this.start();
@@ -466,18 +465,20 @@ class InfinityScroll {
     );
   }
 
-  async setListData(listData: object[] | null, dataUrl?: DataURLType | null) {
-    if (this.dataUrl) {
-      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(
-        this.dataUrl
-      );
+  async setListData(data: object[] | DataURLType) {
+    let newLength = null;
+    // SET dataLoadSpeed
+    // TODO: сделать проверку типа typeof data === DataURLType
+    if (this.dataLoadPlace === 'local') {
+      this.list.data = data;
+      newLength = data && data.length;
+    } else {
+      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(data);
 
       if (!isDataUrlString && !isDataUrlReturnString) {
         throw new Error(
           'Your dataUrl is not a valid URL; or returned value is not a  valid URL'
         );
-      } else {
-        this.dataLoadPlace = 'remote';
       }
 
       if (isDataUrlReturnString) {
@@ -486,45 +487,34 @@ class InfinityScroll {
         console.log('Конечный индекс includeEnd? ', this.includeEnd);
         console.log('Индекс считается с ', this.basedIndex);
       }
-    }
-
-    let newLength = null;
-    // TODO: ждёт переделки чтобы избавить от this.dataLoadPlace
-    if (this.dataLoadPlace === 'local') {
-      this.list.data = listData;
-      newLength = listData && listData.length;
-    } else {
-      // this.dataUrl = props.dataUrl;
-      if (dataUrl === undefined) {
-        throw new Error('Your dataUrl is undefined');
-      }
 
       if (this.dataLoadSpeed === 'instant') {
-        await getRemoteData(dataUrl).then((data): void => {
-          if (!Array.isArray(data)) {
+        await getRemoteData(data).then((fetchedData): void => {
+          if (!Array.isArray(fetchedData)) {
             throw new Error('Your fetched data does not have Array type');
           }
-          this.list.data = data;
-          newLength = data && data.length;
+          this.list.data = fetchedData;
+          newLength = fetchedData && fetchedData.length;
         });
       } else {
         console.log('Будущий функционал для лейзи');
         // TODO: вынести в хелпер?
         const startIdx = this.basedIndex;
         const endIdx = this.basedIndex + Number(!this.includeEnd);
-        const data = await getListDataLazy(dataUrl, startIdx, endIdx);
-        console.log(data);
+        const fetchedData = await getListDataLazy(data, startIdx, endIdx);
+        console.log(fetchedData);
         console.log(this.list.existingSizeInDOM);
-        this.list.data = data;
+        this.list.data = fetchedData;
         if (this.forcedListLength) {
           // TODO: не забыть написать функцию для определения длины списка
           newLength =
             this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
         } else {
-          newLength = data && data.length;
+          newLength = fetchedData && fetchedData.length;
         }
       }
     }
+
     if (!Array.isArray(this.list.data)) {
       throw new Error('Your list does not have Array type');
     }
