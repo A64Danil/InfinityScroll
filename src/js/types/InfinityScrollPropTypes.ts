@@ -2,7 +2,8 @@ import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
 import { XOR } from './utils';
 
-type BaseInfinityScrollPropTypes = {
+export type InfinityScrollPropTypes = {
+  data: object[] | DataURLType;
   selectorId: string;
   listWrapperHeight: string;
   name?: string;
@@ -13,17 +14,17 @@ type BaseInfinityScrollPropTypes = {
   templateString: TemplateStringFunction;
 };
 
-type DataLikeArr = {
-  data: object[];
-  dataUrl?: never;
-};
-type DataLikeUrl = {
-  data?: never;
-  dataUrl: DataURLType;
-};
+// type DataLikeArr = {
+//   data: object[];
+//   dataUrl?: never;
+// };
+// type DataLikeUrl = {
+//   data?: never;
+//   dataUrl: DataURLType;
+// };
 
-export type InfinityScrollPropTypes = XOR<
-  BaseInfinityScrollPropTypes,
-  DataLikeArr,
-  DataLikeUrl
->;
+// export type InfinityScrollPropTypes = XOR<
+//   BaseInfinityScrollPropTypes,
+//   DataLikeArr,
+//   DataLikeUrl
+// >;

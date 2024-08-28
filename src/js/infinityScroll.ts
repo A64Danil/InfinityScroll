@@ -133,15 +133,14 @@ class InfinityScroll {
     this.basedIndex = 1;
 
     console.log(props.data);
-    if (props.data) {
+    if (this.dataLoadPlace === 'local') {
       this.setListData(props.data);
       domChangerProps.listLength = this.list.length;
       this.domMngr = new DomManager(domChangerProps);
       this.start();
     } else {
-      this.dataUrl = props.dataUrl;
+      this.dataUrl = props.data as DataURLType;
       console.log(this.dataUrl);
-
       this.setListData(this.dataUrl).then(() => {
         domChangerProps.listLength = this.list.length;
         this.domMngr = new DomManager(domChangerProps);
