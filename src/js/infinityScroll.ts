@@ -467,13 +467,12 @@ class InfinityScroll {
 
   async setListData(data: object[] | DataURLType) {
     let newLength = null;
-    // SET dataLoadSpeed
-    // TODO: сделать проверку типа typeof data === DataURLType
     if (this.dataLoadPlace === 'local') {
-      this.list.data = data;
+      this.list.data = data as [];
       newLength = data && data.length;
     } else {
-      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(data);
+      const dataUrl = data as DataURLType;
+      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
 
       if (!isDataUrlString && !isDataUrlReturnString) {
         throw new Error(
@@ -481,15 +480,8 @@ class InfinityScroll {
         );
       }
 
-      if (isDataUrlReturnString) {
-        this.dataLoadSpeed = 'lazy';
-        await this.checkApiSettings();
-        console.log('Конечный индекс includeEnd? ', this.includeEnd);
-        console.log('Индекс считается с ', this.basedIndex);
-      }
-
-      if (this.dataLoadSpeed === 'instant') {
-        await getRemoteData(data).then((fetchedData): void => {
+      if (!isDataUrlReturnString) {
+        await getRemoteData(dataUrl as string).then((fetchedData): void => {
           if (!Array.isArray(fetchedData)) {
             throw new Error('Your fetched data does not have Array type');
           }
@@ -497,13 +489,15 @@ class InfinityScroll {
           newLength = fetchedData && fetchedData.length;
         });
       } else {
-        console.log('Будущий функционал для лейзи');
+        this.dataLoadSpeed = 'lazy';
+        await this.checkApiSettings();
+        console.log('Конечный индекс includeEnd? ', this.includeEnd);
+        console.log('Индекс считается с ', this.basedIndex);
         // TODO: вынести в хелпер?
         const startIdx = this.basedIndex;
         const endIdx = this.basedIndex + Number(!this.includeEnd);
-        const fetchedData = await getListDataLazy(data, startIdx, endIdx);
+        const fetchedData = await getListDataLazy(dataUrl, startIdx, endIdx);
         console.log(fetchedData);
-        console.log(this.list.existingSizeInDOM);
         this.list.data = fetchedData;
         if (this.forcedListLength) {
           // TODO: не забыть написать функцию для определения длины списка
