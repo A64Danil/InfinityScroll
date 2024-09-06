@@ -109,3 +109,47 @@ export function checkDataUrl(dataUrl: DataURLType): boolean[] {
 
   return [isDataUrlString, isDataUrlReturnString];
 }
+
+export async function getListLength(dataUrl: DataUrlFunction) {
+  const CHECK_AMOUNT = 4;
+
+  let isRightLimitFounded = false;
+  let fetchIndex = 1;
+
+  let leftIndex;
+  let rightIndex;
+
+  while (!isRightLimitFounded) {
+    const start = fetchIndex;
+    const end = fetchIndex + CHECK_AMOUNT;
+    // eslint-disable-next-line no-await-in-loop
+    const result = await getRemoteDataByRange(dataUrl, start, end);
+    if (result.length > 0) {
+      leftIndex = fetchIndex;
+      fetchIndex *= 10;
+    } else {
+      isRightLimitFounded = true;
+    }
+  }
+
+  rightIndex = fetchIndex;
+  let isEndOfListFounded = false;
+  let counter = 0;
+  while (counter < 100 && !isEndOfListFounded) {
+    const mid = Math.ceil((leftIndex + rightIndex) / 2);
+    // eslint-disable-next-line no-await-in-loop
+    const result = await getRemoteDataByRange(dataUrl, mid, mid + CHECK_AMOUNT);
+    if (result.length > 0) {
+      leftIndex = mid;
+    } else {
+      rightIndex = mid;
+    }
+    counter++;
+
+    if (leftIndex + 1 === rightIndex) {
+      isEndOfListFounded = true;
+    }
+  }
+
+  return leftIndex;
+}
