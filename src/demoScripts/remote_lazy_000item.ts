@@ -3,9 +3,11 @@ import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   data: (start?: number, end?: number, page?: number, limit?: number) =>
     `https://jsonplaceholder.typicode.com/comments?_start=${start}&_end=${end}`,
+  // `https://jsonplaceholder.typicode.com/photos?_start=${start}&_end=${end}`,
+  // `https://jsonplaceholder.typicode.com/posts?_start=${start}&_end=${end}`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
-  forcedListLength: 500,
+  forcedListLength: 50,
   listType: 'list',
   listWrapperHeight: '290px',
   templateString: (element, listLength) => `<li 
