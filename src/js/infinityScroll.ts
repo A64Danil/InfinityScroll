@@ -1,26 +1,24 @@
 import {
+  ChunkController,
+  DomManager,
+  ListController,
   RenderController,
   ScrollDetector,
-  ChunkController,
-  ListController,
-  DomManager,
   Skeleton,
 } from './controllers';
 
 import {
-  checkChildrenAmount,
-  isPropsUndefined,
-  getRemoteData,
-  getListDataLazy,
-  checkIncludeEnd,
   checkBaseIndex,
+  checkChildrenAmount,
   checkDataUrl,
+  checkIncludeEnd,
+  getListDataLazy,
+  getRemoteData,
+  getRemoteDataByRange,
+  isPropsUndefined,
 } from './helpers';
 
-import {
-  calcSequenceByDirection,
-  recalcSequence,
-} from './helpers/calcSequence';
+import { calcSequenceByDirection } from './helpers/calcSequence';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
@@ -54,6 +52,8 @@ class InfinityScroll {
   // хранит ссылку на корневой html-элеент
   private readonly wrapperEl: HTMLElement;
 
+  private subDir: string | undefined;
+
   private readonly forcedListLength: number | 'auto';
 
   // Тип списка (список или таблица)
@@ -68,7 +68,7 @@ class InfinityScroll {
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
   private dataLoadSpeed: 'instant' | 'lazy';
 
-  private readonly dataUrl: DataURLType | undefined;
+  private dataUrl: DataURLType | undefined;
 
   private includeEnd: boolean;
 
@@ -98,6 +98,8 @@ class InfinityScroll {
       throw new Error(`Object ${props.selectorId} does not exist in DOM`);
     }
     this.wrapperEl = wrapper;
+
+    this.subDir = props.subDir;
 
     this.forcedListLength = props.forcedListLength || 'auto';
 
@@ -179,7 +181,8 @@ class InfinityScroll {
       await getListDataLazy(
         this.dataUrl,
         startIdx,
-        this.list.existingSizeInDOM
+        this.list.existingSizeInDOM,
+        this.subDir
       ).then((data): void => {
         console.log('Вот что стянули');
         console.log(data);
@@ -422,7 +425,15 @@ class InfinityScroll {
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           await this.sleep(1000);
-          this.lazyOrderedFetch(renderIndex, true);
+          // TODO: этот момент проверить еще раз
+          // this.lazyOrderedFetch(renderIndex, true);
+          const endIndex = this.chunk.amount * 4 + renderIndex;
+          await getListDataLazy(
+            this.dataUrl,
+            renderIndex,
+            endIndex,
+            this.subDir
+          );
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
           );
@@ -456,10 +467,14 @@ class InfinityScroll {
   }
 
   async checkApiSettings() {
-    this.includeEnd = await checkIncludeEnd(this.dataUrl as DataUrlFunction);
+    this.includeEnd = await checkIncludeEnd(
+      this.dataUrl as DataUrlFunction,
+      this.subDir
+    );
     this.basedIndex = await checkBaseIndex(
       this.dataUrl as DataUrlFunction,
-      this.includeEnd
+      this.includeEnd,
+      this.subDir
     );
   }
 
@@ -480,11 +495,16 @@ class InfinityScroll {
 
       if (!isDataUrlReturnString) {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
-          if (!Array.isArray(fetchedData)) {
+          const transformatedData =
+            this.subDir && !Array.isArray(fetchedData)
+              ? fetchedData[this.subDir]
+              : fetchedData;
+
+          if (!Array.isArray(transformatedData)) {
             throw new Error('Your fetched data does not have Array type');
           }
-          this.list.data = fetchedData;
-          newLength = fetchedData && fetchedData.length;
+          this.list.data = transformatedData;
+          newLength = transformatedData && transformatedData.length;
         });
       } else {
         this.dataLoadSpeed = 'lazy';
@@ -494,7 +514,12 @@ class InfinityScroll {
         // TODO: вынести в хелпер?
         const startIdx = this.basedIndex;
         const endIdx = this.basedIndex + Number(!this.includeEnd);
-        const fetchedData = await getListDataLazy(dataUrl, startIdx, endIdx);
+        const fetchedData = await getListDataLazy(
+          dataUrl,
+          startIdx,
+          endIdx,
+          this.subDir
+        );
         console.log(fetchedData);
         this.list.data = fetchedData;
         if (this.forcedListLength) {
@@ -543,6 +568,7 @@ class InfinityScroll {
   }
 
   async lazyOrderedFetch(unfoundedRanges: number[]) {
+    console.log(unfoundedRanges);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       let [startFetchIndex, endFetchIndex] = [0, 1];
 
@@ -562,17 +588,27 @@ class InfinityScroll {
       // 33 34 35 36 37 38 39 40 41 // start from 1, end excluded // 33 - 41
       // 33 34 35 36 37 38 39 40  // start from 0, end included // 33 - 40
 
-      getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
+      getRemoteDataByRange(
+        this.dataUrl as DataUrlFunction,
+        startFetchIndex,
+        endFetchIndex
+      ).then(
+        // getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
         (data): void => {
-          if (!Array.isArray(data)) {
+          const finalData = this.subDir ? data[this.subDir] : data;
+          // if (this.subDir) {
+          //   console.log('you need to take from subdir');
+          //   console.log(data);
+          // }
+          if (!Array.isArray(finalData)) {
             throw new Error('Your fetched data does not have Array type');
           }
-          console.log(data);
-          this.addNewItemsToDataList(sequenceStart, data);
-          this.updateSkeletonItems(sequenceStart, data);
-          const dataObj = {
-            data: this.list.data?.slice(),
-          };
+          console.log(finalData);
+          this.addNewItemsToDataList(sequenceStart, finalData);
+          this.updateSkeletonItems(sequenceStart, finalData);
+          // const dataObj = {
+          //   data: this.list.data?.slice(),
+          // };
           // console.log(dataObj);
         }
       );

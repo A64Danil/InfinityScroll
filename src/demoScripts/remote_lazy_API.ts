@@ -1,7 +1,7 @@
 import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 
 export const REMOTE_LAZY_API_PROPS: InfinityScrollPropTypes = {
-  data: (start?: number, end?: number): string =>
+  data: ({ start, end }): string =>
     `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_API',
