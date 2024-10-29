@@ -149,7 +149,7 @@ export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
   let isRightLimitFounded = false;
   let fetchIndex = 1;
 
-  let leftIndex;
+  let leftIndex = 0;
   let rightIndex;
 
   while (!isRightLimitFounded) {
