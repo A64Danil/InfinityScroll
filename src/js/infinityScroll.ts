@@ -372,7 +372,7 @@ class InfinityScroll {
 
           if (unfoundedRanges.length) {
             console.log('Unfounded', unfoundedRanges);
-            this.lazyOrderedFetch(unfoundedRanges);
+            this.fetchUnfoundedRanges(unfoundedRanges);
           }
         }
         // END Fetch new DATA
@@ -426,8 +426,8 @@ class InfinityScroll {
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           await this.sleep(1000);
-          // TODO: этот момент проверить еще раз
-          // this.lazyOrderedFetch(renderIndex, true);
+          // TODO: этот момент проверить еще раз - тут явно нужно тянуть только 1 участок, а не группу диапазонов
+          // this.fetchUnfoundedRanges(renderIndex, true);
           const endIndex = this.chunk.amount * 4 + renderIndex;
           await getListDataLazy(
             this.dataUrl,
@@ -573,7 +573,7 @@ class InfinityScroll {
     return [sequenceStart, sequenceEnd];
   }
 
-  async lazyOrderedFetch(unfoundedRanges: number[]) {
+  async fetchUnfoundedRanges(unfoundedRanges: number[]) {
     console.log(unfoundedRanges);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       let [startFetchIndex, endFetchIndex] = [0, 1];
