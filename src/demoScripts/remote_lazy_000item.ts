@@ -15,7 +15,7 @@ export const REMOTE_LAZY_000ITEMS_PROPS: InfinityScrollPropTypes = {
   name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
   // forcedListLength: 500,
-  forcedListLength: 194,
+  // forcedListLength: 194,
   subDir: 'products',
   listType: 'list',
   listWrapperHeight: '290px',

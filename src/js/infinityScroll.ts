@@ -529,7 +529,7 @@ class InfinityScroll {
           newLength = this.forcedListLength;
         } else {
           const fetchedListLength =
-            (await getListLength(dataUrl as DataUrlFunction)) +
+            (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
             Number(!this.basedIndex);
 
           console.log('fetchedListLength', fetchedListLength);

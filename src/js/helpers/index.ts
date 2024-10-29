@@ -38,6 +38,7 @@ export function getRemoteDataByRange(
   limit = end - start
 ) {
   const fetchURL = dataUrl({ start, end, limit });
+  console.log(fetchURL);
   return getRemoteData(fetchURL);
 }
 
@@ -114,6 +115,7 @@ export async function getListDataLazy(
     typeof dataUrl !== 'string' ? dataUrl({ start, end, limit }) : dataUrl;
 
   const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
+    // TODO: Все места с Array.isArray(data) ? data : subDir && data[subDir]; надо выносить куда-то
     const resp = Array.isArray(data) ? data : subDir && data[subDir];
     if (!Array.isArray(resp)) {
       throw new Error('Your fetched data does not have Array type');
@@ -141,7 +143,7 @@ export function checkDataUrl(dataUrl: DataURLType): boolean[] {
   return [isDataUrlString, isDataUrlReturnString];
 }
 
-export async function getListLength(dataUrl: DataUrlFunction) {
+export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
   const CHECK_AMOUNT = 4;
 
   let isRightLimitFounded = false;
@@ -154,7 +156,8 @@ export async function getListLength(dataUrl: DataUrlFunction) {
     const start = fetchIndex;
     const end = fetchIndex + CHECK_AMOUNT;
     // eslint-disable-next-line no-await-in-loop
-    const result = await getRemoteDataByRange(dataUrl, start, end);
+    const data = await getRemoteDataByRange(dataUrl, start, end);
+    const result = Array.isArray(data) ? data : subDir && data[subDir];
     if (result.length > 0) {
       leftIndex = fetchIndex;
       fetchIndex *= 10;
@@ -167,9 +170,12 @@ export async function getListLength(dataUrl: DataUrlFunction) {
   let isEndOfListFounded = false;
   let counter = 0;
   while (counter < 100 && !isEndOfListFounded) {
+    console.log(leftIndex, rightIndex);
     const mid = Math.ceil((leftIndex + rightIndex) / 2);
+    console.log(mid);
     // eslint-disable-next-line no-await-in-loop
-    const result = await getRemoteDataByRange(dataUrl, mid, mid + CHECK_AMOUNT);
+    const data = await getRemoteDataByRange(dataUrl, mid, mid + CHECK_AMOUNT);
+    const result = Array.isArray(data) ? data : subDir && data[subDir];
     if (result.length > 0) {
       leftIndex = mid;
     } else {
