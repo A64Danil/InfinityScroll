@@ -283,7 +283,9 @@ export class DomManager {
       direction === 'down' && i + sequenceNumber >= listLength;
 
     // console.log(i + sequenceNumber, listLength);
-    const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
+    // TODO: протестировать эту часть и понять зачем она на самом деле нужна
+    // const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
+    const isAllowToChange = !isReachBottomLimit;
 
     // TODO: убрать после тестов
     if (isReachBottomLimit) {

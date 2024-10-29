@@ -1,21 +1,22 @@
 import {
-  ChunkController,
-  DomManager,
-  ListController,
   RenderController,
   ScrollDetector,
+  ChunkController,
+  ListController,
+  DomManager,
   Skeleton,
 } from './controllers';
 
 import {
-  checkBaseIndex,
   checkChildrenAmount,
-  checkDataUrl,
-  checkIncludeEnd,
-  getListDataLazy,
+  isPropsUndefined,
   getRemoteData,
   getRemoteDataByRange,
-  isPropsUndefined,
+  getListDataLazy,
+  checkIncludeEnd,
+  checkBaseIndex,
+  checkDataUrl,
+  getListLength,
 } from './helpers';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
@@ -54,7 +55,7 @@ class InfinityScroll {
 
   private subDir: string | undefined;
 
-  private readonly forcedListLength: number | 'auto';
+  private readonly forcedListLength: number | undefined;
 
   // Тип списка (список или таблица)
   private readonly listType: string;
@@ -101,7 +102,7 @@ class InfinityScroll {
 
     this.subDir = props.subDir;
 
-    this.forcedListLength = props.forcedListLength || 'auto';
+    this.forcedListLength = props.forcedListLength;
 
     this.listType = props.listType || 'list';
 
@@ -522,12 +523,17 @@ class InfinityScroll {
         );
         console.log(fetchedData);
         this.list.data = fetchedData;
+        // const getXTotalCount = await
+
         if (this.forcedListLength) {
-          // TODO: не забыть написать функцию для определения длины списка
-          newLength =
-            this.forcedListLength === 'auto' ? 1000 : this.forcedListLength;
+          newLength = this.forcedListLength;
         } else {
-          newLength = fetchedData && fetchedData.length;
+          const fetchedListLength =
+            (await getListLength(dataUrl as DataUrlFunction)) +
+            Number(!this.basedIndex);
+
+          console.log('fetchedListLength', fetchedListLength);
+          newLength = fetchedListLength;
         }
       }
     }

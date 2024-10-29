@@ -10,7 +10,7 @@ export type InfinityScrollPropTypes = {
   dataLoadPlace?: 'local' | 'remote';
   dataLoadSpeed?: 'instant' | 'lazy';
   subDir?: string;
-  forcedListLength?: number | 'auto';
+  forcedListLength?: number;
   listType?: 'list' | 'table';
   templateString: TemplateStringFunction;
 };
