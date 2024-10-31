@@ -488,16 +488,9 @@ class InfinityScroll {
 
       if (!isDataUrlReturnString) {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
-          const transformatedData =
-            this.subDir && !Array.isArray(fetchedData)
-              ? fetchedData[this.subDir]
-              : fetchedData;
-
-          if (!Array.isArray(transformatedData)) {
-            throw new Error('Your fetched data does not have Array type');
-          }
-          this.list.data = transformatedData;
-          newLength = transformatedData && transformatedData.length;
+          const extractedData = this.extractResponse(fetchedData);
+          this.list.data = extractedData;
+          newLength = extractedData && extractedData.length;
         });
       } else {
         this.dataLoadSpeed = 'lazy';
@@ -588,17 +581,10 @@ class InfinityScroll {
       ).then(
         // getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
         (data): void => {
-          const finalData = this.subDir ? data[this.subDir] : data;
-          // if (this.subDir) {
-          //   console.log('you need to take from subdir');
-          //   console.log(data);
-          // }
-          if (!Array.isArray(finalData)) {
-            throw new Error('Your fetched data does not have Array type');
-          }
-          console.log(finalData);
-          this.addNewItemsToDataList(sequenceStart, finalData);
-          this.updateSkeletonItems(sequenceStart, finalData);
+          const extractedData = this.extractResponse(data);
+          console.log(extractedData);
+          this.addNewItemsToDataList(sequenceStart, extractedData);
+          this.updateSkeletonItems(sequenceStart, extractedData);
           // const dataObj = {
           //   data: this.list.data?.slice(),
           // };
@@ -693,25 +679,24 @@ class InfinityScroll {
       );
     }
 
-    console.log('getListDataLazy - get by range');
+    console.log('getListDataLazy - after refactoring');
     console.log(this.subDir);
 
     const fetchedData = await getRemoteDataByRange(
       this.dataUrl,
       start,
       end
-    ).then((data): object[] => {
-      // TODO: Все места с Array.isArray(data) ? data : subDir && data[subDir]; надо выносить куда-то
-      const resp = Array.isArray(data)
-        ? data
-        : this.subDir && data[this.subDir];
-      if (!Array.isArray(resp)) {
-        throw new Error('Your fetched data does not have Array type');
-      }
-      return resp;
-    });
+    ).then((data): object[] => this.extractResponse(data));
 
     return fetchedData;
+  }
+
+  extractResponse(data: object[] | Record<string, unknown>): object[] {
+    const res = Array.isArray(data) ? data : this.subDir && data[this.subDir];
+    if (!Array.isArray(res)) {
+      throw new Error('Your fetched data does not have Array type');
+    }
+    return res;
   }
 }
 
