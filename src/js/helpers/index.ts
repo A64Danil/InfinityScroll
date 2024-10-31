@@ -100,31 +100,6 @@ export async function checkBaseIndex(
   throw new Error("Can't define base index");
 }
 
-// TODO: вынуть getListDataLazy из хелперов назад в класс
-// TODO: следующий шаг - переделать дефолтные параметры на основе того что приходит
-export async function getListDataLazy(
-  dataUrl: DataURLType,
-  start = 0,
-  end = 1,
-  subDir?: string
-) {
-  console.log('getListDataLazy');
-  console.log(subDir);
-  const limit = end - start;
-  const fetchURL =
-    typeof dataUrl !== 'string' ? dataUrl({ start, end, limit }) : dataUrl;
-
-  const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
-    // TODO: Все места с Array.isArray(data) ? data : subDir && data[subDir]; надо выносить куда-то
-    const resp = Array.isArray(data) ? data : subDir && data[subDir];
-    if (!Array.isArray(resp)) {
-      throw new Error('Your fetched data does not have Array type');
-    }
-    return resp;
-  });
-  return fetchedData;
-}
-
 export function isValidUrl(string: string): boolean {
   try {
     const url = new URL(string);

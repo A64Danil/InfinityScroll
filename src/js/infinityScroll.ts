@@ -12,7 +12,6 @@ import {
   isPropsUndefined,
   getRemoteData,
   getRemoteDataByRange,
-  getListDataLazy,
   checkIncludeEnd,
   checkBaseIndex,
   checkDataUrl,
@@ -179,23 +178,20 @@ class InfinityScroll {
 
       // Real data
       //
-      await getListDataLazy(
-        this.dataUrl,
-        startIdx,
-        this.list.existingSizeInDOM,
-        this.subDir
-      ).then((data): void => {
-        console.log('Вот что стянули');
-        console.log(data);
-        this.list.data = this.list.data?.concat(data);
-        //
-        this.list.data[34] = { name: 'Fake data 35' };
-        this.list.data[35] = { name: 'Fake data 36' };
-        this.list.data[37] = { name: 'Fake data 38' };
+      await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
+        (data): void => {
+          console.log('Вот что стянули');
+          console.log(data);
+          this.list.data = this.list.data?.concat(data);
+          //
+          this.list.data[34] = { name: 'Fake data 35' };
+          this.list.data[35] = { name: 'Fake data 36' };
+          this.list.data[37] = { name: 'Fake data 38' };
 
-        console.log('Вот что получилось');
-        console.log(this.list.data);
-      });
+          console.log('Вот что получилось');
+          console.log(this.list.data);
+        }
+      );
     }
 
     const renderProps = {
@@ -429,12 +425,8 @@ class InfinityScroll {
           // TODO: этот момент проверить еще раз - тут явно нужно тянуть только 1 участок, а не группу диапазонов
           // this.fetchUnfoundedRanges(renderIndex, true);
           const endIndex = this.chunk.amount * 4 + renderIndex;
-          await getListDataLazy(
-            this.dataUrl,
-            renderIndex,
-            endIndex,
-            this.subDir
-          );
+          // TODO: результат никуда не сохраняется, поэтому эту часть надо будет переделывать
+          await this.getListDataLazy(renderIndex, endIndex);
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
           );
@@ -515,12 +507,7 @@ class InfinityScroll {
         // TODO: вынести в хелпер?
         const startIdx = this.basedIndex;
         const endIdx = this.basedIndex + Number(!this.includeEnd);
-        const fetchedData = await getListDataLazy(
-          dataUrl,
-          startIdx,
-          endIdx,
-          this.subDir
-        );
+        const fetchedData = await this.getListDataLazy(startIdx, endIdx);
         console.log(fetchedData);
         this.list.data = fetchedData;
         // const getXTotalCount = await
@@ -692,6 +679,35 @@ class InfinityScroll {
         prevIndex = elemIndex;
       }
     });
+  }
+
+  async getListDataLazy(start = 0, end = 1) {
+    if (!this.dataUrl) {
+      throw new Error(
+        'You try to call getListDataLazy, but you dont have dataUrl'
+      );
+    }
+    console.log('getListDataLazy new');
+    console.log(this.subDir);
+    const limit = end - start;
+    const fetchURL =
+      typeof this.dataUrl !== 'string'
+        ? this.dataUrl({ start, end, limit })
+        : this.dataUrl;
+
+    // TODO: убрать getRemoteData, поставить getRemoteDataByRange
+    const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
+      // TODO: Все места с Array.isArray(data) ? data : subDir && data[subDir]; надо выносить куда-то
+      const resp = Array.isArray(data)
+        ? data
+        : this.subDir && data[this.subDir];
+      if (!Array.isArray(resp)) {
+        throw new Error('Your fetched data does not have Array type');
+      }
+      return resp;
+    });
+
+    return fetchedData;
   }
 }
 
