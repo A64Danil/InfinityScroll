@@ -687,16 +687,20 @@ class InfinityScroll {
         'You try to call getListDataLazy, but you dont have dataUrl'
       );
     }
-    console.log('getListDataLazy new');
-    console.log(this.subDir);
-    const limit = end - start;
-    const fetchURL =
-      typeof this.dataUrl !== 'string'
-        ? this.dataUrl({ start, end, limit })
-        : this.dataUrl;
+    if (typeof this.dataUrl === 'string') {
+      throw new Error(
+        'You try to call getListDataLazy, but your dataUrl is a string type'
+      );
+    }
 
-    // TODO: убрать getRemoteData, поставить getRemoteDataByRange
-    const fetchedData = await getRemoteData(fetchURL).then((data): object[] => {
+    console.log('getListDataLazy - get by range');
+    console.log(this.subDir);
+
+    const fetchedData = await getRemoteDataByRange(
+      this.dataUrl,
+      start,
+      end
+    ).then((data): object[] => {
       // TODO: Все места с Array.isArray(data) ? data : subDir && data[subDir]; надо выносить куда-то
       const resp = Array.isArray(data)
         ? data
