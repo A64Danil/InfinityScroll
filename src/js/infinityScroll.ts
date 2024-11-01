@@ -87,7 +87,7 @@ class InfinityScroll {
 
   private render: RenderController | undefined;
 
-  private skeleton: Skeleton;
+  private readonly skeleton: Skeleton;
 
   constructor(props: InfinityScrollPropTypes) {
     this.name = props.name;
@@ -183,7 +183,7 @@ class InfinityScroll {
           console.log('Вот что стянули');
           console.log(data);
           this.list.data = this.list.data?.concat(data);
-          //
+          // TODO: убрать фейковые данные после тестов
           this.list.data[34] = { name: 'Fake data 35' };
           this.list.data[35] = { name: 'Fake data 36' };
           this.list.data[37] = { name: 'Fake data 38' };
