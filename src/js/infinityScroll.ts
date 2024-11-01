@@ -424,11 +424,9 @@ class InfinityScroll {
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           await this.sleep(1000);
-          // TODO: этот момент проверить еще раз - тут явно нужно тянуть только 1 участок, а не группу диапазонов
-          // this.fetchUnfoundedRanges(renderIndex, true);
           const endIndex = this.chunk.amount * 4 + renderIndex;
-          // TODO: результат никуда не сохраняется, поэтому эту часть надо будет переделывать
-          await this.getListDataLazy(renderIndex, endIndex);
+          const ranges: NumRange = [renderIndex, endIndex];
+          this.fetchUnfoundedRanges([ranges]);
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
           );
