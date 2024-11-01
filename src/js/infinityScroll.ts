@@ -18,6 +18,8 @@ import {
   getListLength,
 } from './helpers';
 
+import { NumRange } from './types/utils';
+
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
@@ -52,7 +54,7 @@ class InfinityScroll {
   // хранит ссылку на корневой html-элеент
   private readonly wrapperEl: HTMLElement;
 
-  private subDir: string | undefined;
+  private readonly subDir: string | undefined;
 
   private readonly forcedListLength: number | undefined;
 
@@ -68,7 +70,7 @@ class InfinityScroll {
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
   private dataLoadSpeed: 'instant' | 'lazy';
 
-  private dataUrl: DataURLType | undefined;
+  private readonly dataUrl: DataURLType | undefined;
 
   private includeEnd: boolean;
 
@@ -289,7 +291,7 @@ class InfinityScroll {
     }
   }
 
-  async calcCurrentDOMRender(e: Event): void {
+  async calcCurrentDOMRender(e: Event): Promise<void> {
     if (this.domMngr?.isStopRender) {
       this.domMngr.isStopRender = false;
       return;
@@ -368,7 +370,7 @@ class InfinityScroll {
 
           if (unfoundedRanges.length) {
             console.log('Unfounded', unfoundedRanges);
-            this.fetchUnfoundedRanges(unfoundedRanges);
+            this.fetchUnfoundedRanges(unfoundedRanges as NumRange[]);
           }
         }
         // END Fetch new DATA
@@ -412,7 +414,7 @@ class InfinityScroll {
     return isBigDiff;
   }
 
-  sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   setTimerToRefreshList() {
     const timerID = window.setTimeout(async () => {
@@ -553,16 +555,17 @@ class InfinityScroll {
     return [sequenceStart, sequenceEnd];
   }
 
-  async fetchUnfoundedRanges(unfoundedRanges: number[]) {
+  fetchUnfoundedRanges(unfoundedRanges: NumRange[]): void {
     console.log(unfoundedRanges);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       let [startFetchIndex, endFetchIndex] = [0, 1];
 
-      const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-      const lastEndIndex = this.list.length;
+      // const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
+      // const lastEndIndex = this.list.length;
+
       [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
-        sequenceEnd + this.basedIndex - Boolean(this.includeEnd),
+        sequenceEnd + this.basedIndex - Number(this.includeEnd),
       ];
       console.log(
         `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
@@ -619,7 +622,7 @@ class InfinityScroll {
     }
   }
 
-  checkItemForLoad(sequenceStart, sequenceEnd) {
+  checkItemForLoad(sequenceStart: number, sequenceEnd: number): unknown[] {
     const unfoundedItems = [];
     let isUndefined = false;
     let buffer = [];
@@ -647,6 +650,10 @@ class InfinityScroll {
 
   checkIndexOrdering() {
     const list = this.domMngr?.targetElem;
+
+    if (!list) {
+      throw new Error('You do not have HTML-element for your list');
+    }
 
     let prevIndex: number | null = null;
     // console.log('prevIndex', prevIndex);
