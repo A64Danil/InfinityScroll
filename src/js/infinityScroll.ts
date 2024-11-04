@@ -390,7 +390,12 @@ class InfinityScroll {
           this.scroll.direction,
           this.scroll.isGoingFromBottom
         );
-        if (!isBigDiff) this.checkIndexOrdering();
+        // TODO: remove after tests
+        if (!isBigDiff) {
+          console.log('BEFORE checkIndexOrdering');
+          this.checkIndexOrdering();
+          console.log('AFTER checkIndexOrdering');
+        }
       }
     }
   }
@@ -423,9 +428,10 @@ class InfinityScroll {
         const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
-          await this.sleep(1000);
-          const endIndex = this.chunk.amount * 4 + renderIndex;
-          const ranges: NumRange = [renderIndex, endIndex];
+          // await this.sleep(3000);
+          const startIndex = renderIndex - this.chunk.amount;
+          const endIndex = startIndex + this.list.existingSizeInDOM;
+          const ranges: NumRange = [startIndex, endIndex];
           this.fetchUnfoundedRanges([ranges]);
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
@@ -453,6 +459,10 @@ class InfinityScroll {
           this.scroll.direction,
           isAllowRenderNearBorder
         );
+        // TODO: remove after tests
+        console.log('BEFORE checkIndexOrdering (reset list)');
+        this.checkIndexOrdering();
+        console.log('AFTER checkIndexOrdering  (reset list)');
       }
     }, 30);
     this.timerIdRefreshList = timerID;
@@ -549,7 +559,6 @@ class InfinityScroll {
       console.warn('Случай сложный');
       [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
     }
-    console.log('sequenceStart-end', sequenceStart, sequenceEnd); // 32 - 39
     return [sequenceStart, sequenceEnd];
   }
 
@@ -583,7 +592,6 @@ class InfinityScroll {
         // getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
         (data): void => {
           const extractedData = this.extractResponse(data);
-          console.log(extractedData);
           this.addNewItemsToDataList(sequenceStart, extractedData);
           this.updateSkeletonItems(sequenceStart, extractedData);
           // const dataObj = {
@@ -605,7 +613,6 @@ class InfinityScroll {
       const currentIndex = sequenceStart + i;
       this.list.data[currentIndex] = data[i];
     }
-    console.log(this.list.data);
   }
 
   updateSkeletonItems(sequenceStart: number, data: Array<object>) {
