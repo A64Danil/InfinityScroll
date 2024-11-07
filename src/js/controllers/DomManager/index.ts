@@ -29,8 +29,6 @@ export class DomManager {
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
-  public avrTimeArr: Array<number> = [];
-
   private readonly listLength: number;
 
   private readonly skeleton: Skeleton;
@@ -255,10 +253,6 @@ export class DomManager {
       newOffset,
       isAllowRenderNearBorder
     );
-
-    // TODO: убрать после тестов
-    const allTime = this.avrTimeArr.reduce((acc, el) => acc + el);
-    // console.log('среднее время рендера:', allTime / this.avrTimeArr.length);
 
     // this.isWaitRender = false;
   }

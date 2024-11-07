@@ -157,41 +157,16 @@ class InfinityScroll {
       throw new Error('Your DomManager is undefined');
     }
     console.log(this);
-    // TODO: зачем тут return?
-    if (this.dataLoadPlace === 'remote') {
-      console.log(this.list.data);
-      // return;
-    }
+
     this.setDefaultStyles();
     this.getAllSizes();
 
     if (this.dataLoadSpeed === 'lazy') {
-      console.log('Заполняем первичный раз');
-      console.log(this.list.data);
       const startIdx = this.basedIndex + 1;
-      // Test Data
 
-      // const emptyList = new Array(this.list.length).fill(null).map((el, i) => ({
-      //   id: i,
-      //   name: `test name ${i}`,
-      // }));
-      // console.log(emptyList);
-      // this.list.data = emptyList;
-
-      // Real data
-      //
       await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
         (data): void => {
-          console.log('Вот что стянули');
-          console.log(data);
           this.list.data = this.list.data?.concat(data);
-          // TODO: убрать фейковые данные после тестов
-          this.list.data[34] = { name: 'Fake data 35' };
-          this.list.data[35] = { name: 'Fake data 36' };
-          this.list.data[37] = { name: 'Fake data 38' };
-
-          console.log('Вот что получилось');
-          console.log(this.list.data);
         }
       );
     }
@@ -210,16 +185,10 @@ class InfinityScroll {
     this.domMngr.fillList(this.list);
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
-    let startDate = Date.now();
-
-    this.wrapperEl.addEventListener('scroll', (e) => {
-      const diffTime = Date.now() - startDate;
-      if (diffTime < 100 && this.domMngr !== undefined) {
-        this.domMngr.avrTimeArr.push(diffTime);
-      }
-      this.calcCurrentDOMRender(e);
-      startDate = Date.now();
-    });
+    this.wrapperEl.addEventListener(
+      'scroll',
+      this.calcCurrentDOMRender.bind(this)
+    );
   }
 
   setDefaultStyles() {
@@ -240,7 +209,6 @@ class InfinityScroll {
     if (this.domMngr === undefined) {
       throw new Error('Your DomManager is undefined');
     }
-    console.log('GET SIZES');
     const listWrp = this.wrapperEl;
     const list = this.listEl;
     const listWrpStyles = window.getComputedStyle(listWrp);
@@ -255,7 +223,6 @@ class InfinityScroll {
     }
 
     if (!listItem) {
-      console.warn('Элементов в списке нет');
       if (!this.list.data) {
         throw new Error('You does not have list.data');
       }
@@ -295,7 +262,6 @@ class InfinityScroll {
     this.wrapperEl.prepend(styleELem);
 
     if (listItem) {
-      console.warn('Элемент в списке есть');
       this.domMngr.removeItem('firstChild');
     }
   }
@@ -347,10 +313,6 @@ class InfinityScroll {
       console.warn(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
-      // console.log(
-      //   'this.scroll.isGoingFromBottom',
-      //   this.scroll.isGoingFromBottom
-      // );
 
       if (!this.render) {
         throw new Error('this.render is not exist');
@@ -401,31 +363,18 @@ class InfinityScroll {
         );
         // TODO: remove after tests
         if (!isBigDiff) {
-          console.log('BEFORE checkIndexOrdering');
           this.checkIndexOrdering();
-          console.log('AFTER checkIndexOrdering');
         }
       }
     }
   }
 
-  // clearTimerIfNeeded(): void {
-  //   if (
-  //     this.timerIdRefreshList !== null &&
-  //     this.domMngr &&
-  //     this.domMngr.isWaitRender === false
-  //   ) {
-  //     clearTimeout(this.timerIdRefreshList);
-  //   }
-  // }
-
   checkBigDiff(scrollDiff: number): boolean {
-    const isBigDiff: boolean = this.scroll.isBigDiff(
+    return this.scroll.isBigDiff(
       scrollDiff,
       this.chunk.amount,
       this.list.tailingElementsAmount
     );
-    return isBigDiff;
   }
 
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -433,7 +382,6 @@ class InfinityScroll {
   setTimerToRefreshList() {
     const timerID = window.setTimeout(async () => {
       if (this.domMngr) {
-        // Fetch new DATA
         const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
@@ -530,8 +478,6 @@ class InfinityScroll {
           const fetchedListLength =
             (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
             Number(!this.basedIndex);
-
-          console.log('fetchedListLength', fetchedListLength);
           newLength = fetchedListLength;
         }
       }
@@ -576,9 +522,6 @@ class InfinityScroll {
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       let [startFetchIndex, endFetchIndex] = [0, 1];
 
-      // const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-      // const lastEndIndex = this.list.length;
-
       [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
         sequenceEnd + this.basedIndex - Number(this.includeEnd),
@@ -586,12 +529,6 @@ class InfinityScroll {
       console.log(
         `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
       );
-
-      // 32 33 34 35 36 37 38 39 40 // start from 0, end excluded // 32 - 40
-      // 32 33 34 35 36 37 38 39  // start from 0, end included // 32 - 39
-
-      // 33 34 35 36 37 38 39 40 41 // start from 1, end excluded // 33 - 41
-      // 33 34 35 36 37 38 39 40  // start from 0, end included // 33 - 40
 
       getRemoteDataByRange(
         this.dataUrl as DataUrlFunction,
@@ -603,19 +540,11 @@ class InfinityScroll {
           const extractedData = this.extractResponse(data);
           this.addNewItemsToDataList(sequenceStart, extractedData);
           this.updateSkeletonItems(sequenceStart, extractedData);
-          // const dataObj = {
-          //   data: this.list.data?.slice(),
-          // };
-          // console.log(dataObj);
         }
       );
     });
   }
 
-  // 0 - 31 (32 всего)
-  // 32 - 39 (40 всего)
-  // 32 - 40 (41 всего)
-  /// id 33 -> ячейку 32
   addNewItemsToDataList(sequenceStart: number, data: Array<object>) {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
@@ -699,9 +628,6 @@ class InfinityScroll {
         'You try to call getListDataLazy, but your dataUrl is a string type'
       );
     }
-
-    console.log('getListDataLazy - after refactoring');
-    console.log(this.subDir);
 
     const fetchedData = await getRemoteDataByRange(
       this.dataUrl,
