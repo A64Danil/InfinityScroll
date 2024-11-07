@@ -285,6 +285,15 @@ class InfinityScroll {
 
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
 
+    const cssText = `.${this.selectorId}_List li { 
+      max-height: ${this.list.itemHeight}px;
+      box-sizing: border-box;
+      overflow: hidden; 
+    }`;
+    const styleELem = document.createElement('style');
+    styleELem.appendChild(document.createTextNode(cssText));
+    this.wrapperEl.prepend(styleELem);
+
     if (listItem) {
       console.warn('Элемент в списке есть');
       this.domMngr.removeItem('firstChild');

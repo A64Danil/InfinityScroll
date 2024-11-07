@@ -11,6 +11,7 @@ export class Skeleton {
     this.template = props.template;
   }
 
+  // TODO: need to rename?
   setListHeight(listLength: number) {
     this.listLength = listLength;
   }
