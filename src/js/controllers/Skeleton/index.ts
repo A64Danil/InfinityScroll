@@ -17,25 +17,22 @@ export class Skeleton {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  setRequiredAttrs({ element, dataIndex }) {
-    element.setAttribute('aria-setsize', this.listLength);
-    element.setAttribute('aria-posinset', dataIndex);
+  setRequiredAttrs({
+    element,
+    dataIndex,
+  }: {
+    element: HTMLElement;
+    dataIndex: number;
+  }) {
+    element.setAttribute('aria-setsize', this.listLength.toString());
+    element.setAttribute('aria-posinset', dataIndex.toString());
   }
 
-  updateElement(srcElem, data, dataIndex) {
-    const tempContainer = document.createElement('div');
-    const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
-    tempContainer.innerHTML = itemFromStrTpl;
-    const itemHTML = tempContainer.firstElementChild;
-    this.setRequiredAttrs({
-      element: itemHTML,
-      dataIndex,
-    });
-    // console.log(itemHTML);
-    srcElem.replaceWith(itemHTML);
-  }
-
-  createElement({ data, dataIndex }): HTMLElement {
+  updateElement(
+    srcElem: HTMLElement,
+    data: Record<string, unknown>,
+    dataIndex: number
+  ) {
     const tempContainer = document.createElement('div');
     const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
     tempContainer.innerHTML = itemFromStrTpl;
@@ -44,7 +41,24 @@ export class Skeleton {
       element: itemHTML,
       dataIndex,
     });
-    // console.log(itemHTML);
+    srcElem.replaceWith(itemHTML);
+  }
+
+  createElement({
+    data,
+    dataIndex,
+  }: {
+    data: Record<string, unknown>;
+    dataIndex: number;
+  }): HTMLElement {
+    const tempContainer = document.createElement('div');
+    const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
+    tempContainer.innerHTML = itemFromStrTpl;
+    const itemHTML = tempContainer.firstElementChild as HTMLElement;
+    this.setRequiredAttrs({
+      element: itemHTML,
+      dataIndex,
+    });
     return itemHTML;
   }
 }
