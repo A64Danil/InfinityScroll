@@ -12,10 +12,6 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   return keys.some((key) => !obj[key] && obj[key] !== 0);
 }
 
-// type TFetchedObject = {
-//   [key: string]: unknown[];
-// };
-
 export function getRemoteData(
   url: string
 ): Promise<[]> | Promise<Record<string, any>> {
@@ -42,16 +38,13 @@ export function getRemoteDataByRange(
   return getRemoteData(fetchURL);
 }
 
-// TODO: значал проверяем, захватывается ли хвостовой индекс
 export async function checkIncludeEnd(
   dataUrl: DataUrlFunction,
   subDir?: string
-): boolean {
+): Promise<boolean> {
   const resp = await getRemoteDataByRange(dataUrl, 1, 2);
 
   const data = Array.isArray(resp) ? resp : subDir && resp[subDir];
-
-  console.log(data);
 
   if (data.length === 2) {
     return true;
@@ -61,26 +54,17 @@ export async function checkIncludeEnd(
     return false;
   }
 
-  throw new Error("Can't define indlude end of range");
+  throw new Error("Can't define include end of range");
 }
 
 export async function checkBaseIndex(
   dataUrl: DataUrlFunction,
   includeEnd: boolean,
   subDir?: string
-): 0 | 1 {
-  console.log(includeEnd);
+): Promise<0 | 1> {
   const endIndex = Number(!includeEnd);
-  const nullBasedIndexes = [0, 0 + endIndex];
-  const oneBasedIndexes = [1, 1 + endIndex];
-  // console.log('nullBasedIndexes', nullBasedIndexes);
-  // console.log('oneBasedIndexes', oneBasedIndexes);
 
-  // if not include 0 - 1 and 1 - 2
-  // if incldude 0 - 0 and 1 - 1
-
-  const nullBasedResp = await getRemoteDataByRange(dataUrl, 0, endIndex); // 0 - 1 || 0 - 0
-
+  const nullBasedResp = await getRemoteDataByRange(dataUrl, 0, endIndex);
   const oneBasedResp = await getRemoteDataByRange(dataUrl, 1, 1 + endIndex); // 1 - 2 || 1 - 1
 
   const nullBasedData = Array.isArray(nullBasedResp)
@@ -113,7 +97,7 @@ export function checkDataUrl(dataUrl: DataURLType): boolean[] {
   const isDataUrlString = typeof dataUrl === 'string' && isValidUrl(dataUrl);
 
   const isDataUrlReturnString =
-    typeof dataUrl === 'function' && isValidUrl(dataUrl(1, 1));
+    typeof dataUrl === 'function' && isValidUrl(dataUrl({ start: 1, end: 2 }));
 
   return [isDataUrlString, isDataUrlReturnString];
 }
