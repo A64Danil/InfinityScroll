@@ -18,7 +18,7 @@ import {
   getListLength,
 } from './helpers';
 
-import { NumRange } from './types/utils';
+import { NumRange, Rec } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
@@ -633,12 +633,12 @@ class InfinityScroll {
       this.dataUrl,
       start,
       end
-    ).then((data): object[] => this.extractResponse(data));
+    ).then((data) => this.extractResponse(data));
 
     return fetchedData;
   }
 
-  extractResponse(data: object[] | Record<string, unknown>): object[] {
+  extractResponse(data: Rec[]): Rec[] {
     const res = Array.isArray(data) ? data : this.subDir && data[this.subDir];
     if (!Array.isArray(res)) {
       throw new Error('Your fetched data does not have Array type');
