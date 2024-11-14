@@ -149,6 +149,19 @@ class InfinityScroll {
         this.domMngr = new DomManager(domChangerProps);
         this.start();
       });
+
+      //
+      // if (this.dataLoadPlace === 'local') {
+      // }
+      // if (this.dataLoadPlace === 'remote') {
+      //   this.dataUrl = props.data as DataURLType;
+      // }
+      //
+      // TODO: refactor setListData or make new getListLength
+      // this.list.length = await this.getListLength(props.data);
+      // domChangerProps.listLength = this.list.length;
+      // this.domMngr = new DomManager(domChangerProps);
+      // this.start();
     }
   }
 
