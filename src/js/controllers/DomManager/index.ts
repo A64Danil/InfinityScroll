@@ -8,6 +8,8 @@ import {
   ListPropsToModifyDom,
 } from '../../types/PropsToModifyDom';
 
+import { Rec } from '../../types/utils';
+
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
@@ -132,8 +134,7 @@ export class DomManager {
     }
   }
 
-  // TODO: переработать приём elemNum
-  createItem(elemData: object, elemNum: number): HTMLElement {
+  createItem(elemData: Rec, elemNum: number): HTMLElement {
     return this.skeleton.createElement({
       data: elemData,
       dataIndex: elemNum + 1,
@@ -231,12 +232,10 @@ export class DomManager {
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
       const elemNum = i + sequenceNumber;
-      // console.log(elemNum);
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
       }
       const elemData = list.data[elemNum];
-      // console.log(elemData);
       templateFragment.append(this.createItem(elemData, elemNum));
     }
 
@@ -298,7 +297,7 @@ export class DomManager {
     isGoingFromBottom: boolean,
     tailingElementsAmount: number,
     listLength: number,
-    data: Array<object>,
+    data: Rec[],
     childPosition: 'firstChild' | 'lastChild'
   ): DocumentFragment {
     const templateFragment = document.createDocumentFragment();
@@ -316,7 +315,6 @@ export class DomManager {
       if (allowToChange) {
         // add items
         const elemNum = i + sequenceNumber;
-        // console.log('elemNum', elemNum);
         const elemData = data[elemNum];
         templateFragment.append(this.createItem(elemData, elemNum));
         // remove items
@@ -338,7 +336,6 @@ export class DomManager {
     }
   }
 
-  // TODO: Доделать это №3
   changeItemsInList(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
@@ -382,7 +379,6 @@ export class DomManager {
     direction: IScrollDirection,
     isGoingFromBottom: boolean
   ): void {
-    // TODO: Доделать это №4
     this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
     this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
 

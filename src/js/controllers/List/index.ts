@@ -1,6 +1,8 @@
+import { Rec } from '../../types/utils';
+
 export class ListController {
   // Массив данных для превращения в хтмл-ссписок
-  public data: object[] | undefined;
+  public data: Rec[] | undefined;
 
   // Длина списка
   length = 0;
