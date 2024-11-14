@@ -1,5 +1,6 @@
 import { DataURLType } from '../types/DataURL';
 import { DataUrlFunction } from '../types/DataUrlFunction';
+import { Rec } from '../types/utils';
 
 export const checkChildrenAmount = (length: number, fullSize: number): void => {
   if (length !== fullSize) {
@@ -12,9 +13,7 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
   return keys.some((key) => !obj[key] && obj[key] !== 0);
 }
 
-export function getRemoteData(
-  url: string
-): Promise<[]> | Promise<Record<string, any>> {
+export function getRemoteData(url: string): Promise<Rec[]> {
   console.log('try to get data from', url);
 
   return fetch(url).then((response) =>
@@ -46,11 +45,11 @@ export async function checkIncludeEnd(
 
   const data = Array.isArray(resp) ? resp : subDir && resp[subDir];
 
-  if (data.length === 2) {
+  if (data?.length === 2) {
     return true;
   }
 
-  if (data.length === 1) {
+  if (data?.length === 1) {
     return false;
   }
 
@@ -74,10 +73,10 @@ export async function checkBaseIndex(
     ? oneBasedResp
     : subDir && oneBasedResp[subDir];
 
-  if (nullBasedData.length === 1) {
+  if (nullBasedData?.length === 1) {
     return 0;
   }
-  if (oneBasedData.length === 1) {
+  if (oneBasedData?.length === 1) {
     return 1;
   }
 
@@ -117,7 +116,7 @@ export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
     // eslint-disable-next-line no-await-in-loop
     const data = await getRemoteDataByRange(dataUrl, start, end);
     const result = Array.isArray(data) ? data : subDir && data[subDir];
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       leftIndex = fetchIndex;
       fetchIndex *= 10;
     } else {
@@ -135,7 +134,7 @@ export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
     // eslint-disable-next-line no-await-in-loop
     const data = await getRemoteDataByRange(dataUrl, mid, mid + CHECK_AMOUNT);
     const result = Array.isArray(data) ? data : subDir && data[subDir];
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       leftIndex = mid;
     } else {
       rightIndex = mid;
