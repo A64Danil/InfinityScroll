@@ -1,3 +1,5 @@
+import { Rec } from './utils';
+
 type ChunkPropsToModifyDom = {
   startRenderIndex: number;
   amount: number;
@@ -9,7 +11,7 @@ type ListPropsToModifyDom = {
   halfOfExistingSizeInDOM: number;
   tailingElementsAmount: number;
   length: number;
-  data: object[] | undefined;
+  data: Rec[] | undefined;
   startIndexOfLastPart: number;
   itemHeight: number;
 };
