@@ -579,9 +579,9 @@ class InfinityScroll {
   }
 
   checkItemForLoad(sequenceStart: number, sequenceEnd: number): unknown[] {
-    const unfoundedItems = [];
+    const unfoundedItems: NumRange[] = [];
     let isUndefined = false;
-    let buffer = [];
+    const buffer: number[] = [];
     for (let i = sequenceStart; i < sequenceEnd; i++) {
       const currentElem = this.list.data[i];
       // console.log(`Check ${i}`, currentElem !== undefined);
@@ -593,11 +593,11 @@ class InfinityScroll {
         (currentElem !== undefined && isUndefined) ||
         (i === sequenceEnd - 1 && isUndefined)
       ) {
-        buffer.push(
-          i === sequenceEnd - 1 && currentElem === undefined ? i + 1 : i
-        );
-        unfoundedItems.push(buffer.slice());
-        buffer = [];
+        const index =
+          i === sequenceEnd - 1 && currentElem === undefined ? i + 1 : i;
+        buffer.push(index);
+        unfoundedItems.push(buffer.slice() as NumRange);
+        buffer.length = 0;
         isUndefined = false;
       }
     }
