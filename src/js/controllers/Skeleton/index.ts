@@ -4,6 +4,7 @@ export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
 
+  // TODO: 0 instead of undefined
   private listLength: number | undefined;
 
   constructor(props: { template: TemplateStringFunction }) {
