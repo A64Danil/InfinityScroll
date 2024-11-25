@@ -381,9 +381,17 @@ class InfinityScroll {
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           // await this.sleep(3000);
-          const startIndex = renderIndex - this.chunk.amount;
-          const endIndex = startIndex + this.list.existingSizeInDOM;
-          const ranges: NumRange = [startIndex, endIndex];
+          // const startIndex = renderIndex - this.chunk.amount;
+          // const endIndex = startIndex + this.list.existingSizeInDOM;
+          // const rangesOLD: NumRange = [startIndex, endIndex];
+          // console.log('rangesOLD', rangesOLD);
+          const [sequenceStart, sequenceEnd] = this.getSequence(
+            this.chunk.startRenderIndex,
+            true
+          );
+          const ranges: NumRange = [sequenceStart, sequenceEnd];
+          console.log('ranges', ranges);
+
           this.fetchUnfoundedRanges([ranges]);
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
@@ -500,7 +508,8 @@ class InfinityScroll {
       );
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
-      sequenceStart = renderIndex;
+      const tempStartIndex = renderIndex - this.chunk.amount;
+      sequenceStart = tempStartIndex > 0 ? tempStartIndex : 0;
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
     const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
