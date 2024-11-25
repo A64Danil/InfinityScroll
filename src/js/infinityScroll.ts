@@ -538,7 +538,7 @@ class InfinityScroll {
     });
   }
 
-  addNewItemsToDataList(sequenceStart: number, data: Array<object>) {
+  addNewItemsToDataList(sequenceStart: number, data: Rec[]) {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
@@ -546,13 +546,15 @@ class InfinityScroll {
     }
   }
 
-  updateSkeletonItems(sequenceStart: number, data: Array<object>) {
+  updateSkeletonItems(sequenceStart: number, data: Rec[]) {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
       const dataIndex = currentIndex + 1;
       const searchSelector = `[aria-posinset="${dataIndex}"]`;
-      const element = this.domMngr.targetElem.querySelector(searchSelector);
+      const element = this.domMngr.targetElem.querySelector(
+        searchSelector
+      ) as HTMLElement;
       // console.log(searchSelector, dataIndex, currentIndex);
       if (element) this.skeleton.updateElement(element, data[i], dataIndex);
     }
