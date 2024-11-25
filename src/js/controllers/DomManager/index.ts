@@ -31,7 +31,7 @@ export class DomManager {
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
-  private readonly listLength: number;
+  // private readonly listLength: number;
 
   private readonly skeleton: Skeleton;
 
@@ -39,13 +39,13 @@ export class DomManager {
     skeleton: Skeleton;
     template: TemplateStringFunction;
     targetElem: HTMLElement;
-    listLength: number;
+    // listLength: number;
   }) {
     // this.data = props.data;
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
     this.template = props.template;
-    this.listLength = props.listLength;
+    // this.listLength = props.listLength;
   }
 
   setPaddingToList(

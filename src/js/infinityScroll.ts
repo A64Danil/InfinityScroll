@@ -79,7 +79,7 @@ class InfinityScroll {
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
-  private domMngr: DomManager | undefined;
+  private readonly domMngr: DomManager;
 
   private scroll: ScrollDetector;
 
@@ -121,12 +121,14 @@ class InfinityScroll {
       template: props.templateString,
     });
 
+    // TODO: всё ок, а установку listLength сделать асинхронной
     const domChangerProps = {
       skeleton: this.skeleton,
       targetElem: this.listEl,
-      listLength: 0,
+      // listLength: 0,
       template: props.templateString,
     };
+    this.domMngr = new DomManager(domChangerProps);
 
     this.dataLoadPlace = Array.isArray(props.data) ? 'local' : 'remote';
 
@@ -137,32 +139,36 @@ class InfinityScroll {
     this.basedIndex = 1;
 
     console.log(props.data);
-    if (this.dataLoadPlace === 'local') {
-      this.setListData(props.data);
-      domChangerProps.listLength = this.list.length;
-      this.domMngr = new DomManager(domChangerProps);
-      this.start();
-    } else {
-      this.dataUrl = props.data as DataURLType;
-      this.setListData(this.dataUrl).then(() => {
-        domChangerProps.listLength = this.list.length;
-        this.domMngr = new DomManager(domChangerProps);
-        this.start();
-      });
+    // if (this.dataLoadPlace === 'local') {
+    //   this.setListData(props.data);
+    //   domChangerProps.listLength = this.list.length;
+    //   this.domMngr = new DomManager(domChangerProps);
+    //   this.start();
+    // } else {
+    //   this.dataUrl = props.data as DataURLType;
+    //   this.setListData(this.dataUrl).then(() => {
+    //     domChangerProps.listLength = this.list.length;
+    //     this.domMngr = new DomManager(domChangerProps);
+    //     this.start();
+    //   });
+    // }
 
-      //
-      // if (this.dataLoadPlace === 'local') {
-      // }
-      // if (this.dataLoadPlace === 'remote') {
-      //   this.dataUrl = props.data as DataURLType;
-      // }
-      //
-      // TODO: refactor setListData or make new getListLength
-      // this.list.length = await this.getListLength(props.data);
+    //
+    // if (this.dataLoadPlace === 'local') {
+    // }
+
+    if (this.dataLoadPlace === 'remote') {
+      this.dataUrl = props.data as DataURLType;
+    }
+    //
+    // TODO: refactor setListData or make new getListLength
+    // this.list.length = await this.getListLength(props.data);
+    this.setListData(props.data).then(() => {
       // domChangerProps.listLength = this.list.length;
       // this.domMngr = new DomManager(domChangerProps);
-      // this.start();
-    }
+      // this.domMngr = new DomManager(domChangerProps);
+      this.start();
+    });
   }
 
   async start() {
@@ -280,7 +286,7 @@ class InfinityScroll {
   }
 
   async calcCurrentDOMRender(e: Event): Promise<void> {
-    if (this.domMngr?.isStopRender) {
+    if (this.domMngr.isStopRender) {
       this.domMngr.isStopRender = false;
       return;
     }
