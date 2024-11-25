@@ -151,9 +151,6 @@ class InfinityScroll {
   }
 
   async start() {
-    if (this.domMngr === undefined) {
-      throw new Error('Your DomManager is undefined');
-    }
     console.log(this);
 
     this.setDefaultStyles();
@@ -379,7 +376,7 @@ class InfinityScroll {
 
   setTimerToRefreshList() {
     const timerID = window.setTimeout(async () => {
-      if (this.domMngr) {
+      if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
@@ -401,6 +398,7 @@ class InfinityScroll {
           `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
         );
 
+        // TODO: проверить, какие индексы фетчатся, когда мы подходим к верхней части списка
         const isAllowRenderNearBorder = this.render.isAllowRenderNearBorder(
           this.scroll.direction,
           renderIndex
@@ -473,10 +471,9 @@ class InfinityScroll {
         if (this.forcedListLength) {
           newLength = this.forcedListLength;
         } else {
-          const fetchedListLength =
+          newLength =
             (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
             Number(!this.basedIndex);
-          newLength = fetchedListLength;
         }
       }
     }
@@ -518,9 +515,7 @@ class InfinityScroll {
   fetchUnfoundedRanges(unfoundedRanges: NumRange[]): void {
     console.log(unfoundedRanges);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
-      let [startFetchIndex, endFetchIndex] = [0, 1];
-
-      [startFetchIndex, endFetchIndex] = [
+      const [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
         sequenceEnd + this.basedIndex - Number(this.includeEnd),
       ];
