@@ -2,7 +2,7 @@ import { Rec } from '../../types/utils';
 
 export class ListController {
   // Массив данных для превращения в хтмл-ссписок
-  public data: Rec[] | undefined;
+  public data: Rec[];
 
   // Длина списка
   length = 0;
@@ -27,5 +27,6 @@ export class ListController {
 
   constructor() {
     console.log('Start List Controller', this);
+    this.data = [];
   }
 }
