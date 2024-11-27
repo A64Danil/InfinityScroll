@@ -378,17 +378,15 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
+        const [sequenceStart, sequenceEnd] = this.getSequence(
+          this.chunk.startRenderIndex,
+          true
+        );
+
         if (this.dataLoadSpeed === 'lazy') {
           // TODO: функция для тестов
           // await this.sleep(3000);
-          // const startIndex = renderIndex - this.chunk.amount;
-          // const endIndex = startIndex + this.list.existingSizeInDOM;
-          // const rangesOLD: NumRange = [startIndex, endIndex];
-          // console.log('rangesOLD', rangesOLD);
-          const [sequenceStart, sequenceEnd] = this.getSequence(
-            this.chunk.startRenderIndex,
-            true
-          );
+
           const ranges: NumRange = [sequenceStart, sequenceEnd];
           console.log('ranges', ranges);
 
@@ -415,7 +413,7 @@ class InfinityScroll {
         this.domMngr.resetAllList(
           this.chunk,
           renderIndex,
-          this.chunk.amount,
+          sequenceStart,
           this.list,
           this.scroll.direction,
           isAllowRenderNearBorder

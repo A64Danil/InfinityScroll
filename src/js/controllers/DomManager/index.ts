@@ -201,37 +201,18 @@ export class DomManager {
     return precalcSequence;
   }
 
-  // TODO: вынести в хелпер?
-  // eslint-disable-next-line class-methods-use-this
-  recalcSequence(sequence: number, startIndexOfLastPart: number) {
-    let newSequence =
-      sequence > startIndexOfLastPart ? startIndexOfLastPart : sequence;
-
-    if (newSequence < 0) newSequence = 0;
-
-    return newSequence;
-  }
-
   resetAllList(
     chunk: ChunkController,
     startRenderIndex: number,
-    chunkAmount: number,
+    sequenceStart: number,
     list: ListController,
     direction: IScrollDirection,
     isAllowRenderNearBorder: boolean
   ): void {
-    console.log('=====RESET LIST=====', startRenderIndex);
-    const calculatedSequence = startRenderIndex - chunkAmount;
-
-    const sequenceNumber = this.recalcSequence(
-      calculatedSequence,
-      list.startIndexOfLastPart
-    );
-
     const templateFragment = document.createDocumentFragment();
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
-      const elemNum = i + sequenceNumber;
+      const elemNum = i + sequenceStart;
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
       }
@@ -239,7 +220,7 @@ export class DomManager {
       templateFragment.append(this.createItem(elemData, elemNum));
     }
 
-    const newOffset = sequenceNumber * list.itemHeight;
+    const newOffset = sequenceStart * list.itemHeight;
 
     this.targetElem.innerHTML = '';
     this.targetElem.append(templateFragment);
@@ -252,8 +233,6 @@ export class DomManager {
       newOffset,
       isAllowRenderNearBorder
     );
-
-    // this.isWaitRender = false;
   }
 
   // eslint-disable-next-line class-methods-use-this
