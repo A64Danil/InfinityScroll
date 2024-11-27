@@ -571,6 +571,7 @@ class InfinityScroll {
     const unfoundedItems: NumRange[] = [];
     let isUndefined = false;
     const buffer: number[] = [];
+    const lastIndex = sequenceEnd - 1;
     for (let i = sequenceStart; i < sequenceEnd; i++) {
       const currentElem = this.list.data[i];
       // console.log(`Check ${i}`, currentElem !== undefined);
@@ -578,12 +579,10 @@ class InfinityScroll {
         isUndefined = true;
         buffer.push(i);
       } else if (
-        // TODO: можно оптимизировать
-        (currentElem !== undefined && isUndefined) ||
-        (i === sequenceEnd - 1 && isUndefined)
+        isUndefined &&
+        (currentElem !== undefined || i === lastIndex)
       ) {
-        const index =
-          i === sequenceEnd - 1 && currentElem === undefined ? i + 1 : i;
+        const index = i === lastIndex && currentElem === undefined ? i + 1 : i;
         buffer.push(index);
         unfoundedItems.push(buffer.slice() as NumRange);
         buffer.length = 0;
