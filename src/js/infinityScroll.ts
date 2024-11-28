@@ -26,10 +26,6 @@ import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
 import { DataUrlFunction } from './types/DataUrlFunction';
 
-// http://localhost:3000/data?_page=1&_limit=20
-
-console.log('Main TS file loaded');
-
 type NameToTagObj = {
   [key: string]: string;
 };
@@ -356,9 +352,11 @@ class InfinityScroll {
           this.scroll.direction,
           this.scroll.isGoingFromBottom
         );
-        // TODO: remove after tests
-        if (!isBigDiff) {
-          this.checkIndexOrdering();
+        if (process.env.NODE_ENV === 'development') {
+          // For tests - 1
+          if (!isBigDiff) {
+            this.checkIndexOrdering();
+          }
         }
       }
     }
@@ -384,8 +382,10 @@ class InfinityScroll {
         );
 
         if (this.dataLoadSpeed === 'lazy') {
-          // TODO: функция для тестов
-          // await this.sleep(3000);
+          if (process.env.NODE_ENV === 'development') {
+            // For tests - 2
+            // await this.sleep(3000);
+          }
 
           const ranges: NumRange = [sequenceStart, sequenceEnd];
           console.log('ranges', ranges);
@@ -418,10 +418,12 @@ class InfinityScroll {
           this.scroll.direction,
           isAllowRenderNearBorder
         );
-        // TODO: remove after tests
-        console.log('BEFORE checkIndexOrdering (reset list)');
-        this.checkIndexOrdering();
-        console.log('AFTER checkIndexOrdering  (reset list)');
+        if (process.env.NODE_ENV === 'development') {
+          // For tests - 3
+          console.log('BEFORE checkIndexOrdering (reset list)');
+          this.checkIndexOrdering();
+          console.log('AFTER checkIndexOrdering  (reset list)');
+        }
       }
     }, 30);
     this.timerIdRefreshList = timerID;
