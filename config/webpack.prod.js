@@ -45,6 +45,19 @@ module.exports = merge(common, {
 
     optimization: {
         minimize: true,
+        minimizer: [
+            (compiler) => {
+                const TerserPlugin = require('terser-webpack-plugin');
+                new TerserPlugin({
+                    terserOptions: {
+                        compress: {
+                            pure_funcs: ['console.log'], // Удалить только console.log
+                            // drop_console: true, // Удалить все консоли
+                        },
+                    },
+                }).apply(compiler);
+            },
+        ],
         // minimizer: [new CssMinimizerPlugin(), "..."],
         // Once your build outputs multiple chunks, this option will ensure they share the webpack runtime
         // instead of having their own. This also helps with long-term caching, since the chunks will only
