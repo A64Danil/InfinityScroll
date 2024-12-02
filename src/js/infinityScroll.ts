@@ -93,7 +93,7 @@ class InfinityScroll {
 
     const wrapper = document.getElementById(props.selectorId);
     if (wrapper === null) {
-      throw new Error(`Object ${props.selectorId} does not exist in DOM`);
+      throw new Error(`Element ${props.selectorId} does not exist in DOM`);
     }
     this.wrapperEl = wrapper;
 
@@ -133,9 +133,6 @@ class InfinityScroll {
     this.basedIndex = 1;
 
     console.log(props.data);
-
-    // if (this.dataLoadPlace === 'local') {
-    // }
 
     if (this.dataLoadPlace === 'remote') {
       this.dataUrl = props.data as DataURLType;
@@ -267,10 +264,13 @@ class InfinityScroll {
     const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
-    checkChildrenAmount(
-      this.listEl.childNodes.length,
-      this.list.existingSizeInDOM
-    );
+
+    if (process.env.NODE_ENV === 'development') {
+      checkChildrenAmount(
+        this.listEl.childNodes.length,
+        this.list.existingSizeInDOM
+      );
+    }
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
     const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
     this.scroll.setScrollDirection(scroll);
@@ -301,7 +301,7 @@ class InfinityScroll {
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
       this.chunk.startRenderIndex = resultIndex;
-      console.warn(
+      console.log(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
 
@@ -474,7 +474,6 @@ class InfinityScroll {
         const fetchedData = await this.getListDataLazy(startIdx, endIdx);
         console.log(fetchedData);
         this.list.data = fetchedData;
-        // const getXTotalCount = await
 
         if (this.forcedListLength) {
           newLength = this.forcedListLength;
@@ -515,7 +514,7 @@ class InfinityScroll {
     const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
     const lastEndIndex = this.list.length;
     if (sequenceStart > lastStartIndex) {
-      console.warn('Случай сложный');
+      console.log('Случай сложный');
       [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
     }
     return [sequenceStart, sequenceEnd];
@@ -536,14 +535,11 @@ class InfinityScroll {
         this.dataUrl as DataUrlFunction,
         startFetchIndex,
         endFetchIndex
-      ).then(
-        // getRemoteData(this.dataUrl(startFetchIndex, endFetchIndex)).then(
-        (data): void => {
-          const extractedData = this.extractResponse(data);
-          this.addNewItemsToDataList(sequenceStart, extractedData);
-          this.updateSkeletonItems(sequenceStart, extractedData);
-        }
-      );
+      ).then((data): void => {
+        const extractedData = this.extractResponse(data);
+        this.addNewItemsToDataList(sequenceStart, extractedData);
+        this.updateSkeletonItems(sequenceStart, extractedData);
+      });
     });
   }
 

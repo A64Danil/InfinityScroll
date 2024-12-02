@@ -361,9 +361,11 @@ export class DomManager {
     this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
     this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
 
-    checkChildrenAmount(
-      this.targetElem.childNodes.length,
-      list.existingSizeInDOM
-    );
+    if (process.env.NODE_ENV === 'development') {
+      checkChildrenAmount(
+        this.targetElem.childNodes.length,
+        list.existingSizeInDOM
+      );
+    }
   }
 }
