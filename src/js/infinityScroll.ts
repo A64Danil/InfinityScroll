@@ -391,6 +391,7 @@ class InfinityScroll {
           console.log('ranges', ranges);
 
           this.fetchUnfoundedRanges([ranges]);
+          // TODO: Это срабатывает не сразу
           console.log(
             `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
           );
@@ -400,7 +401,7 @@ class InfinityScroll {
         }
         console.log('Восстанавливаем значение this.chunk.startRenderIndex');
         this.chunk.startRenderIndex = renderIndex;
-        console.warn(
+        console.log(
           `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
         );
 
@@ -427,7 +428,7 @@ class InfinityScroll {
       }
     }, 30);
     this.timerIdRefreshList = timerID;
-    console.log('Timer started by id', this.timerIdRefreshList);
+    // console.log('Timer started by id', this.timerIdRefreshList);
   }
 
   async checkApiSettings() {
@@ -603,6 +604,7 @@ class InfinityScroll {
       const elemIndex = Number(elem.getAttribute('aria-posinset'));
       if (prevIndex !== null) {
         if (prevIndex + 1 !== elemIndex) {
+          // TODO: проверить как стили могут влиять на эту ошибку
           console.error(
             `Индексы поломались на элементе ${elemIndex} (ожидали ${
               prevIndex + 1
