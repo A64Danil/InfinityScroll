@@ -13,8 +13,6 @@ import { Rec } from '../../types/utils';
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
-  // private scrollTemp = 0;
-
   public isStopRender = false;
 
   // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
@@ -31,21 +29,17 @@ export class DomManager {
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
 
-  // private readonly listLength: number;
-
   private readonly skeleton: Skeleton;
 
   constructor(props: {
     skeleton: Skeleton;
     template: TemplateStringFunction;
     targetElem: HTMLElement;
-    // listLength: number;
   }) {
     // this.data = props.data;
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
     this.template = props.template;
-    // this.listLength = props.listLength;
   }
 
   setPaddingToList(
@@ -123,12 +117,6 @@ export class DomManager {
       // TODO: делать правильные рассчеты из размера чанка
       const calc = offset + height;
       console.log('Примерный скролл', calc);
-      // if (this.scrollTemp !== 0 && this.scrollTemp === calc) {
-      //   console.warn('== Calc равен прерыдущему значению! ==');
-      // } else {
-      //   console.warn('== Calc не равен прерыдущему значению (все ок) ==');
-      // }
-      // this.scrollTemp = calc;
       this.isStopRender = true;
       parent.scrollTop = calc;
     }
