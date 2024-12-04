@@ -80,18 +80,20 @@ export class DomManager {
     chunk: ChunkPropsToModifyDom,
     startRenderIndex: number,
     list: ListPropsToModifyDom,
-    direction: IScrollDirection,
-    forcedOffset: number | undefined = undefined,
-    isAllowRenderNearBorder = false
+    direction: IScrollDirection
+    // forcedOffset: number | undefined = undefined,
+    // isAllowRenderNearBorder = false
   ): void {
-    if (forcedOffset !== undefined) {
-      this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
-      if (isAllowRenderNearBorder) {
-        this.setEvenScrollToList(forcedOffset, chunk.htmlHeight);
-      }
-      this.setPaddingToList(list, chunk.htmlHeight, forcedOffset);
-      return;
-    }
+    // TODO: без этого тоже работает
+    // console.log('setOffsetToList', forcedOffset);
+    // if (forcedOffset !== undefined) {
+    //   this.targetElem.style.transform = `translate(0,${forcedOffset}px)`;
+    //   if (isAllowRenderNearBorder) {
+    //     this.setEvenScrollToList(forcedOffset, chunk.htmlHeight);
+    //   }
+    //   this.setPaddingToList(list, chunk.htmlHeight, forcedOffset);
+    //   return;
+    // }
 
     const startOffsetIndex = this.calcStartOffsetIndex(
       chunk.startRenderIndex,
@@ -105,22 +107,24 @@ export class DomManager {
     this.setPaddingToList(list, chunk.htmlHeight, offset);
   }
 
+  // TODO: это вообще не нужно
   // TODO: сделать условия чтобы в крайних точках оффсет не выставлялся
   /**
    * Set certain scroll when forced offset
    */
-  setEvenScrollToList(offset: number, height: number) {
-    const parent = this.targetElem.parentElement;
-    if (parent) {
-      const scroll = parent.scrollTop;
-      console.log('Реальный скролл', scroll);
-      // TODO: делать правильные рассчеты из размера чанка
-      const calc = offset + height;
-      console.log('Примерный скролл', calc);
-      this.isStopRender = true;
-      parent.scrollTop = calc;
-    }
-  }
+  // setEvenScrollToList(offset: number, height: number) {
+  //   const parent = this.targetElem.parentElement;
+  //   if (parent) {
+  //     const scroll = parent.scrollTop;
+  //     console.log('Реальный скролл', scroll);
+  //     // TODO: делать правильные рассчеты из размера чанка
+  //     const calc = offset + height;
+  //     console.log('Примерный скролл', calc);
+  //     this.isStopRender = true;
+  //     console.log('Устанавливаем примерный скролл');
+  //     parent.scrollTop = calc;
+  //   }
+  // }
 
   createItem(elemData: Rec, elemNum: number): HTMLElement {
     return this.skeleton.createElement({
@@ -194,8 +198,8 @@ export class DomManager {
     startRenderIndex: number,
     sequenceStart: number,
     list: ListController,
-    direction: IScrollDirection,
-    isAllowRenderNearBorder: boolean
+    direction: IScrollDirection
+    // isAllowRenderNearBorder: boolean
   ): void {
     const templateFragment = document.createDocumentFragment();
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
@@ -208,21 +212,22 @@ export class DomManager {
       templateFragment.append(this.createItem(elemData, elemNum));
     }
 
-    const newOffset = sequenceStart * list.itemHeight;
+    // const newOffset = sequenceStart * list.itemHeight;
 
     this.targetElem.innerHTML = '';
     this.targetElem.append(templateFragment);
-    console.log('before setOffset', startRenderIndex, newOffset);
+    // console.log('before setOffset', startRenderIndex, newOffset);
     this.setOffsetToList(
       chunk,
       startRenderIndex,
       list,
-      direction,
-      newOffset,
-      isAllowRenderNearBorder
+      direction
+      // newOffset,
+      // isAllowRenderNearBorder
     );
   }
 
+  // TODO: Это важная функция, без нее конец списка тупит
   // eslint-disable-next-line class-methods-use-this
   checkAllowToChangeList(
     direction: IScrollDirection,
