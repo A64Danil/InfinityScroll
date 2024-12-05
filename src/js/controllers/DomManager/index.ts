@@ -253,11 +253,13 @@ export class DomManager {
     const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
     // const isAllowToChange = !isReachBottomLimit;
 
-    // TODO: убрать после тестов
-    if (isReachBottomLimit) {
-      console.warn('Выходим за пределы списка в его нижней части');
-    } else if (isReachTopLimit) {
-      console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+    if (process.env.NODE_ENV === 'development') {
+      // for tests
+      if (isReachBottomLimit) {
+        console.warn('Выходим за пределы списка в его нижней части');
+      } else if (isReachTopLimit) {
+        console.warn('Выходим за пределы списка в его ВЕРХНЕЙ части');
+      }
     }
 
     return isAllowToChange;
