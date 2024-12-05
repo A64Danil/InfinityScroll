@@ -249,8 +249,9 @@ export class DomManager {
 
     // console.log(i + sequenceNumber, listLength);
     // TODO: протестировать эту часть и понять зачем она на самом деле нужна
-    // const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
-    const isAllowToChange = !isReachBottomLimit;
+    // Это нужно чтобы мы не риисовали лишние элементы в начале И в конце списка
+    const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
+    // const isAllowToChange = !isReachBottomLimit;
 
     // TODO: убрать после тестов
     if (isReachBottomLimit) {
