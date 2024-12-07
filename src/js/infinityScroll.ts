@@ -388,10 +388,6 @@ class InfinityScroll {
           console.log('ranges', ranges);
 
           this.fetchUnfoundedRanges([ranges]);
-          // TODO: Это срабатывает не сразу
-          console.log(
-            `Дата зафетчилась, rednerIndex: ${renderIndex}, timerID: ${timerID}, this.timerIdRefreshList: ${this.timerIdRefreshList}`
-          );
         }
         if (timerID !== this.timerIdRefreshList) {
           return;
@@ -517,9 +513,9 @@ class InfinityScroll {
         sequenceStart + this.basedIndex,
         sequenceEnd + this.basedIndex - Number(this.includeEnd),
       ];
-      console.log(
-        `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
-      );
+      // console.log(
+      //   `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
+      // );
 
       getRemoteDataByRange(
         this.dataUrl as DataUrlFunction,
@@ -527,6 +523,7 @@ class InfinityScroll {
         endFetchIndex
       ).then((data): void => {
         const extractedData = this.extractResponse(data);
+        console.log(`Loaded from: ${startFetchIndex}, to: ${endFetchIndex}`);
         this.addNewItemsToDataList(sequenceStart, extractedData);
         this.updateSkeletonItems(sequenceStart, extractedData);
       });
