@@ -459,7 +459,6 @@ class InfinityScroll {
         await this.checkApiSettings();
         console.log('Конечный индекс includeEnd? ', this.includeEnd);
         console.log('Индекс считается с ', this.basedIndex);
-        // TODO: вынести в хелпер?
         const startIdx = this.basedIndex;
         const endIdx = this.basedIndex + Number(!this.includeEnd);
         const fetchedData = await this.getListDataLazy(startIdx, endIdx);
@@ -594,7 +593,6 @@ class InfinityScroll {
       const elemIndex = Number(elem.getAttribute('aria-posinset'));
       if (prevIndex !== null) {
         if (prevIndex + 1 !== elemIndex) {
-          // TODO: проверить как стили могут влиять на эту ошибку
           console.error(
             `Индексы поломались на элементе ${elemIndex} (ожидали ${
               prevIndex + 1
