@@ -255,17 +255,6 @@ class InfinityScroll {
   }
 
   async calcCurrentDOMRender(e: Event): Promise<void> {
-    // TODO: оказалась лищняя часть - убираем
-    // if (this.domMngr.isStopRender) {
-    //   console.log('Запрещаем лишнний рендер, ранний выход.');
-    //   console.log(
-    //     'scrollTop - early return',
-    //     this.domMngr.targetElem.parentElement.scrollTop
-    //   );
-    //   this.domMngr.isStopRender = false;
-    //   return;
-    // }
-
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
     // Вычисляем позицию чанка
@@ -293,8 +282,6 @@ class InfinityScroll {
     const resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
-
-    // this.clearTimerIfNeeded();
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
@@ -410,12 +397,6 @@ class InfinityScroll {
         console.log(
           `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
         );
-        // TODO: оказалось что без этого тоже работает
-        // TODO: проверить, какие индексы фетчатся, когда мы подходим к верхней части списка
-        // const isAllowRenderNearBorder = this.render.isAllowRenderNearBorder(
-        //   this.scroll.direction,
-        //   renderIndex
-        // );
         // END Fetch new DATA
         this.domMngr.resetAllList(
           this.chunk,
@@ -423,7 +404,6 @@ class InfinityScroll {
           sequenceStart,
           this.list,
           this.scroll.direction
-          // isAllowRenderNearBorder
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 3
