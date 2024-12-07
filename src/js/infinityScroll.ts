@@ -240,10 +240,14 @@ class InfinityScroll {
 
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
 
-    const cssText = `.${this.selectorId}_List li { 
+    const cssText = `.${this.selectorId}_List {
+      overflow: hidden; 
+      }
+      
+.${this.selectorId}_List li { 
       max-height: ${this.list.itemHeight}px;
       box-sizing: border-box;
-      overflow: hidden; 
+      white-space: nowrap;
     }`;
     const styleELem = document.createElement('style');
     styleELem.appendChild(document.createTextNode(cssText));
