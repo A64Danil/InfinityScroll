@@ -245,8 +245,6 @@ class InfinityScroll {
       }
       
 .${this.selectorId}_List li { 
-      max-height: ${this.list.itemHeight}px;
-      box-sizing: border-box;
       white-space: nowrap;
     }`;
     const styleELem = document.createElement('style');
