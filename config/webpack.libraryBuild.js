@@ -10,8 +10,8 @@ const fs = require('fs');
 
 
 module.exports = {
-    mode: 'none',
-    // mode: 'production',
+    // mode: 'none',
+    mode: 'production',
     devtool: false,
     entry: {
         main: [paths.src + '/js/infinityScroll.ts'],
@@ -61,7 +61,7 @@ module.exports = {
         ],
     },
     optimization: {
-        minimize: false,
+        minimize: true,
         minimizer: [
             (compiler) => {
                 const TerserPlugin = require('terser-webpack-plugin');
