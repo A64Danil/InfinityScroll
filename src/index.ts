@@ -1,4 +1,3 @@
-import './styles/main.scss';
 import './js/scripts';
 
 import BigDataList100 from '../mocks/bigList100.json'; // import mock data

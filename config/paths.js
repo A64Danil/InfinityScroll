@@ -13,6 +13,9 @@ module.exports = {
     // Only library files
     lib: path.resolve(__dirname, '../lib'),
 
+    // Bad useless files
+    delete: path.resolve(__dirname, '../delete'),
+
     // Static files that get copied to build folder
     public: path.resolve(__dirname, '../public'),
 }

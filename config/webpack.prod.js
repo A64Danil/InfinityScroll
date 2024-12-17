@@ -3,21 +3,28 @@ const { merge } = require('webpack-merge')
 const common = require('./webpack.common.js')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-// const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const glob = require('glob');
+const path = require('path')
 
-module.exports = merge(common, {
+const cssEntryPoints = glob.sync('./src/styles/**/*.scss').reduce((acc, file) => {
+    const name = path.basename(file, '.scss'); // Имя файла без расширения
+    acc[name] = file; // Добавляем SCSS-файлы как entry points
+    return acc;
+}, {});
+
+
+
+const cssConfig = {
     mode: 'production',
     devtool: false,
+    entry: cssEntryPoints,
     output: {
-        path: paths.build,
-        publicPath: '',
-        filename: 'js/[name].[contenthash].bundle.js',
+        path: paths.delete,
+        filename: '[name].deleteMe',
     },
     plugins: [
-        // Extracts CSS into separate files
-        // Note: style-loader is for development, MiniCssExtractPlugin is for production
         new MiniCssExtractPlugin({
-            filename: 'styles/[name].[contenthash].css',
+            filename: '../dist/styles/[name].css',
             chunkFilename: '[id].css',
         }),
     ],
@@ -42,9 +49,26 @@ module.exports = merge(common, {
             },
         ],
     },
-
     optimization: {
-        minimize: true,
+        // minimize: true,
+        minimize: false,
+    }
+};
+
+const mainProdConfig = merge(common, {
+    mode: 'production',
+    devtool: false,
+    entry: {
+        lib: [paths.src + '/js/infinityScroll.ts'],
+    },
+    output: {
+        path: paths.dist,
+        publicPath: '',
+        filename: 'js/[name].[contenthash].bundle.js',
+    },
+    optimization: {
+        // minimize: true,
+        minimize: false,
         minimizer: [
             (compiler) => {
                 const TerserPlugin = require('terser-webpack-plugin');
@@ -72,3 +96,5 @@ module.exports = merge(common, {
         maxAssetSize: 512000,
     },
 })
+
+module.exports = [mainProdConfig, cssConfig]
