@@ -5,9 +5,12 @@ module.exports = {
     src: path.resolve(__dirname, '../src'),
 
     // Production build files
-    build: path.resolve(__dirname, '../dist'),
+    build: path.resolve(__dirname, '../build'),
 
-    // Production build files
+    // Production finish files
+    dist: path.resolve(__dirname, '../dist'),
+
+    // Only library files
     lib: path.resolve(__dirname, '../lib'),
 
     // Static files that get copied to build folder

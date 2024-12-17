@@ -9,6 +9,7 @@ out/
 node_modules/
 coverage/
 dist/
+build/
 upload/
 /.ORIGeslintrc.json
 /mocks/*.json
