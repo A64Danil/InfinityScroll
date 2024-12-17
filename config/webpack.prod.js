@@ -6,6 +6,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const glob = require('glob');
 const path = require('path')
 
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+
 const cssEntryPoints = glob.sync('./src/styles/**/*.scss').reduce((acc, file) => {
     const name = path.basename(file, '.scss'); // Имя файла без расширения
     acc[name] = file; // Добавляем SCSS-файлы как entry points
@@ -23,6 +25,12 @@ const cssConfig = {
         filename: '[name].deleteMe',
     },
     plugins: [
+
+        new CleanWebpackPlugin({
+            dry: false,
+            dangerouslyAllowCleanPatternsOutsideProject: true,
+            cleanOnceBeforeBuildPatterns: ['../dist/js/main.*.js', '../dist/js/runtime.*.js'],
+        }),
         new MiniCssExtractPlugin({
             filename: '../dist/styles/[name].css',
             chunkFilename: '[id].css',
@@ -59,7 +67,7 @@ const mainProdConfig = merge(common, {
     mode: 'production',
     devtool: false,
     entry: {
-        lib: [paths.src + '/js/infinityScroll.ts'],
+        infinityScroll: [paths.src + '/js/infinityScroll.ts'],
     },
     output: {
         path: paths.dist,
