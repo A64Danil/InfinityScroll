@@ -4,18 +4,15 @@
   "description": "Endless HTML-list with virtual scroll",
   "main": "index.js",
   "scripts": {
-    "startOLD": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js",
-    "buildOLD": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
-    "datagen": "node mocks/dataGenerator.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config config/webpack.dev.js",
     "build": "webpack --config config/webpack.prod.js",
     "buildLib": "webpack --config config/webpack.libraryBuild.js",
+    "datagen": "node mocks/dataGenerator.js",
     "lint": "eslint ./src --format table",
     "lint:fix": "eslint ./src --fix --format table --color",
     "lintts": "tsc --noEmit",
     "lintall": "eslint ./src --format table && tsc --noEmit",
-    "server": "json-server --watch mocks/bigList10000.json"
+    "jsonServer": "json-server --watch mocks/bigList10000.json"
   },
   "repository": {
     "type": "git",
