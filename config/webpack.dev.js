@@ -11,15 +11,19 @@ module.exports = merge(common, {
     devtool: 'inline-source-map',
     devServer: {
         historyApiFallback: true,
-        contentBase: paths.build,
-        // open: true,
-        compress: true,
-        // hot: true,
+        static: {
+            directory: paths.build,
+        },
+        open: false,
+        compress: false,
+        hot: true,
+        liveReload: true,
         port: 8080,
+        watchFiles: ['src/**/*', 'public/**/*'], // Следит за файлами в src и public
     },
     plugins: [
         // Only update what has changed on hot reload
-        new webpack.HotModuleReplacementPlugin(),
+        // new webpack.HotModuleReplacementPlugin(),
     ],
     module: {
         rules: [
