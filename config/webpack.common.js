@@ -18,9 +18,12 @@ function generateHtmlPlugins(templateDir) {
         // console.log(path.resolve(__dirname, `${templateDir}/${name}.${extension}`))
         return new HtmlWebpackPlugin({
             title: namedTitle,
+            origName: name.replace('demoList_', ''),
             filename: `${name}.html`,
             template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`),
-            // inject: false,
+            mode: process.env.mode,
+            inject: process.env.mode === 'development',
+            // inject: true,
         })
     })
 }
