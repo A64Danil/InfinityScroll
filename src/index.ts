@@ -12,6 +12,12 @@ import { REMOTE_LAZY_000ITEMS_PROPS } from './demoScripts/remote_lazy_000item';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
 import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_100items';
 
+if (process.env.NODE_ENV === 'development') {
+  (async () => {
+    // @ts-ignore
+    await import('./styles/main.scss');
+  })();
+}
 console.log('Entry point');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
