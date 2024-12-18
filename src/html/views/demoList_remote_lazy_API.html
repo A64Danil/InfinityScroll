@@ -1,4 +1,6 @@
-<% var data = { title: htmlWebpackPlugin.options.title, author: "Danil X" }; %>
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X" }; %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,5 +14,30 @@
       _.template(require('html-loader!./../includes/demoLists/remote_lazy_api.html'))(data)
       %>
     </section>
+
+    <script>
+      // console.log(InfinityScroll);
+
+      console.log('test log from html');
+
+      const REMOTE_LAZY_API_PROPS = {
+        data: ({ start, end }) =>
+          `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
+        name: 'my scroll list name',
+        selectorId: 'REMOTE_LAZY_API',
+        forcedListLength: 17154017,
+        // forcedListLength: 1000000,
+        // maximal value is 33554400px
+        // forcedListLength: 5000000, //    padding-bottom: 5.6445e+07px; transform: translate(0px, 3.35538e+07px);
+        listType: 'list',
+        listWrapperHeight: '290px',
+        templateString: (element, listLength) => `<li
+        class="REMOTE_LAZY_API__listItem" >
+           ${element?.name}
+    </li>`,
+      };
+
+      new InfinityScroll(REMOTE_LAZY_API_PROPS);
+    </script>
   </body>
 </html>
