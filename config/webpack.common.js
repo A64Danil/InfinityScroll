@@ -57,6 +57,14 @@ module.exports = {
                     },
                     noErrorOnMissing: true,
                 },
+                {
+                    from: paths.mocks,
+                    to: 'assets/json',
+                    globOptions: {
+                        ignore: ['*.DS_Store', '*.js', 'db.json', 'bigList10.json'],
+                    },
+                    noErrorOnMissing: true,
+                },
             ],
         }),
 
