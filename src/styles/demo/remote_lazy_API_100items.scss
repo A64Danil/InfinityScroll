@@ -1,0 +1,25 @@
+.REMOTE_LAZY_API {
+  color: #333;
+  height: 260px;
+
+  &__listItem {
+    padding: 8px 10px;
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px;
+    max-height: 72px;
+    overflow: hidden;
+
+    &:hover {
+      background: #eee;
+    }
+    &:before {
+      content: attr(aria-posinset) ')';
+    }
+
+    &.big {
+      padding: 15px 10px;
+      font-size: 36px;
+    }
+  }
+}
