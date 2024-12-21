@@ -69,5 +69,26 @@ new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS)
         - "aria-posinset" to set correct item index
       </p>
     </section>
+    <% if (data.mode === 'production') {%>
+    <script type="module">
+      import BigDataList100 from '../assets/json/bigList100.js'; // import mock data
+
+      console.log('start: <%= data.title %> ');
+
+      const BigJson1 = BigDataList100.data;
+
+      const LOCAL_SIMPLE_100ITEMS_PROPS = {
+        data: BigJson1,
+        selectorId: 'LOCAL_SIMPLE_100ITEMS',
+        listWrapperHeight: '270px',
+        templateString: (element, listLength, number) => `<li
+        class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+            ${element.name} ${element.number} - ${number}
+    </li>`,
+      };
+
+      new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+    </script>
+    <% } %>
   </body>
 </html>
