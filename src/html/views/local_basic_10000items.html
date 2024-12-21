@@ -71,10 +71,10 @@ new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS)
     </section>
 
     <% if (data.mode === 'production') {%>
-    <script>
-      console.log('start: <%= data.title %> ');
+    <script type="module">
+      import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
 
-      import BigDataList10000 from '../assets/json/bigList10000.json'; // import mock data
+      console.log('start: <%= data.title %> ');
 
       const BigJson1 = BigDataList10000.data;
 
