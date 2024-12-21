@@ -8,6 +8,16 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const path = require('path')
 const fs = require('fs');
 
+function escapeHtml(string) {
+    return string
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+
 function generateHtmlPlugins(templateDir) {
     const templateFiles = fs.readdirSync(path.resolve(__dirname, templateDir));
     return templateFiles.map(item => {
@@ -24,6 +34,9 @@ function generateHtmlPlugins(templateDir) {
             mode: process.env.mode,
             inject: process.env.mode === 'development',
             // inject: true,
+            templateParameters: {
+                escapeHtml, // Передаём функцию экранирования в шаблон
+            },
         })
     })
 }
