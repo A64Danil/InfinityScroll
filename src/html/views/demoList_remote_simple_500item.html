@@ -14,5 +14,14 @@ author: "Danil X" }; %>
       _.template(require('html-loader!./../includes/demoLists/remote_simple_500items.html'))(data)
       %>
     </section>
+    <% if (data.mode === 'production') {%>
+    <script>
+      console.log('start: <%= data.title %> ');
+
+      const PROPS = {};
+
+      new InfinityScroll(PROPS);
+    </script>
+    <% } %>
   </body>
 </html>
