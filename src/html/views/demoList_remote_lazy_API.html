@@ -14,21 +14,18 @@ author: "Danil X" }; %>
       _.template(require('html-loader!./../includes/demoLists/remote_lazy_api.html'))(data)
       %>
     </section>
-
+    <% if (data.mode === 'production') {%>
     <script>
-      // console.log(InfinityScroll);
-
-      console.log('test log from html');
+      console.log('start: <%= data.title %> ');
 
       const REMOTE_LAZY_API_PROPS = {
         data: ({ start, end }) =>
           `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
-        name: 'my scroll list name',
+        name: 'Remote lazy api list (17kkk items) ',
         selectorId: 'REMOTE_LAZY_API',
         forcedListLength: 17154017,
         // forcedListLength: 1000000,
         // maximal value is 33554400px
-        // forcedListLength: 5000000, //    padding-bottom: 5.6445e+07px; transform: translate(0px, 3.35538e+07px);
         listType: 'list',
         listWrapperHeight: '290px',
         templateString: (element, listLength) => `<li
@@ -39,5 +36,6 @@ author: "Danil X" }; %>
 
       new InfinityScroll(REMOTE_LAZY_API_PROPS);
     </script>
+    <% } %>
   </body>
 </html>
