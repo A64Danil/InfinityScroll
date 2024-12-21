@@ -17,15 +17,19 @@ author: "Danil X" }; %>
 
     <section>
       <h2>How to use it:</h2>
-
-      <p class="codeDescription">
-        1. Place any tag with your unique ID into your html-code:
-      </p>
+      <p class="codeDescription">1. Put script to the head tag:</p>
       <pre class="code">
-&lt;div id=&quot;LOCAL_BASIC_10000ITEMS&quot;&gt;&lt;/div&gt;
+<script src="js/infinityScroll.bundle.js"></script> // like this, if you download this
+<script src="https://iscroll.qoobeo.ru/js/infinityScroll.bundle.js"></script> // like this, if you don't want to download it
       </pre>
       <p class="codeDescription">
-        2. Configure list and start it by call new InfinityScroll(config):
+        2. Place any tag with your unique ID into your html-code:
+      </p>
+      <pre class="code">
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/local_basic_10000items.html'))(data)) %>
+      </pre>
+      <p class="codeDescription">
+        3. Configure list and start it by call new InfinityScroll(config):
       </p>
       <pre class="code">
 import BigDataList10000 from '../../mocks/bigList10000.json';
