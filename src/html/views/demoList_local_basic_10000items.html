@@ -17,19 +17,23 @@ author: "Danil X" }; %>
 
     <section>
       <h2>How to use it:</h2>
-      <p class="codeDescription">1. Put script to the head tag:</p>
+      <p class="codeDescription">
+        <%=
+        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p class="codeDescription">2. Put script to the head tag:</p>
       <pre class="code">
-<script src="js/infinityScroll.bundle.js"></script> // like this, if you download this
-<script src="https://iscroll.qoobeo.ru/js/infinityScroll.bundle.js"></script> // like this, if you don't want to download it
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </pre>
       <p class="codeDescription">
-        2. Place any tag with your unique ID into your html-code:
+        3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/local_basic_10000items.html'))(data)) %>
       </pre>
       <p class="codeDescription">
-        3. Configure list and start it by call new InfinityScroll(config):
+        4. Configure list and start it by call new InfinityScroll(config):
       </p>
       <pre class="code">
 import BigDataList10000 from '../../mocks/bigList10000.json';
@@ -57,7 +61,7 @@ new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS)
       <h2>Setup your list:</h2>
       <p>You need to configure only 4 required parameters:</p>
       <ol>
-        <li>Data - link to your *.json file or simple js-array</li>
+        <li>Data - simple js-array or link to your API</li>
         <li>SelectorId - ID of tag, where list will be placed</li>
         <li>ListWrapperHeight - define height of your list</li>
         <li>
@@ -66,12 +70,12 @@ new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS)
         </li>
       </ol>
 
-      <p class="codeDescription">
-        Use aria-attributes to set correct list-index for items: <br />
-        - "aria-setsize" to set correct list length (because you don't have all
-        element per time in a list) <br />
-        - "aria-posinset" to set correct item index
-      </p>
+      <!--      <p class="codeDescription">-->
+      <!--        Use aria-attributes to set correct list-index for items: <br />-->
+      <!--        - "aria-setsize" to set correct list length (because you don't have all-->
+      <!--        element per time in a list) <br />-->
+      <!--        - "aria-posinset" to set correct item index-->
+      <!--      </p>-->
     </section>
 
     <% if (data.mode === 'production') {%>
