@@ -17,57 +17,77 @@ author: "Danil X" }; %>
 
     <section>
       <h2>How to use it:</h2>
-
       <p class="codeDescription">
-        1. Place any tag with your unique ID into your html-code:
+        <%=
+        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
       </p>
+      <p class="codeDescription">2. Put script to the head tag:</p>
       <pre class="code">
-&lt;div id=&quot;LOCAL_SIMPLE_100ITEMS&quot;&gt;&lt;/div&gt;
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </pre>
       <p class="codeDescription">
-        2. Configure list and start it by call new InfinityScroll(config):
+        3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code">
-import BigDataList100 from '../../mocks/bigList100.json';
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/local_simple_100item.html'))(data)) %>
+      </pre>
+      <p class="codeDescription">
+        4. Configure list and start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code">
+&lt;script type="module"&gt;
+  import BigDataList100 from '../assets/json/bigList100.js'; // import mock data
 
-const BigJson1 = BigDataList100.data;
+  console.log('start: <%= data.title %> ');
 
-const LOCAL_SIMPLE_100ITEMS_PROPS = {
-  data: BigJson1,
-  selectorId: 'LOCAL_SIMPLE_100ITEMS',
-  listWrapperHeight: '350px',
-  templateString: (element: object, listLength?: number): string => `&lt;li
-              aria-setsize=&quot;${listLength}&quot;
-              aria-posinset=&quot;${element.number + 1}&quot;
-               class="LOCAL_SIMPLE_100ITEMS_List__listItem"
-      &gt;
-            ${element.name} ${element.number + 1}
+  const BigJson1 = BigDataList100.data;
+
+  const LOCAL_SIMPLE_100ITEMS_PROPS = {
+      data: BigJson1,
+      selectorId: 'LOCAL_SIMPLE_100ITEMS',
+      listWrapperHeight: '270px',
+      templateString: (element, listLength, number) => `&lt;li&gt;
+        class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+            ${element.name} ${element.number} - ${number}
     &lt;/li&gt;`,
-};,
+  };
 
-new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS)
+  new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+&lt;/script&gt;
+      </pre>
+      <p class="codeDescription">5. Add your styles:</p>
+      <pre class="code">
+.LOCAL_SIMPLE_100ITEMS_Border {
+  position: relative;
+  padding: 10px 0;
+  border: 2px solid #444;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.LOCAL_SIMPLE_100ITEMS_List {
+  color: #555;
+  margin: 0;
+}
+.LOCAL_SIMPLE_100ITEMS_List__listItem {
+  padding: 8px 10px;
+  font-weight: normal;
+  border-radius: 4px;
+  font-size: 18px;
+}
+.LOCAL_SIMPLE_100ITEMS_List__listItem:hover {
+  background: #efefef;
+}
+.LOCAL_SIMPLE_100ITEMS_List__listItem:before {
+  content: attr(aria-posinset) ')';
+}
       </pre>
     </section>
 
     <section>
-      <h2>Setup your list:</h2>
-      <p>You need to configure only 4 required parameters:</p>
-      <ol>
-        <li>Data - link to your *.json file or simple js-array</li>
-        <li>SelectorId - ID of tag, where list will be placed</li>
-        <li>ListWrapperHeight - define height of your list</li>
-        <li>
-          TemplateString - your template. You can style your items adding only 1
-          class to items
-        </li>
-      </ol>
-
-      <p class="codeDescription">
-        Use aria-attributes to set correct list-index for items: <br />
-        - "aria-setsize" to set correct list length (because you don't have all
-        element per time in a list) <br />
-        - "aria-posinset" to set correct item index
-      </p>
+      <%=
+      _.template(require('html-loader!./../includes/demoDescriptions/listSetupShort.html'))(data)
+      %>
     </section>
     <% if (data.mode === 'production') {%>
     <script type="module">
