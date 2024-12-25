@@ -1,14 +1,14 @@
 import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
-import { XOR } from './utils';
+// import { XOR } from './utils';
 
 export type InfinityScrollPropTypes = {
   data: object[] | DataURLType;
   selectorId: string;
-  listWrapperHeight: string;
-  name?: string;
+  listWrapperHeight: string; // take from styles?? (aka remove?)
+  name?: string; // remove ?
   dataLoadPlace?: 'local' | 'remote';
-  dataLoadSpeed?: 'instant' | 'lazy';
+  dataLoadSpeed?: 'instant' | 'lazy'; // turn to lazyMode: true ?
   subDir?: string;
   forcedListLength?: number;
   listType?: 'list' | 'table';
