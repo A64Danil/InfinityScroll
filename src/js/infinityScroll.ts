@@ -64,7 +64,7 @@ class InfinityScroll {
   private readonly dataLoadPlace: 'local' | 'remote';
 
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
-  private dataLoadSpeed: 'instant' | 'lazy';
+  private isLazy: boolean;
 
   private readonly dataUrl: DataURLType | undefined;
 
@@ -126,7 +126,7 @@ class InfinityScroll {
 
     this.dataLoadPlace = Array.isArray(props.data) ? 'local' : 'remote';
 
-    this.dataLoadSpeed = 'instant';
+    this.isLazy = false;
 
     this.includeEnd = false;
 
@@ -149,7 +149,7 @@ class InfinityScroll {
     this.setDefaultStyles();
     this.getAllSizes();
 
-    if (this.dataLoadSpeed === 'lazy') {
+    if (this.isLazy) {
       const startIdx = this.basedIndex + 1;
 
       await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
@@ -316,7 +316,7 @@ class InfinityScroll {
         };
 
         // Fetch new DATA
-        if (this.dataLoadSpeed === 'lazy' && !isBigDiff) {
+        if (this.isLazy && !isBigDiff) {
           const [sequenceStart, sequenceEnd] = this.getSequence(
             this.chunk.startRenderIndex
           );
@@ -376,7 +376,7 @@ class InfinityScroll {
           true
         );
 
-        if (this.dataLoadSpeed === 'lazy') {
+        if (this.isLazy) {
           if (process.env.NODE_ENV === 'development') {
             // For tests - 2
             // await this.sleep(3000);
@@ -449,7 +449,7 @@ class InfinityScroll {
           newLength = extractedData && extractedData.length;
         });
       } else {
-        this.dataLoadSpeed = 'lazy';
+        this.isLazy = true;
         await this.checkApiSettings();
         console.log('Конечный индекс includeEnd? ', this.includeEnd);
         console.log('Индекс считается с ', this.basedIndex);

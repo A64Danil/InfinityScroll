@@ -77,7 +77,7 @@ author: "Danil X" }; %>
 const REMOTE_LAZY_000ITEMS_PROPS = {
   data: BigJson1,
   dataLoadPlace: 'remote',
-  dataLoadSpeed: 'lazy',
+  isLazy: true,
   dataUrl: (start?: number, end?: number, page?: number, limit?: number) =>
     `http://localhost:3000/data?_start=${start}&_end=${end}`,
   name: 'my scroll list name',
