@@ -7,7 +7,6 @@ export type InfinityScrollPropTypes = {
   selectorId: string;
   listWrapperHeight: string; // take from styles?? (aka remove?)
   name?: string; // remove ?
-  dataLoadPlace?: 'local' | 'remote'; // unused prop?
   isLazy?: boolean; // turn to lazyMode: true ?
   subDir?: string;
   forcedListLength?: number;
