@@ -66,6 +66,12 @@ author: "Danil X" }; %>
             >Remote Lazy Api List (100 items)</a
           >
         </li>
+
+        <li class="demoLinkItem">
+          <a href="/demoList_remote_lazy_dummyjson_API.html" class="demoLink"
+            >Remote Lazy DummyJSON Api List with subdir (~200 items)</a
+          >
+        </li>
       </ul>
     </section>
 
@@ -96,15 +102,6 @@ const REMOTE_LAZY_000ITEMS_PROPS = {
 
 new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
       </pre>
-    </section>
-
-    <section>
-      <!--   работает-->
-      <!--      <p><%= htmlWebpackPlugin.options.info %></p>-->
-
-      <%=
-      _.template(require('html-loader!./../includes/demoLists/remote_lazy_000items.html'))(data)
-      %>
     </section>
   </body>
 </html>
