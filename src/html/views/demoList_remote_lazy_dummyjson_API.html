@@ -48,8 +48,6 @@ author: "Danil X" }; %>
   }) => `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
   selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
   subDir: 'products',
-  listType: 'list',
-  listWrapperHeight: '290px',
   templateString: (element, listLength) => `&lt;li
               class="REMOTE_LAZY_DUMMYJSON_API_List__listItem big" &gt;
             ${element?.id} ${element?.title}
@@ -97,8 +95,6 @@ author: "Danil X" }; %>
           `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
         selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
         subDir: 'products',
-        listType: 'list',
-        listWrapperHeight: '290px',
         templateString: (element, listLength) => `<li
            class="REMOTE_LAZY_DUMMYJSON_API_List__listItem big"
         >

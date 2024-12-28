@@ -5,8 +5,6 @@ export const REMOTE_LAZY_DUMMYJSON_API_PROPS: InfinityScrollPropTypes = {
     `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
   selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
   subDir: 'products',
-  listType: 'list',
-  listWrapperHeight: '290px',
   templateString: (element, listLength) => `<li 
         class="REMOTE_LAZY_DUMMYJSON_API_List__listItem big" 
         >
