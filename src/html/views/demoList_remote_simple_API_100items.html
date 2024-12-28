@@ -40,11 +40,9 @@ author: "Danil X" }; %>
   console.log('start: <%= data.title %> ');
 
   const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
-      data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`, / link to json (response from API)
-      // name: 'my EMOTE_SIMPLE_API_100ITEMS',
+      data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`, // link to json (response from API)
       selectorId: 'REMOTE_SIMPLE_API_100ITEMS', // Container's ID
       // listType: 'list',
-      listWrapperHeight: '290px',
       templateString: (element, listLength, elemNum) => `&lt;li
         class="REMOTE_simple_API_100ITEMS__listItem"&gt;
                ${element?.name} (elemNum - ${elemNum})
@@ -85,10 +83,7 @@ author: "Danil X" }; %>
 
       const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
         data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`,
-        name: 'my scroll list name',
         selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
-        listType: 'list',
-        listWrapperHeight: '290px',
         templateString: (element, listLength, elemNum) => `<li
         class="REMOTE_simple_API_100ITEMS__listItem"
         >

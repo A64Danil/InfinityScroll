@@ -41,10 +41,7 @@ author: "Danil X" }; %>
 
   const REMOTE_SIMPLE_500ITEMS_PROPS = {
       data: 'https://jsonplaceholder.typicode.com/comments', // link to json (response from API)
-      // name: 'my REMOTE_SIMPLE_500ITEMS',
       selectorId: 'REMOTE_SIMPLE_500ITEM',  // Container's ID
-      // listType: 'list',
-      listWrapperHeight: '290px',
       templateString: (element, listLength, elemNum) => `&lt;li
         class="REMOTE_SIMPLE_500ITEM_List__listItem" &gt;
                 ${element.email} ${element.id} (elemNum - ${elemNum})
@@ -83,10 +80,7 @@ author: "Danil X" }; %>
 
       const REMOTE_SIMPLE_500ITEMS_PROPS = {
         data: 'https://jsonplaceholder.typicode.com/comments',
-        name: 'my REMOTE_SIMPLE_500ITEMS',
         selectorId: 'REMOTE_SIMPLE_500ITEM',
-        listType: 'list',
-        listWrapperHeight: '290px',
         templateString: (element, listLength, elemNum) => `<li
         class="REMOTE_SIMPLE_500ITEM_List__listItem"
         >
