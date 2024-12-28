@@ -5,7 +5,7 @@ import { DataURLType } from './DataURL';
 export type InfinityScrollPropTypes = {
   data: object[] | DataURLType;
   selectorId: string;
-  listWrapperHeight?: string; // take from styles?? (aka remove?)
+  listWrapperHeight?: string;
   name?: string; // remove ?
   isLazy?: boolean; // сделать лейзи если в data - функция
   subDir?: string;
