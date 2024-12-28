@@ -62,7 +62,7 @@ class InfinityScroll {
   private readonly listType: string;
 
   // Тип списка (список или таблица)
-  private readonly listWrapperHeight: string;
+  private readonly listWrapperHeight: string | undefined;
 
   // Тип загрузки (список доступен локально или надо качать с интернета)
   private readonly dataLoadPlace: 'local' | 'remote';
@@ -186,8 +186,6 @@ class InfinityScroll {
   setDefaultStyles() {
     if (this.listWrapperHeight !== undefined) {
       this.wrapperEl.style.height = this.listWrapperHeight;
-      // TODO: remove logs
-      console.warn('Set forced HEIGHT from js to listWrapperHeight');
     }
 
     if (this.wrapperEl.offsetHeight < 10) {
@@ -196,7 +194,6 @@ class InfinityScroll {
       throw new Error(msg);
     }
 
-    console.log(`=====> ${this.wrapperEl.offsetHeight}`);
     this.wrapperEl.style.overflowY = 'scroll';
   }
 
