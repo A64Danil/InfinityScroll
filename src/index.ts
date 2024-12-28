@@ -12,85 +12,87 @@ import { REMOTE_LAZY_DUMMYJSON_API_PROPS } from './demoScripts/remote_lazy_dummy
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
 import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_100items';
 
-if (process.env.NODE_ENV === 'development') {
-  (async () => {
-    // @ts-ignore
-    await import('./styles/main.scss');
-  })();
-}
 console.log('Entry point');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BigJson1 = BigDataList100.data;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// const BigJson2 = BigDataList10k.data;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// const BigJson3 = BigDataList100k.data;
+(async () => {
+  if (process.env.NODE_ENV === 'development') {
+    // @ts-ignore
+    await import('./styles/main.scss');
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const BigJson1 = BigDataList100.data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const BigJson2 = BigDataList10k.data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const BigJson3 = BigDataList100k.data;
 
-const pureList = document.getElementById(
-  LOCAL_BASIC_10000ITEMS_PROPS.selectorId
-);
+  const pureList = document.getElementById(
+    LOCAL_BASIC_10000ITEMS_PROPS.selectorId
+  );
 
-if (pureList !== null) {
-  console.log('Basic list Started');
-  const myLazyScroll = new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
-}
+  if (pureList !== null) {
+    console.log('Basic list Started');
+    const myLazyScroll = new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
+  }
 
-const instantList = document.getElementById(
-  LOCAL_SIMPLE_100ITEMS_PROPS.selectorId
-);
-if (instantList !== null) {
-  console.log('Instant list Started');
-  const myInstantScroll = new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
-}
+  const instantList = document.getElementById(
+    LOCAL_SIMPLE_100ITEMS_PROPS.selectorId
+  );
+  if (instantList !== null) {
+    console.log('Instant list Started');
+    const myInstantScroll = new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+  }
 
-const remoteList = document.getElementById(
-  REMOTE_SIMPLE_500ITEMS_PROPS.selectorId
-);
+  const remoteList = document.getElementById(
+    REMOTE_SIMPLE_500ITEMS_PROPS.selectorId
+  );
 
-if (remoteList !== null) {
-  console.log('Remote list Started');
-  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
-}
+  if (remoteList !== null) {
+    console.log('Remote list Started');
+    const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+  }
 
-const remoteListApi = document.getElementById(
-  REMOTE_SIMPLE_API_100ITEMS_PROPS.selectorId
-);
+  const remoteListApi = document.getElementById(
+    REMOTE_SIMPLE_API_100ITEMS_PROPS.selectorId
+  );
 
-if (remoteListApi !== null) {
-  console.log('Remote Api_100_items list Started');
-  const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
-}
+  if (remoteListApi !== null) {
+    console.log('Remote Api_100_items list Started');
+    const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
+  }
 
-const lazyDummyJsonList = document.getElementById(
-  REMOTE_LAZY_DUMMYJSON_API_PROPS.selectorId
-);
+  const lazyDummyJsonList = document.getElementById(
+    REMOTE_LAZY_DUMMYJSON_API_PROPS.selectorId
+  );
 
-if (lazyDummyJsonList !== null) {
-  console.log('Lazy DummyJson list Started');
-  const myLazyScroll = new InfinityScroll(REMOTE_LAZY_DUMMYJSON_API_PROPS);
-}
+  if (lazyDummyJsonList !== null) {
+    console.log('Lazy DummyJson list Started');
+    const myLazyScroll = new InfinityScroll(REMOTE_LAZY_DUMMYJSON_API_PROPS);
+  }
 
-const lazyAPIList = document.getElementById(REMOTE_LAZY_API_PROPS.selectorId);
+  const lazyAPIList = document.getElementById(REMOTE_LAZY_API_PROPS.selectorId);
 
-if (lazyAPIList !== null) {
-  console.log('Lazy API list Started');
-  const myLazyAPIScroll = new InfinityScroll(REMOTE_LAZY_API_PROPS);
-}
+  if (lazyAPIList !== null) {
+    console.log('Lazy API list Started');
+    const myLazyAPIScroll = new InfinityScroll(REMOTE_LAZY_API_PROPS);
+  }
 
-const lazyAPIList100 = document.getElementById(
-  REMOTE_LAZY_API_PROPS_100ITEMS.selectorId
-);
+  const lazyAPIList100 = document.getElementById(
+    REMOTE_LAZY_API_PROPS_100ITEMS.selectorId
+  );
 
-if (lazyAPIList100 !== null) {
-  console.log('Lazy API list Started');
-  const myLazyAPIScroll100 = new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS);
-}
+  if (lazyAPIList100 !== null) {
+    console.log('Lazy API list Started');
+    const myLazyAPIScroll100 = new InfinityScroll(
+      REMOTE_LAZY_API_PROPS_100ITEMS
+    );
+  }
 
-const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
-  '#infinityScrollListStartBtn'
-);
+  const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
+    '#infinityScrollListStartBtn'
+  );
 
-StartBtn?.addEventListener('click', () => {
-  console.log('Nothing happens');
-});
+  StartBtn?.addEventListener('click', () => {
+    console.log('Nothing happens');
+  });
+})();
