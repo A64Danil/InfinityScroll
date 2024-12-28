@@ -180,7 +180,12 @@ class InfinityScroll {
   }
 
   setDefaultStyles() {
-    this.wrapperEl.style.height = this.listWrapperHeight;
+    if (this.listWrapperHeight !== undefined) {
+      this.wrapperEl.style.height = this.listWrapperHeight;
+      // TODO: remove logs
+      console.warn('Set forced HEIGHT from js to listWrapperHeight');
+    }
+    console.log(`=====> ${this.wrapperEl.offsetHeight}`);
     this.wrapperEl.style.overflowY = 'scroll';
   }
 
