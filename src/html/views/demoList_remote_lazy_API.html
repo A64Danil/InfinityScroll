@@ -14,28 +14,6 @@ author: "Danil X" }; %>
       _.template(require('html-loader!./../includes/demoLists/remote_lazy_api.html'))(data)
       %>
     </section>
-    <% if (data.mode === 'production') {%>
-    <script>
-      console.log('start: <%= data.title %> ');
-
-      const REMOTE_LAZY_API_PROPS = {
-        data: ({ start, end }) =>
-          `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
-        name: 'Remote lazy api list (17kkk items) ',
-        selectorId: 'REMOTE_LAZY_API',
-        forcedListLength: 17154017,
-        // forcedListLength: 1000000,
-        // maximal value is 33554400px
-        listType: 'list',
-        listWrapperHeight: '290px',
-        templateString: (element, listLength) => `<li
-        class="REMOTE_LAZY_API__listItem" >
-           ${element?.name}
-    </li>`,
-      };
-
-      new InfinityScroll(REMOTE_LAZY_API_PROPS);
-    </script>
 
     <section>
       <h2>How to use it:</h2>
@@ -66,7 +44,6 @@ author: "Danil X" }; %>
     `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
   selectorId: 'REMOTE_LAZY_API',
   forcedListLength: 17154017,
-  listWrapperHeight: '290px',
   templateString: (element, listLength) => `&lt;li
               class="REMOTE_LAZY_API__listItem" &gt;
            ${element?.name}
@@ -109,6 +86,24 @@ author: "Danil X" }; %>
       _.template(require('html-loader!./../includes/demoDescriptions/listSetupShort.html'))(data)
       %>
     </section>
+    <% if (data.mode === 'production') {%>
+    <script>
+      console.log('start: <%= data.title %> ');
+
+      const REMOTE_LAZY_API_PROPS = {
+        data: ({ start, end }) =>
+          `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
+        selectorId: 'REMOTE_LAZY_API',
+        forcedListLength: 17154017,
+        // listType: 'list',
+        templateString: (element, listLength) => `<li
+        class="REMOTE_LAZY_API__listItem" >
+           ${element?.name}
+    </li>`,
+      };
+
+      new InfinityScroll(REMOTE_LAZY_API_PROPS);
+    </script>
     <% } %>
   </body>
 </html>
