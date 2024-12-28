@@ -15,10 +15,14 @@ import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_10
 console.log('Entry point');
 
 (async () => {
-  if (process.env.NODE_ENV === 'development') {
-    // @ts-ignore
-    await import('./styles/main.scss');
-  }
+  const loadDevStyles =
+    process.env.NODE_ENV === 'development'
+      ? // @ts-ignore
+        () => import('./styles/main.scss')
+      : () => Promise.resolve();
+
+  await loadDevStyles();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const BigJson1 = BigDataList100.data;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
