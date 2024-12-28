@@ -1,7 +1,9 @@
-.REMOTE_LAZY_DUMMYJSON_API_List {
+.REMOTE_LAZY_DUMMYJSON_API {
   color: #333;
   height: 310px;
+}
 
+.REMOTE_LAZY_DUMMYJSON_API_List {
   &__listItem {
     padding: 5px 10px;
     font-size: 18px;
