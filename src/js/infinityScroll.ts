@@ -185,6 +185,13 @@ class InfinityScroll {
       // TODO: remove logs
       console.warn('Set forced HEIGHT from js to listWrapperHeight');
     }
+
+    if (this.wrapperEl.offsetHeight < 10) {
+      throw new Error(
+        'Your list height is less than 10px. You need to set your list-height from STYLES (by css) or pass like property in JS'
+      );
+    }
+
     console.log(`=====> ${this.wrapperEl.offsetHeight}`);
     this.wrapperEl.style.overflowY = 'scroll';
   }
