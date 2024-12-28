@@ -18,6 +18,8 @@ import {
   getListLength,
 } from './helpers';
 
+import { errorMsg } from '../locales/errors';
+
 import { NumRange, Rec } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
@@ -34,6 +36,8 @@ const nameToTag: NameToTagObj = {
   list: 'UL',
   table: 'TABLE',
 };
+
+const LANG: string = navigator.language.split('-')[0];
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
@@ -187,9 +191,9 @@ class InfinityScroll {
     }
 
     if (this.wrapperEl.offsetHeight < 10) {
-      throw new Error(
-        'Your list height is less than 10px. You need to set your list-height from STYLES (by css) or pass like property in JS'
-      );
+      const msg = errorMsg[LANG].zeroHeight;
+      this.wrapperEl.innerHTML = `<h3>${msg}</h3>`;
+      throw new Error(msg);
     }
 
     console.log(`=====> ${this.wrapperEl.offsetHeight}`);
