@@ -44,7 +44,6 @@ author: "Danil X" }; %>
     `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
   selectorId: 'REMOTE_LAZY_API_100ITEMS',
   forcedListLength: 100,
-  listWrapperHeight: '290px',
   templateString: (element, listLength, elemNum) => `&lt;li
               class="REMOTE_LAZY_API__listItem" &gt;
            ${element?.name} (elemNum - ${elemNum})
@@ -95,7 +94,6 @@ author: "Danil X" }; %>
           `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
         selectorId: 'REMOTE_LAZY_API_100ITEMS',
         forcedListLength: 100,
-        listWrapperHeight: '290px',
         templateString: (element, listLength, elemNum) => `<li
         class="REMOTE_LAZY_API__listItem"
         >
