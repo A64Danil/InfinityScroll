@@ -296,15 +296,7 @@ class InfinityScroll {
 .${this.selectorId}_List li { 
       white-space: nowrap;
     }
-    
-    .OFF-${innerElementClassName} {
-      overflow: hidden; 
-      }
-      
-.OFF-${innerElementClassName} > ${childElementTagName} { 
-      /* white-space: nowrap; */
-      max-height: ${this.list.itemHeight}px;
-    }
+
     
 .${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}`;
     const styleELem = document.createElement('style');
