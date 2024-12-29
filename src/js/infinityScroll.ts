@@ -40,6 +40,24 @@ const nameToTag: NameToTagObj = {
 
 const LANG: string = navigator.language.split('-')[0];
 
+const cssAnimationSkeletonText = `.loading .dots {
+    width: 0.5em;
+    animation: load 3s steps(4, end) infinite;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: text-bottom;
+}
+
+@keyframes load {
+    from {
+        width: 0em;
+    }
+    to   {
+        width: 2em;
+    }
+}
+`;
+
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 class InfinityScroll {
@@ -259,13 +277,36 @@ class InfinityScroll {
 
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
 
+    const innerElementClassName = `${this.selectorId}_${this.listType
+      .charAt(0)
+      .toUpperCase()}${this.listType.slice(1)}`;
+
+    const mapOfChildSelector = {
+      list: 'li',
+      table: 'tbody > tr',
+      div: 'div',
+    };
+
+    const childElementTagName = mapOfChildSelector[this.listType];
+
     const cssText = `.${this.selectorId}_List {
       overflow: hidden; 
       }
       
 .${this.selectorId}_List li { 
       white-space: nowrap;
-    }`;
+    }
+    
+    .OFF-${innerElementClassName} {
+      overflow: hidden; 
+      }
+      
+.OFF-${innerElementClassName} > ${childElementTagName} { 
+      /* white-space: nowrap; */
+      max-height: ${this.list.itemHeight}px;
+    }
+    
+.${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}`;
     const styleELem = document.createElement('style');
     styleELem.appendChild(document.createTextNode(cssText));
     this.wrapperEl.prepend(styleELem);
