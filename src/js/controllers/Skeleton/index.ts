@@ -1,4 +1,5 @@
 import { TemplateStringFunction } from '../../types/TemplateStringFunction';
+import { elemFromString, trFromString } from '../../helpers/stringToDom';
 
 export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
@@ -7,9 +8,13 @@ export class Skeleton {
   // TODO: 0 instead of undefined
   private listLength: number | undefined;
 
-  constructor(props: { template: TemplateStringFunction }) {
+  private readonly makeItemFromString: (itemFromStrTpl: string) => HTMLElement;
+
+  constructor(props: { template: TemplateStringFunction; listType: string }) {
     console.log('start Skeleton');
     this.template = props.template;
+    this.makeItemFromString =
+      props.listType !== 'table' ? elemFromString : trFromString;
   }
 
   // TODO: need to rename?
@@ -34,10 +39,8 @@ export class Skeleton {
     data: Record<string, unknown>,
     dataIndex: number
   ) {
-    const tempContainer = document.createElement('div');
-    const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
-    tempContainer.innerHTML = itemFromStrTpl;
-    const itemHTML = tempContainer.firstElementChild as HTMLElement;
+    const itemLikeStrFromTpl = this.template(data, this.listLength, dataIndex);
+    const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     this.setRequiredAttrs({
       element: itemHTML,
       dataIndex,
@@ -52,10 +55,8 @@ export class Skeleton {
     data: Record<string, unknown>;
     dataIndex: number;
   }): HTMLElement {
-    const tempContainer = document.createElement('div');
-    const itemFromStrTpl = this.template(data, this.listLength, dataIndex);
-    tempContainer.innerHTML = itemFromStrTpl;
-    const itemHTML = tempContainer.firstElementChild as HTMLElement;
+    const itemLikeStrFromTpl = this.template(data, this.listLength, dataIndex);
+    const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     this.setRequiredAttrs({
       element: itemHTML,
       dataIndex,
