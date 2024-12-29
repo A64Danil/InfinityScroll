@@ -1,5 +1,10 @@
 import { TemplateStringFunction } from '../../types/TemplateStringFunction';
-import { elemFromString, trFromString } from '../../helpers/stringToDom';
+import {
+  elemFromString,
+  trFromString,
+  setPlaceholder,
+  setTdPlaceholder,
+} from '../../helpers/domHelpers';
 
 export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
@@ -10,11 +15,15 @@ export class Skeleton {
 
   private readonly makeItemFromString: (itemFromStrTpl: string) => HTMLElement;
 
+  private readonly setLoadingPlaceholder: (item: HTMLElement) => void;
+
   constructor(props: { template: TemplateStringFunction; listType: string }) {
     console.log('start Skeleton');
     this.template = props.template;
     this.makeItemFromString =
       props.listType !== 'table' ? elemFromString : trFromString;
+    this.setLoadingPlaceholder =
+      props.listType !== 'table' ? setPlaceholder : setTdPlaceholder;
   }
 
   // TODO: need to rename?
@@ -57,6 +66,9 @@ export class Skeleton {
   }): HTMLElement {
     const itemLikeStrFromTpl = this.template(data, this.listLength, dataIndex);
     const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
+    if (!data) {
+      this.setLoadingPlaceholder(itemHTML);
+    }
     this.setRequiredAttrs({
       element: itemHTML,
       dataIndex,
