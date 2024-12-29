@@ -43,11 +43,17 @@ author: "Danil X" }; %>
   data: ({ start, end }) =>
     `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
   selectorId: 'REMOTE_LAZY_API_100ITEMS',
-  forcedListLength: 100,
-  templateString: (element, listLength, elemNum) => `&lt;li
-              class="REMOTE_LAZY_API__listItem" &gt;
-           ${element?.name} (elemNum - ${elemNum})
-    &lt;/li&gt;`,
+  forcedListLength: 100,&lt;tr
+        class=&quot;REMOTE_LAZY_API_100ITEMS__listItem&quot;
+        &gt;
+          &lt;td&gt;#${elemNum} - id${element?.id}&lt;/td&gt;
+          &lt;td&gt;${element?.name} (${element?.country_code})&lt;/td&gt;
+          &lt;td&gt;${element?.industry}&lt;/td&gt;
+          &lt;td&gt;${element?.founded}&lt;/td&gt;
+          &lt;td&gt;${element?.size}&lt;/td&gt;
+          &lt;td&gt;${element?.city} (${element?.state})&lt;/td&gt;
+    &lt;/tr&gt;
+  templateString: (element, listLength, elemNum) => ``,
 };
 
   new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS );
@@ -94,11 +100,17 @@ author: "Danil X" }; %>
           `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
         selectorId: 'REMOTE_LAZY_API_100ITEMS',
         forcedListLength: 100,
-        templateString: (element, listLength, elemNum) => `<li
-        class="REMOTE_LAZY_API__listItem"
+        listType: 'table',
+        templateString: (element, listLength, elemNum) => `<tr
+        class="REMOTE_LAZY_API_100ITEMS__listItem"
         >
-           ${element?.name} (elemNum - ${elemNum})
-    </li>`,
+          <td>#${elemNum} - id${element?.id}</td>
+          <td>${element?.name} (${element?.country_code})</td>
+          <td>${element?.industry}</td>
+          <td>${element?.founded}</td>
+          <td>${element?.size}</td>
+          <td>${element?.city} (${element?.state})</td>
+    </tr>`,
       };
 
       new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS);
