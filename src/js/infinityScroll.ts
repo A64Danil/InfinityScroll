@@ -35,6 +35,7 @@ type NameToTagObj = {
 const nameToTag: NameToTagObj = {
   list: 'UL',
   table: 'TABLE',
+  div: 'DIV',
 };
 
 const LANG: string = navigator.language.split('-')[0];
@@ -59,7 +60,7 @@ class InfinityScroll {
   private readonly forcedListLength: number | undefined;
 
   // Тип списка (список или таблица)
-  private readonly listType: string;
+  private readonly listType: 'table' | 'list' | 'div';
 
   // Тип списка (список или таблица)
   private readonly listWrapperHeight: string | undefined;
@@ -119,6 +120,7 @@ class InfinityScroll {
 
     this.skeleton = new Skeleton({
       template: props.templateString,
+      listType: this.listType,
     });
 
     const domChangerProps = {
@@ -203,7 +205,11 @@ class InfinityScroll {
       .charAt(0)
       .toUpperCase()}${this.listType.slice(1)}`;
     newEl.setAttribute('class', newElClass);
-    return this.wrapperEl.appendChild(newEl);
+    if (this.listType !== 'table') {
+      return this.wrapperEl.appendChild(newEl);
+    }
+    const tbody = document.createElement('tbody');
+    return this.wrapperEl.appendChild(newEl).appendChild(tbody);
   }
 
   getAllSizes(): void {
