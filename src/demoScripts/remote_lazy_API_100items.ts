@@ -7,7 +7,7 @@ export const REMOTE_LAZY_API_PROPS_100ITEMS: InfinityScrollPropTypes = {
   forcedListLength: 100,
   listType: 'table',
   templateString: (element, listLength, elemNum) => `<tr
-        class="REMOTE_LAZY_API__listItem" 
+        class="REMOTE_LAZY_API_100ITEMS__listItem" 
         >
           <td>#${elemNum} - id${element?.id}</td>
           <td>${element?.name} (${element?.country_code})</td>
