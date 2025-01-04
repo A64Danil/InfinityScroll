@@ -5,13 +5,11 @@ import { DataURLType } from './DataURL';
 export type InfinityScrollPropTypes = {
   data: object[] | DataURLType;
   selectorId: string;
-  listWrapperHeight?: string;
-  name?: string; // remove ?
-  isLazy?: boolean; // сделать лейзи если в data - функция
-  subDir?: string;
-  forcedListLength?: number;
-  listType?: 'list' | 'table';
   templateString: TemplateStringFunction;
+  listWrapperHeight?: string;
+  forcedListLength?: number;
+  listType?: 'list' | 'table' | 'div';
+  subDir?: string;
 };
 
 // type DataLikeArr = {
