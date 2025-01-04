@@ -78,30 +78,56 @@ author: "Danil X" }; %>
     <section>
       <h2>How to use it:</h2>
 
+      <p class="codeDescription">Types of config:</p>
+      <pre class="code">
+const REMOTE_LAZY_000ITEMS_PROPS = {
+  data: object[] | DataURLType;
+  selectorId: string;
+  templateString: (
+      element: { [key: string]: unknown },
+      listLength?: number,
+      elemNum?: number
+    ) => string;
+  listWrapperHeight?: string;
+  forcedListLength?: number;
+  listType?: 'list' | 'table' | 'div';
+  subDir?: string;
+
+};
+
+new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
+      </pre>
+    </section>
+
+    <section>
+      <h2>Demo example:</h2>
+
       <p class="codeDescription">Description in progress:</p>
       <pre class="code">
 const REMOTE_LAZY_000ITEMS_PROPS = {
-  data: BigJson1,
-  dataLoadPlace: 'remote',
-  isLazy: true,
-  dataUrl: (start?: number, end?: number, page?: number, limit?: number) =>
+  data: (start, end) =>
     `http://localhost:3000/data?_start=${start}&_end=${end}`,
-  name: 'my scroll list name',
   selectorId: 'REMOTE_LAZY_000ITEM',
   forcedListLength: 500,
   listType: 'list',
   listWrapperHeight: '290px',
-  templateString: (element: object, listLength?: number): string => `&lt;li
-              class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;
-              aria-setsize=&quot;${listLength}&quot;
-              aria-posinset=&quot;${element?.number}&quot;
-      &gt;
+  templateString: (element: object, listLength?: number): string => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot; &gt;
             ${element?.number} ${element?.name}
     &lt;/li&gt;`,
 };
 
 new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
       </pre>
+    </section>
+
+    <section>
+      <h2>Config's property description</h2>
+    </section>
+
+    <section>
+      <%=
+      _.template(require('html-loader!./../includes/demoDescriptions/listSetupFull.html'))(data)
+      %>
     </section>
   </body>
 </html>

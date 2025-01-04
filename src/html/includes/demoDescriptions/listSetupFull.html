@@ -1,0 +1,96 @@
+<section>
+  <h3>Data</h3>
+  <p>data - your array with objects. Can be like:</p>
+  <ol>
+    <li>just array</li>
+    <li>URL-string to your array in network</li>
+    <li>Function, that's return URL-string to your array in network</li>
+  </ol>
+  <pre class="code">
+data: BigJson1, // just array
+// OR
+data: 'https://jsonplaceholder.typicode.com/comments', // url-string
+// OR
+data: (&#123; start, end, page, limit &#125;) => `https://dummyjson.com/products?limit=$&#123;limit&#125;&skip=$&#123;start&#125;`, // function, returning URL-string
+// OR
+data: (&#123; start, end &#125;) => `https://restapi.qoobeo.ru/api/v1/companys?start=$&#123;start&#125;&end=$&#123;end&#125;&isFullSchema=true`, // function, returning URL-string
+      </pre
+  >
+</section>
+
+<section>
+  <h3>SelectorId</h3>
+  <p class="codeDescription">ID of your root element</p>
+  <pre class="code">
+selectorId: 'myRootID';
+      </pre
+  >
+</section>
+
+<section>
+  <h3>TemplateString</h3>
+  <p class="codeDescription">Template of list items</p>
+  <pre class="code">
+templateString: (element, listLength) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;&gt;
+            $&#123;element?.number&#125; $&#123;element?.name&#125;
+    &lt;/li&gt;`,
+      </pre
+  >
+</section>
+
+<section>
+  <h3>ListWrapperHeight <i>(optional)</i></h3>
+  <p class="codeDescription">
+    Height of your root element. Set in styles or in JS.
+  </p>
+  <pre class="code">
+listWrapperHeight: '350px',
+      </pre
+  >
+</section>
+
+<section>
+  <h3>ForcedListLength <i>(optional)</i></h3>
+  <p class="codeDescription">
+    You can set length of your list manually. To limit very big list or just to
+    accelerate initializating of list (to prevent automatical searching of list
+    length).
+  </p>
+  <pre class="code">
+forcedListLength: 100,
+      </pre
+  >
+</section>
+
+<section>
+  <h3>ListType <i>(optional)</i></h3>
+  <p class="codeDescription">
+    Switch type of your list between LIST (ul), TABLE (table) and just DIV
+    (div). Default value is 'list'
+  </p>
+  <pre class="code">
+listType?: 'list' | 'table' | 'div';
+      </pre
+  >
+</section>
+
+<section>
+  <h3>SubDir <i>(optional)</i></h3>
+  <p class="codeDescription">
+    Set additional directory to parce your API-response. In case, if you have
+    response not like array, but like object with array
+  </p>
+  <pre class="code">
+const response = &#123;
+    status: 200,
+    products: [&#123;&#125;, &#123;&#125;, &#123;&#125;, ...],
+    total: 286,
+    offset: 38,
+&#125;;
+      </pre
+  >
+  <pre class="code">
+subDir: 'products',
+      </pre
+  >
+</section>
