@@ -89,3 +89,16 @@ pre {
   background-color: #007bff;
   border-color: #007bff;
 }
+
+.mainMenu {
+  display: flex;
+  flex-wrap: wrap;
+  //justify-content: space-between;
+  gap: 40px;
+  padding: 0;
+
+
+  &__item {
+    display: block;
+  }
+}

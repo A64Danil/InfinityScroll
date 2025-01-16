@@ -1,5 +1,5 @@
 <header>
-  <h1 class="visually-hidden">Infinity Scroll</h1>
+  <h1 class="visually-hidden">Infinity Scroll - <%= title %></h1>
 
   <div class="mainLogo">
     <img
@@ -8,15 +8,16 @@
       title="Infinity Scroll LOGO"
     />
   </div>
-  <h2 class="pageTitle"><%= title %></h2>
 
   <nav>
     <ul class="mainMenu">
-      <li><a href="/index.html">home</a></li>
-      <li><a href="/index.html">demos</a></li>
-      <li><a href="/gettingStarted.html">usage</a></li>
-      <li><a href="/settings.html">settings</a></li>
-      <li><a href="/download.html">download</a></li>
+      <li class="mainMenu__item"><a href="/index.html">Main page</a></li>
+      <li class="mainMenu__item"><a href="/index.html">Demo list</a></li>
+      <li class="mainMenu__item">
+        <a href="/gettingStarted.html">Getting Started</a>
+      </li>
+      <li class="mainMenu__item"><a href="/settings.html">Settings</a></li>
+      <li class="mainMenu__item"><a href="/download.html">Download</a></li>
     </ul>
   </nav>
 </header>
