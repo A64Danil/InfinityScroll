@@ -17,7 +17,9 @@ author: "Danil X" }; %>
         _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
         %>
       </p>
-      <p class="codeDescription">2. Put script to the head tag or before your closing body tag:</p>
+      <p class="codeDescription">
+        2. Put script to the head tag or before your closing body tag:
+      </p>
       <pre class="code">
 <!--  Here you need to connect howToIncludeScriptFile.html     -->
       </pre>
@@ -25,10 +27,11 @@ author: "Danil X" }; %>
         3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code">
-<div id="demo_list_iscroll"></div>
+&lt;div id=&quot;demo_list_iscroll&quot;&gt;&lt;/div&gt;
       </pre>
       <p class="codeDescription">
-        4. Configure list in your script file or an inline script tag. And then, start it by call new InfinityScroll(config):
+        4. Configure list in your script file or an inline script tag. And then,
+        start it by call new InfinityScroll(config):
       </p>
       <pre class="code">
 &lt;script type="module"&gt;
@@ -54,12 +57,10 @@ author: "Danil X" }; %>
 
     <section>
       <h2>Config's property description</h2>
-    </section>
-
-    <section>
-      <%=
-      _.template(require('html-loader!./../includes/demoDescriptions/listSetupFull.html'))(data)
-      %>
+      <p>
+        Here you can see
+        <a href="/settings.html">full instruction to setup</a> your list!
+      </p>
     </section>
   </body>
 </html>
