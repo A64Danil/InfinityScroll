@@ -11,9 +11,11 @@ data: BigJson1, // just array
 // OR
 data: 'https://jsonplaceholder.typicode.com/comments', // url-string
 // OR
-data: (&#123; start, end, page, limit &#125;) => `https://dummyjson.com/products?limit=$&#123;limit&#125;&skip=$&#123;start&#125;`, // function, returning URL-string
+// function, returning URL-string (based on offset and limit)
+data: (&#123; start, end, page, limit &#125;) => `https://dummyjson.com/products?limit=$&#123;limit&#125;&skip=$&#123;start&#125;`,
 // OR
-data: (&#123; start, end &#125;) => `https://restapi.qoobeo.ru/api/v1/companys?start=$&#123;start&#125;&end=$&#123;end&#125;&isFullSchema=true`, // function, returning URL-string
+// function, returning URL-string (based on start-end)
+data: (&#123; start, end &#125;) => `https://restapi.qoobeo.ru/api/v1/companys?start=$&#123;start&#125;&end=$&#123;end&#125;&isFullSchema=true`, //
       </pre
   >
 </section>
