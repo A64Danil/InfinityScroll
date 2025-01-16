@@ -12,18 +12,16 @@ author: "Danil X" }; %>
 
     <section>
       <h2>Download:</h2>
-      <p><%=
-        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
-        %></p>
       <p>
-        2. Or just connect it to your project like romete link
+        <%=
+        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p>2. Or just connect it to your project like romete link</p>
+
       <pre class="code">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </pre>
-
-      </p>
-
-
     </section>
   </body>
 </html>
