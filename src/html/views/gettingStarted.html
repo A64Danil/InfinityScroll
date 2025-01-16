@@ -1,0 +1,65 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X" }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+
+    <section>
+      <h2>Getting Started:</h2>
+      <p class="codeDescription">
+        <%=
+        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p class="codeDescription">2. Put script to the head tag or before your closing body tag:</p>
+      <pre class="code">
+<!--  Here you need to connect howToIncludeScriptFile.html     -->
+      </pre>
+      <p class="codeDescription">
+        3. Place any tag with your unique ID into your html-code:
+      </p>
+      <pre class="code">
+<div id="demo_list_iscroll"></div>
+      </pre>
+      <p class="codeDescription">
+        4. Configure list in your script file or an inline script tag. And then, start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code">
+&lt;script type="module"&gt;
+  import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
+
+  console.log('start: demo_list_iscroll');
+
+  const BigJson1 = BigDataList10000.data;
+
+  const LOCAL_BASIC_10000ITEMS_PROPS = {
+      data: BigJson1, // Any array
+      selectorId: 'demo_list_iscroll', // Container's ID
+      listWrapperHeight: '350px', // Your list's height
+      templateString: (element, listLength, number) => `&lt;li&gt;
+        ${element.name} ${element.number} - ${number}
+&lt;/li&gt;`, // template of list items
+  };
+
+  new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
+&lt;/script&gt
+      </pre>
+    </section>
+
+    <section>
+      <h2>Config's property description</h2>
+    </section>
+
+    <section>
+      <%=
+      _.template(require('html-loader!./../includes/demoDescriptions/listSetupFull.html'))(data)
+      %>
+    </section>
+  </body>
+</html>

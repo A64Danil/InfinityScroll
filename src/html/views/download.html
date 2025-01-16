@@ -1,0 +1,19 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X" }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+
+    <section>
+      <%=
+      _.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)
+      %>
+    </section>
+  </body>
+</html>
