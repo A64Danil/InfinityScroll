@@ -21,7 +21,7 @@ author: "Danil X" }; %>
         2. Put script to the head tag or before your closing body tag:
       </p>
       <pre class="code">
-<!--  Here you need to connect howToIncludeScriptFile.html     -->
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
