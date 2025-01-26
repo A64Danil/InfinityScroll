@@ -12,6 +12,17 @@
 <script src="js/infinityScroll.bundle.js"></script>
 <link rel="stylesheet" href="styles/common.css" />
 <link rel="stylesheet" href="styles/<%= origName %>.css" />
+
+<link rel="stylesheet" href="assets/styles/hl/atom-one-dark.min.css" />
+<script src="assets/js/hl/highlight.min.js"></script>
+<script src="assets/js/hl/javascript.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre code').forEach((el) => {
+      hljs.highlightElement(el);
+    });
+  });
+</script>
 <% } %>
 
 <title>Infinity Scroll - <%=title%></title>
