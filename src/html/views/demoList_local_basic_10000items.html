@@ -23,19 +23,19 @@ author: "Danil X" }; %>
         %>
       </p>
       <p class="codeDescription">2. Put script to the head tag:</p>
-      <pre class="code">
+      <pre class="code"><code class="language-html">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-html">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/local_basic_10000items.html'))(data)) %>
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-javascript">
 &lt;script type="module"&gt;
   import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
 
@@ -54,7 +54,7 @@ author: "Danil X" }; %>
 
   new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
 &lt;/script&gt
-      </pre>
+      </code></pre>
     </section>
 
     <section>
