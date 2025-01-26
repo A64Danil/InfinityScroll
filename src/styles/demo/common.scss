@@ -55,16 +55,15 @@ pre {
   margin-bottom: 10px;
 }
 
-.code {
-  display: block;
-  white-space: pre;
-  /*padding: 0 1em 1em 1em;*/
-  padding: 1em;
-  color: #fff;
-  background: #000;
-  margin-bottom: var(--mb);
-  overflow-x: scroll;
-}
+//.code {
+//  display: block;
+//  white-space: pre;
+//  padding: 1em;
+//  color: #fff;
+//  background: #000;
+//  margin-bottom: var(--mb);
+//  overflow-x: scroll;
+//}
 
 .attention {
   margin-top: calc((var(--mb) - 4px) * -1);
