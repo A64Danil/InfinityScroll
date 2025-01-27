@@ -89,7 +89,8 @@ module.exports = {
         }),
 
         // Prettier configuration
-        new PrettierPlugin(),
+        // TODO: отключаем на время билда
+        // new PrettierPlugin(),
     ].concat(htmlPlugins),
     module: {
         rules: [
