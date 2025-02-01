@@ -1,5 +1,10 @@
 $font-size: 1rem;
 $font-color: #333;
+$mb: 2rem;
+
+:root {
+  --mb: 4rem;
+}
 
 body {
   width: 85%;
@@ -55,15 +60,22 @@ pre {
   margin-bottom: 10px;
 }
 
-//.code {
-//  display: block;
-//  white-space: pre;
-//  padding: 1em;
-//  color: #fff;
-//  background: #000;
-//  margin-bottom: var(--mb);
-//  overflow-x: scroll;
-//}
+.code {
+  display: block;
+  //white-space: pre;
+  //padding: 1em;
+  //overflow-x: scroll;
+  border-radius: 6px;
+  color: #fff;
+  background: #000;
+  margin-bottom: var(--mb);
+
+  code {
+    box-shadow: inset 0 0 10px 0px #000000;
+    border-radius: inherit;
+    border: 2px solid black;
+  }
+}
 
 .attention {
   margin-top: calc((var(--mb) - 4px) * -1);
