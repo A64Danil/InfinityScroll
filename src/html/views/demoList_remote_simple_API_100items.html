@@ -23,19 +23,19 @@ author: "Danil X" }; %>
         %>
       </p>
       <p class="codeDescription">2. Put script to the head tag:</p>
-      <pre class="code">
+      <pre class="code"><code class="language-html">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-html">
 <%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/remote_simple_api_100items.html'))(data)) %>
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-javascript">
 &lt;script type="module"&gt;
   console.log('start: <%= data.title %> ');
 
@@ -51,9 +51,9 @@ author: "Danil X" }; %>
 
   new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
 &lt;/script&gt;
-      </pre>
+      </code></pre>
       <p class="codeDescription">5. Add your styles:</p>
-      <pre class="code">
+      <pre class="code"><code class="language-css">
 .REMOTE_simple_API_100ITEMS {
   color: #333;
 }
@@ -69,7 +69,7 @@ author: "Danil X" }; %>
 .REMOTE_simple_API_100ITEMS__listItem:before {
   content: attr(aria-posinset) ')';
 }
-      </pre>
+      </code></pre>
     </section>
 
     <section>
