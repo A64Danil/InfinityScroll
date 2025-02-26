@@ -8,6 +8,6 @@ export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   selectorId: 'LOCAL_SIMPLE_100ITEMS',
   templateString: (element, listLength, number) => `<li
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
-            ${element.name} ${element.number} - ${number}
+            ${element.name} ${element.number} <span>(order number ${number})</span>
     </li>`,
 };

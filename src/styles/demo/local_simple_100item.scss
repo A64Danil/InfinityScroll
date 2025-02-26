@@ -2,10 +2,11 @@
 
 .LOCAL_SIMPLE_100ITEMS_Border {
   position: relative;
-  padding: 10px 0;
-  border: 2px solid #444;
+  //padding: 10px 0;
+  border: 2px solid #777;
   border-radius: 8px;
   margin-bottom: 20px;
+  overflow: hidden;
 }
 
 #LOCAL_SIMPLE_100ITEMS {
@@ -13,8 +14,10 @@
 }
 
 .LOCAL_SIMPLE_100ITEMS_List {
-  color: #555;
+  color: #444;
   margin: 0;
+  padding-left: 0;
+  background-color: #f7f7f7;
 
   &__listItem {
     padding: 8px 10px;
@@ -22,11 +25,23 @@
     border-radius: 4px;
     font-size: 18px;
 
+    &:nth-child(2n) {
+      background-color: #fefefe;
+    }
+
     &:hover {
       background: #efefef;
     }
     &:before {
       content: attr(aria-posinset) ')';
+      color: #555;
     }
+
+    span {
+      font-size: 14px;
+      color: #888;
+    }
+
+
   }
 }
