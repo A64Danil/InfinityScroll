@@ -259,27 +259,8 @@ class InfinityScroll {
       listItem = list.firstChild as HTMLElement;
     }
 
-    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
-
-    this.chunk.amount = Math.ceil(
-      this.list.wrapperHeight / this.list.itemHeight
-    );
-
-    this.list.existingSizeInDOM = this.chunk.amount * 4;
-    this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
-    this.chunk.lastRenderIndex =
-      this.list.length - this.list.halfOfExistingSizeInDOM;
-
-    this.list.startIndexOfLastPart =
-      this.list.length - this.list.existingSizeInDOM;
-    this.chunk.lastOrderNumber = Math.floor(
-      this.list.length / this.chunk.amount
-    );
-
-    this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
-
-    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
-
+    // TODO: вынести в отдельную функцию?
+    // Set required styles
     const innerElementClassName = `${this.selectorId}_${this.listType
       .charAt(0)
       .toUpperCase()}${this.listType.slice(1)}`;
@@ -305,6 +286,28 @@ class InfinityScroll {
     const styleELem = document.createElement('style');
     styleELem.appendChild(document.createTextNode(cssText));
     this.wrapperEl.prepend(styleELem);
+    // End - Set required styles
+
+    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
+
+    this.chunk.amount = Math.ceil(
+      this.list.wrapperHeight / this.list.itemHeight
+    );
+
+    this.list.existingSizeInDOM = this.chunk.amount * 4;
+    this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
+    this.chunk.lastRenderIndex =
+      this.list.length - this.list.halfOfExistingSizeInDOM;
+
+    this.list.startIndexOfLastPart =
+      this.list.length - this.list.existingSizeInDOM;
+    this.chunk.lastOrderNumber = Math.floor(
+      this.list.length / this.chunk.amount
+    );
+
+    this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
+
+    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
 
     if (listItem) {
       this.domMngr.removeItem('firstChild');
