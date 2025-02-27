@@ -1,8 +1,8 @@
-@import 'demo/common';
-@import 'demo/remote_simple_500item';
-@import 'demo/remote_simple_API_100items';
-@import 'demo/local_simple_100item';
-@import 'demo/remote_lazy_000item';
-@import 'demo/remote_lazy_dummyjson_API';
-@import 'demo/remote_lazy_api';
-@import 'demo/remote_lazy_API_100items';
+@use 'demo/common';
+@use 'demo/remote_simple_500item';
+@use 'demo/remote_simple_API_100items';
+@use 'demo/local_simple_100item';
+@use 'demo/remote_lazy_000item';
+@use 'demo/remote_lazy_dummyjson_API';
+@use 'demo/remote_lazy_api';
+@use 'demo/remote_lazy_API_100items';
