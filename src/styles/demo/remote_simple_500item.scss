@@ -1,20 +1,91 @@
+.listWrapper_500item {
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0 20px 0 rgba(0 0 0 / 47%);
+  background-color: #fefefe;
+  position: relative;
+
+  // This is fake scrollbar extender
+  //&:before {
+  //  content: "";
+  //  display: block;
+  //  position: absolute;
+  //  right: 0;
+  //  top: 0;
+  //  width: 18px;
+  //  height: 100%;
+  //  background-color: #f1f1f1;
+  //}
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    background-color: tomato;
+    z-index: 2;
+  }
+
+  &:before {
+    top: 0;
+    background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+
+  }
+
+  &:after {
+    bottom: 0;
+    background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+  }
+}
+
 #REMOTE_SIMPLE_500ITEM {
   height: 285px;
+  position: relative;
 }
 
 .REMOTE_SIMPLE_500ITEM_List {
   color: #333;
+  padding-left: 0;
+  list-style: none;
+  margin-top: 0;
 
   &__listItem {
-    padding: 5px 10px;
+    display: flex;
+    //flex-wrap: wrap;
+    padding: 5px 10px 8px 20px;
     font-weight: normal;
-    //transition: background-color 0.3s ease-in-out;
+    border-bottom: 1px dashed #ccc;
 
     &:hover {
       background: #eee;
     }
     &:before {
       content: attr(aria-posinset) ')';
+    }
+
+    .listItemContainer {
+      padding-left: 10px;
+
+
+      .header {
+        font-weight: 500;
+        margin-bottom: 5px;
+
+        span {
+          color: #777;
+          font-size: 14px;
+        }
+      }
+
+      .descr {
+        white-space: normal;
+        height: 3.45em;
+        overflow: hidden;
+        color: #6d7261;
+      }
     }
   }
 }
