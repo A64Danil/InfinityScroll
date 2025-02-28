@@ -1,22 +1,62 @@
 #REMOTE_SIMPLE_API_100ITEMS {
   height: 290px;
+  background-color: #fff;
+  outline: 1px solid darkgray;
 }
 
-.REMOTE_simple_API_100ITEMS {
+.REMOTE_SIMPLE_API_100ITEMS {
   color: #333;
 
+  &_List {
+    padding: 0;
+    margin: 0;
+  }
+
   &__listItem {
-    padding: 5px 10px;
+    display: flex;
+    padding: 12px 10px 20px;
     font-weight: normal;
     //transition: background-color 0.3s ease-in-out;
     white-space: nowrap;
     overflow: hidden;
+
+    &:nth-child(2n) {
+      background-color: #f7f7f7;
+    }
+
 
     &:hover {
       background: #eee;
     }
     &:before {
       content: attr(aria-posinset) ')';
+      font-size: 24px;
+      padding-right: 5px;
+
     }
+
+
+    .contentWrapper {
+
+      .title {
+        font-size: 24px;
+        margin-bottom: 6px;
+
+        span {
+          color: gray;
+          font-size: 14px;
+        }
+
+      }
+
+      .descr {
+
+      }
+
+      em {
+        color: gray;
+      }
+    }
+
   }
 }

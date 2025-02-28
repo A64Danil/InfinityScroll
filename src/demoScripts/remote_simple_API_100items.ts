@@ -1,14 +1,23 @@
 import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 
 export const REMOTE_SIMPLE_API_100ITEMS_PROPS: InfinityScrollPropTypes = {
-  data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`,
+  data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`,
   name: 'my scroll list name',
   selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
   listType: 'list',
-  listWrapperHeight: '290px',
+  listWrapperHeight: '490px',
   templateString: (element, listLength, elemNum) => `<li 
-        class="REMOTE_simple_API_100ITEMS__listItem" 
+        class="REMOTE_SIMPLE_API_100ITEMS__listItem" 
         >
-           ${element?.name} (elemNum - ${elemNum})
+            <div class="contentWrapper">
+              <p class="title">
+                <em>Company:</em> ${element?.name} 
+                <span>(${elemNum})</span>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${element?.website}  <em>(industry: ${element?.industry})</em> 
+              </p>
+              
+            </div>
     </li>`,
 };
