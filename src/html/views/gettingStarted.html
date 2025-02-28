@@ -8,9 +8,11 @@ author: "Danil X" }; %>
     <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
-    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
-
-    <section>
+    <section class="container">
+      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    </section>
+    
+    <section class="container">
       <h2>Getting Started:</h2>
       <p class="codeDescription">
         <%=
@@ -55,7 +57,7 @@ author: "Danil X" }; %>
       </pre>
     </section>
 
-    <section>
+    <section class="container">
       <h2>Config's property description</h2>
       <p>
         Here you can see

@@ -8,9 +8,11 @@ author: "Danil X" }; %>
     <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
-    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    <section class="container">
+      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    </section>
 
-    <section>
+    <section class="container">
       <h2>What is it?</h2>
 
       <p class="codeDescription">
@@ -22,7 +24,7 @@ author: "Danil X" }; %>
       </p>
     </section>
 
-    <section>
+    <section class="container">
       <h2>Demo list</h2>
 
       <p>
@@ -75,7 +77,7 @@ author: "Danil X" }; %>
       </ul>
     </section>
 
-    <section>
+    <section class="container">
       <h2>How to use it:</h2>
 
       <p class="codeDescription">Types of config:</p>
@@ -99,7 +101,7 @@ new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
       </code></pre>
     </section>
 
-    <section>
+    <section class="container">
       <h2>Demo example:</h2>
 
       <p class="codeDescription">Description in progress:</p>

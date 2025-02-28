@@ -8,13 +8,15 @@ author: "Danil X" }; %>
     <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
-    <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    <section class="container">
+      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    </section>
 
-    <section>
+    <section class="container">
       <h2>Settings</h2>
     </section>
 
-    <section>
+    <section class="container">
       <%=
       _.template(require('html-loader!./../includes/demoDescriptions/listSetupFull.html'))(data)
       %>

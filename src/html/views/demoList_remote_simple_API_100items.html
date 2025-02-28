@@ -10,12 +10,15 @@ author: "Danil X" }; %>
   <body>
     <section class="container">
       <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+    </section>
+
+    <section class="container">
       <%=
       _.template(require('html-loader!./../includes/demoLists/remote_simple_api_100items.html'))(data)
       %>
     </section>
 
-    <section>
+    <section class="container">
       <h2>How to use it:</h2>
       <p class="codeDescription">
         <%=
@@ -72,7 +75,7 @@ author: "Danil X" }; %>
       </code></pre>
     </section>
 
-    <section>
+    <section class="container">
       <%=
       _.template(require('html-loader!./../includes/demoDescriptions/listSetupShort.html'))(data)
       %>
