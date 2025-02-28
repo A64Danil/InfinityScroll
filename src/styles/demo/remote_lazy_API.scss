@@ -1,25 +1,60 @@
 .REMOTE_LAZY_API {
   color: #333;
-  height: 400px;
+  height: 600px;
+  background-color: #fff;
+  outline: 3px solid darkgray;
+
+
+  &_List {
+    padding: 0;
+    margin: 0;
+  }
 
   &__listItem {
-    padding: 8px 10px;
+    display: flex;
+    padding: 12px 10px 20px;
     font-weight: normal;
-    border-radius: 4px;
-    font-size: 18px;
-    max-height: 72px;
+    //transition: background-color 0.3s ease-in-out;
+    white-space: nowrap;
     overflow: hidden;
+
+    &:nth-child(2n) {
+      background-color: #f7f7f7;
+    }
+
 
     &:hover {
       background: #eee;
     }
     &:before {
-      content: attr(aria-posinset) ') ';
+      content: attr(aria-posinset) ')';
+      font-size: 24px;
+      padding-right: 5px;
+
     }
 
-    &.big {
-      padding: 15px 10px;
-      font-size: 36px;
+
+    .contentWrapper {
+
+      .title {
+        font-size: 24px;
+        margin-bottom: 6px;
+
+        span {
+          color: gray;
+          font-size: 14px;
+        }
+
+      }
+
+      .descr {
+
+      }
+
+      em {
+        color: gray;
+      }
     }
+
   }
 }
