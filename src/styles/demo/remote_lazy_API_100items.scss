@@ -1,6 +1,8 @@
 .REMOTE_LAZY_API_100ITEMS {
   color: #333;
-  height: 260px;
+  height: 600px;
+  background-color: #fff;
+  outline: 3px solid darkgray;
 
   &__listItem {
     font-weight: normal;
@@ -8,6 +10,10 @@
     font-size: 18px;
     max-height: 72px;
     overflow: hidden;
+
+    &:nth-child(2n) {
+      background-color: #f7f7f7;
+    }
 
     &:hover {
       background: #eee;
