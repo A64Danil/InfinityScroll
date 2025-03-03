@@ -14,7 +14,7 @@ author: "Danil X" }; %>
 
     <section>
       <%=
-      _.template(require('html-loader!./../includes/demoLists/remote_lazy_api_100items.html'))(data)
+      _.template(require('html-loader!./../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)
       %>
     </section>
 
@@ -33,7 +33,7 @@ author: "Danil X" }; %>
         3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/remote_lazy_api_100items.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
@@ -98,7 +98,7 @@ author: "Danil X" }; %>
     <script>
       console.log('start: <%= data.title %> ');
 
-      const REMOTE_LAZY_API_PROPS_100ITEMS = {
+      const REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI = {
         data: ({ start, end }) =>
           `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
         selectorId: 'REMOTE_LAZY_API_100ITEMS',
@@ -116,7 +116,7 @@ author: "Danil X" }; %>
     </tr>`,
       };
 
-      new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS);
+      new InfinityScroll(REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI);
     </script>
     <% } %>
   </body>
