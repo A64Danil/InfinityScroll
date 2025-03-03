@@ -83,7 +83,8 @@ class InfinityScroll {
   // Тип списка (список или таблица)
   private readonly listType: 'table' | 'list' | 'div';
 
-  // Тип списка (список или таблица)
+  private readonly tHeadNames: string[] | undefined;
+
   private readonly listWrapperHeight: string | undefined;
 
   // Тип загрузки (список доступен локально или надо качать с интернета)
@@ -114,7 +115,6 @@ class InfinityScroll {
   private readonly skeleton: Skeleton;
 
   constructor(props: InfinityScrollPropTypes) {
-    this.name = props.name;
     this.selectorId = props.selectorId;
 
     const wrapper = document.getElementById(props.selectorId);
@@ -128,6 +128,8 @@ class InfinityScroll {
     this.forcedListLength = props.forcedListLength;
 
     this.listType = props.listType || 'list';
+
+    this.tHeadNames = props.tHeadNames;
 
     this.listWrapperHeight = props.listWrapperHeight;
 
@@ -226,11 +228,29 @@ class InfinityScroll {
       .charAt(0)
       .toUpperCase()}${this.listType.slice(1)}`;
     newEl.setAttribute('class', newElClass);
-    if (this.listType !== 'table') {
-      return this.wrapperEl.appendChild(newEl);
+
+    if (
+      this.listType === 'table' &&
+      this.tHeadNames &&
+      this.tHeadNames.length > 0
+    ) {
+      const tbody = document.createElement('tbody');
+      const thead = document.createElement('thead');
+
+      const tHeadColsWithNames: string = this.tHeadNames?.reduce(
+        (acc, name) => {
+          const col = `<td>${name}</td>`;
+          return acc + col;
+        },
+        ''
+      );
+
+      thead.innerHTML = `<tr class="REMOTE_LAZY_API_100ITEMS__listItem">${tHeadColsWithNames}</tr>`;
+      this.wrapperEl.appendChild(newEl).appendChild(thead);
+      return this.wrapperEl.appendChild(newEl).appendChild(tbody);
     }
-    const tbody = document.createElement('tbody');
-    return this.wrapperEl.appendChild(newEl).appendChild(tbody);
+
+    return this.wrapperEl.appendChild(newEl);
   }
 
   getAllSizes(): void {
