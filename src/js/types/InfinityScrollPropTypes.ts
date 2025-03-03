@@ -9,6 +9,7 @@ export type InfinityScrollPropTypes = {
   listWrapperHeight?: string;
   forcedListLength?: number;
   listType?: 'list' | 'table' | 'div';
+  tHeadNames?: string[];
   subDir?: string;
 };
 
