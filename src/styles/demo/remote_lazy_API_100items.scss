@@ -4,12 +4,18 @@
   background-color: #fff;
   outline: 3px solid darkgray;
 
+  &_Table {
+    position: relative;
+    table-layout: fixed;
+  }
+
   &__listItem {
     font-weight: normal;
     border-radius: 4px;
     font-size: 18px;
-    max-height: 72px;
+    height: 3.75em;
     overflow: hidden;
+    vertical-align: top;
 
     &:nth-child(2n) {
       background-color: #f7f7f7;
@@ -20,11 +26,28 @@
     }
     &:before {
       content: attr(aria-posinset) ') ';
+      display: table-cell;
     }
 
-    &.big {
-      padding: 15px 10px;
-      font-size: 36px;
+    td,
+    &:before {
+      padding: 6px 10px;
+    }
+  }
+
+  thead {
+    //position: absolute;
+    position: sticky;
+    top: 0;
+    background: #ddd;
+    z-index: 1;
+
+    tr {
+      height: 1em;
+    }
+
+    .REMOTE_LAZY_API_100ITEMS__listItem:before {
+      content: attr(aria-posinset) '№ ';
     }
   }
 }
