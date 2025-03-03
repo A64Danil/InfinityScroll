@@ -10,7 +10,7 @@ import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500ite
 import { REMOTE_SIMPLE_API_100ITEMS_PROPS } from './demoScripts/remote_simple_API_100items';
 import { REMOTE_LAZY_DUMMYJSON_API_PROPS } from './demoScripts/remote_lazy_dummyjson_API';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
-import { REMOTE_LAZY_API_PROPS_100ITEMS } from './demoScripts/remote_lazy_API_100items';
+import { REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS } from './demoScripts/remote_lazy_100items_table_iscrollAPI';
 
 console.log('Entry point');
 
@@ -82,13 +82,13 @@ console.log('Entry point');
   }
 
   const lazyAPIList100 = document.getElementById(
-    REMOTE_LAZY_API_PROPS_100ITEMS.selectorId
+      REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS.selectorId
   );
 
   if (lazyAPIList100 !== null) {
     console.log('Lazy API list Started');
     const myLazyAPIScroll100 = new InfinityScroll(
-      REMOTE_LAZY_API_PROPS_100ITEMS
+        REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS
     );
   }
 
