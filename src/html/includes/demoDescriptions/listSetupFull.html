@@ -68,7 +68,9 @@ forcedListLength: 100,
   <h3>ListType <i>(optional)</i></h3>
   <p class="codeDescription">
     Switch type of your list between LIST (ul), TABLE (table) and just DIV
-    (div). Default value is 'list'
+    (div). Default value is 'list'.
+      <br>
+      <strong>Attention:</strong> if you are using a TABLE, we strongly recommend setting the min-height of your TR (table row) based on the size of the maximum content that may be inside the cells.
   </p>
   <pre class="code">
 listType?: 'list' | 'table' | 'div';
