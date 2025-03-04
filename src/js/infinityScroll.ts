@@ -245,7 +245,7 @@ class InfinityScroll {
         ''
       );
 
-      thead.innerHTML = `<tr class="${newElClass}__listItem">${tHeadColsWithNames}</tr>`;
+      thead.innerHTML = `<tr class="${this.selectorId}__listItem">${tHeadColsWithNames}</tr>`;
       this.wrapperEl.appendChild(newEl).appendChild(thead);
       return this.wrapperEl.appendChild(newEl).appendChild(tbody);
     }
