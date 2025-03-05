@@ -10,7 +10,7 @@ export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
 
-  private templateCb: Record<string, (arg: any) => any>;
+  private readonly templateCb: Record<string, (arg: any) => any>;
 
   // TODO: 0 instead of undefined
   private listLength: number | undefined;

@@ -63,6 +63,7 @@ const cssAnimationSkeletonText = `.loading .dots {
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
+// TODO: начать кэшировать некоторые настройки списка
 class InfinityScroll {
   // хранит в себе id сетТаймаута
   private timerIdRefreshList: number | undefined;

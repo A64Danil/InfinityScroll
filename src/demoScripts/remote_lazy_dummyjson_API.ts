@@ -5,25 +5,52 @@ export const REMOTE_LAZY_DUMMYJSON_API_PROPS: InfinityScrollPropTypes = {
     `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
   selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
   subDir: 'products',
-  templateString: (element, listLength) => `<li 
+  templateString: (element, listLength, elemNum, templateCb) => `<li 
         class="REMOTE_LAZY_DUMMYJSON_API__listItem" 
         >
-        
+
             <div class="imgWrapper">
                 <img src="${element?.thumbnail}" alt="">
             </div>
-        <div class="contentWrapper">
+            <div class="contentWrapper">
         
               <p class="title">
                 ${element?.title} <em>(${element?.brand})</em>
                 </p>
               <p class="desc">
-                <em>website:</em> ${element?.website}  <em>(industry: ${element?.industry})</em> 
+                <em>website:</em> ${element?.website}  <em>(industry: ${
+    element?.industry
+  })</em> 
               </p>
+              
+              <div class="reviewList">
+              ${templateCb?.reviewShower(element?.reviews)}
+              </div>
               
             </div>
     </li>`,
+  templateCb: {
+    reviewShower(reviewsAray: []) {
+      return reviewsAray
+        ?.map(
+          (el, i) => `<div class="review">
+        <p>${el?.reviewerName} <em>${el?.reviewerEmail}</em> <strong>${el?.rating} / 5</strong></p>
+        <p>${el?.comment}</p>
+        <p><em>${el?.date}</em></p>
+</div>`
+        )
+        .join('');
+    },
+    anyOtherFunc() {},
+  },
 };
+
+// <!--                ${this.templateCb.reviewShower(element.reviews)}-->
+// <!--                 REMOTE_LAZY_DUMMYJSON_API_PROPS.templateCb.reviewShower(element.reviews)-->
+
+//   ${REMOTE_LAZY_DUMMYJSON_API_PROPS.templateCb.reviewShower(
+//                 element?.reviews
+//               )}
 
 type Review = {
   rating: number;

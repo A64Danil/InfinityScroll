@@ -56,12 +56,22 @@
 
       }
 
-      .descr {
-
+      .desc {
+        margin-bottom: 20px;
       }
 
       em {
         color: gray;
+      }
+
+      .reviewList {
+        background-color: #f7f7f7;
+        border-left: 10px solid #ccc;
+        padding: 20px;
+
+        .review {
+          margin-bottom: 10px;
+        }
       }
     }
 
