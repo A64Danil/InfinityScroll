@@ -10,6 +10,8 @@ export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
 
+  private templateCb: Record<string, (arg: any) => any>;
+
   // TODO: 0 instead of undefined
   private listLength: number | undefined;
 
@@ -17,9 +19,14 @@ export class Skeleton {
 
   private readonly setLoadingPlaceholder: (item: HTMLElement) => void;
 
-  constructor(props: { template: TemplateStringFunction; listType: string }) {
+  constructor(props: {
+    template: TemplateStringFunction;
+    templateCb: Record<string, (arg: any) => any>;
+    listType: string;
+  }) {
     console.log('start Skeleton');
     this.template = props.template;
+    this.templateCb = props.templateCb;
     this.makeItemFromString =
       props.listType !== 'table' ? elemFromString : trFromString;
     this.setLoadingPlaceholder =
@@ -48,7 +55,12 @@ export class Skeleton {
     data: Record<string, unknown>,
     dataIndex: number
   ) {
-    const itemLikeStrFromTpl = this.template(data, this.listLength, dataIndex);
+    const itemLikeStrFromTpl = this.template(
+      data,
+      this.listLength,
+      dataIndex,
+      this.templateCb
+    );
     const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     this.setRequiredAttrs({
       element: itemHTML,
@@ -64,7 +76,12 @@ export class Skeleton {
     data: Record<string, unknown>;
     dataIndex: number;
   }): HTMLElement {
-    const itemLikeStrFromTpl = this.template(data, this.listLength, dataIndex);
+    const itemLikeStrFromTpl = this.template(
+      data,
+      this.listLength,
+      dataIndex,
+      this.templateCb
+    );
     const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     if (!data) {
       this.setLoadingPlaceholder(itemHTML);
