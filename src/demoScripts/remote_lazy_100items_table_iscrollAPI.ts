@@ -7,14 +7,14 @@ export const REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS: InfinityScrollPropType
   forcedListLength: 100,
   listType: 'table',
   tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
-  templateString: (element, listLength, elemNum) => `<tr
+  templateString: ({ item, listLength, idx }) => `<tr
         class="REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem" 
         >
-          <td>${element?.id}</td>
-          <td>${element?.name} (${element?.country_code})</td>
-          <td>${element?.industry}</td>
-          <td>${element?.founded}</td>
-          <td>${element?.size}</td>
-          <td>${element?.city} (${element?.state})</td>
+          <td>${item?.id}</td>
+          <td>${item?.name} (${item?.country_code})</td>
+          <td>${item?.industry}</td>
+          <td>${item?.founded}</td>
+          <td>${item?.size}</td>
+          <td>${item?.city} (${item?.state})</td>
     </tr>`,
 };

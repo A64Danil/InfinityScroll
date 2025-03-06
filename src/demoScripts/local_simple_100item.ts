@@ -6,8 +6,8 @@ const BigJson1 = BigDataList100.data;
 export const LOCAL_SIMPLE_100ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   selectorId: 'LOCAL_SIMPLE_100ITEMS',
-  templateString: (element, listLength, number) => `<li
+  templateString: ({ item, listLength, idx }) => `<li
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
-            ${element.name} ${element.number} <span>(order number ${number})</span>
+            ${item.name} ${item.number} <span>(order number ${idx})</span>
     </li>`,
 };
