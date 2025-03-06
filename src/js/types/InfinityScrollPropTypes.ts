@@ -11,7 +11,7 @@ export type InfinityScrollPropTypes = {
   listType?: 'list' | 'table' | 'div';
   tHeadNames?: string[];
   subDir?: string;
-  templateCb: Record<string, (arg: any) => any>;
+  templateCb?: Record<string, (arg: any) => any>;
 };
 
 // type DataLikeArr = {

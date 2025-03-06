@@ -55,12 +55,12 @@ export class Skeleton {
     data: Record<string, unknown>,
     dataIndex: number
   ) {
-    const itemLikeStrFromTpl = this.template(
-      data,
-      this.listLength,
-      dataIndex,
-      this.templateCb
-    );
+    const itemLikeStrFromTpl = this.template({
+      item: data,
+      listLength: this.listLength,
+      idx: dataIndex,
+      templateCb: this.templateCb,
+    });
     const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     this.setRequiredAttrs({
       element: itemHTML,
@@ -76,12 +76,12 @@ export class Skeleton {
     data: Record<string, unknown>;
     dataIndex: number;
   }): HTMLElement {
-    const itemLikeStrFromTpl = this.template(
-      data,
-      this.listLength,
-      dataIndex,
-      this.templateCb
-    );
+    const itemLikeStrFromTpl = this.template({
+      item: data,
+      listLength: this.listLength,
+      idx: dataIndex,
+      templateCb: this.templateCb,
+    });
     const itemHTML = this.makeItemFromString(itemLikeStrFromTpl);
     if (!data) {
       this.setLoadingPlaceholder(itemHTML);
