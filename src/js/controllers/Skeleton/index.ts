@@ -77,7 +77,7 @@ export class Skeleton {
     dataIndex: number;
   }): HTMLElement {
     const itemLikeStrFromTpl = this.template({
-      item: data,
+      item: data || {},
       listLength: this.listLength,
       idx: dataIndex,
       templateCb: this.templateCb,
