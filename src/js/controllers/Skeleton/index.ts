@@ -10,7 +10,7 @@ export class Skeleton {
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
 
-  private readonly templateCb: Record<string, (arg: any) => any>;
+  private readonly templateCb: Record<string, (arg: any) => any> | undefined;
 
   // TODO: 0 instead of undefined
   private listLength: number | undefined;
@@ -21,7 +21,7 @@ export class Skeleton {
 
   constructor(props: {
     template: TemplateStringFunction;
-    templateCb: Record<string, (arg: any) => any>;
+    templateCb: Record<string, (arg: any) => any> | undefined;
     listType: string;
   }) {
     console.log('start Skeleton');
