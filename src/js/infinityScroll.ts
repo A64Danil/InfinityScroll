@@ -5,6 +5,7 @@ import {
   ListController,
   DomManager,
   Skeleton,
+  Vsb,
 } from './controllers';
 
 import {
@@ -77,6 +78,9 @@ class InfinityScroll {
   // хранит ссылку на корневой html-элеент
   private readonly wrapperEl: HTMLElement;
 
+  // промежуточная обёртка
+  private middleWrapper: HTMLElement | undefined;
+
   private readonly subDir: string | undefined;
 
   private readonly forcedListLength: number | undefined;
@@ -115,6 +119,8 @@ class InfinityScroll {
 
   private readonly skeleton: Skeleton;
 
+  private vsb: Vsb;
+
   constructor(props: InfinityScrollPropTypes) {
     this.selectorId = props.selectorId;
 
@@ -141,6 +147,8 @@ class InfinityScroll {
     this.chunk = new ChunkController();
 
     this.list = new ListController();
+
+    this.vsb = new Vsb();
 
     this.skeleton = new Skeleton({
       template: props.templateString,
@@ -205,7 +213,10 @@ class InfinityScroll {
     this.domMngr.fillList(this.list);
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
-    this.wrapperEl.addEventListener(
+    this.createVirtualScroll();
+
+    // this.wrapperEl.addEventListener(
+    this.middleWrapper.addEventListener(
       'scroll',
       this.calcCurrentDOMRender.bind(this)
     );
@@ -222,10 +233,18 @@ class InfinityScroll {
       throw new Error(msg);
     }
 
-    this.wrapperEl.style.overflowY = 'scroll';
+    // this.wrapperEl.style.overflowY = 'scroll';
+    this.wrapperEl.style.position = 'relative';
   }
 
   createInnerList(): HTMLElement {
+    // Create middle wrapper
+
+    this.middleWrapper = document.createElement('div');
+    this.middleWrapper.classList.add('middleWrapper');
+
+    this.wrapperEl.append(this.middleWrapper);
+
     const newEl = document.createElement(nameToTag[this.listType]);
     const newElClass = `${this.selectorId}_${this.listType
       .charAt(0)
@@ -249,11 +268,13 @@ class InfinityScroll {
       );
 
       thead.innerHTML = `<tr class="${this.selectorId}__listItem">${tHeadColsWithNames}</tr>`;
-      this.wrapperEl.appendChild(newEl).appendChild(thead);
-      return this.wrapperEl.appendChild(newEl).appendChild(tbody);
+      // this.wrapperEl.appendChild(newEl).appendChild(thead);
+      this.middleWrapper.appendChild(newEl).appendChild(thead);
+      return this.middleWrapper.appendChild(newEl).appendChild(tbody);
     }
 
-    return this.wrapperEl.appendChild(newEl);
+    // return this.wrapperEl.appendChild(newEl);
+    return this.middleWrapper.appendChild(newEl);
   }
 
   getAllSizes(): void {
@@ -337,9 +358,24 @@ class InfinityScroll {
     }
   }
 
+  createVirtualScroll() {
+    const totalHeight = this.list.getTotalListHeight();
+    const realHeight = this.listEl.offsetHeight;
+    this.vsb.init({
+      itemHeight: this.list.itemHeight,
+      listLength: this.list.length,
+      totalHeight,
+      realHeight,
+    });
+
+    // this.list.getPaginatedData(this.vsb.totalPages, this.vsb.safeLimit);
+    this.middleWrapper?.after(this.vsb.elem);
+  }
+
   async calcCurrentDOMRender(e: Event): Promise<void> {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
+    this.vsb.setScroll(scroll);
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 
