@@ -30,8 +30,10 @@ html {
   position: absolute;
   //left: 50px;
   top: 0;
-  right: -10px;
-  transform: translate(100%, 0px);
+  right: 0px;
+  //right: -10px;
+  transform: translate(-100%, 0px);
+  //transform: translate(100%, 0px);
   width: 20px;
   height: 100%;
   overflow: scroll;
