@@ -29,4 +29,9 @@ export class ListController {
     console.log('Start List Controller', this);
     this.data = [];
   }
+
+  getTotalListHeight(): number {
+    const totalListHeight = this.itemHeight * this.length;
+    return totalListHeight;
+  }
 }
