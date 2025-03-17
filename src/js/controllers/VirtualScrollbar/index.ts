@@ -31,7 +31,8 @@ export class Vsb {
 
     this.scroll = 1;
 
-    this.safeLimit = 10000000;
+    // this.safeLimit = 10000000;
+    this.safeLimit = 11100;
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
@@ -46,13 +47,18 @@ export class Vsb {
   init({
     totalHeight,
     realHeight,
+    listLength,
+    itemHeight,
   }: {
     totalHeight: number;
     realHeight: number;
+    listLength: number;
+    itemHeight: number;
   }) {
     console.log('totalHeight', totalHeight);
     this.createFiller(realHeight);
-    this.countTotalPages(totalHeight);
+    this.countTotalPages(listLength, itemHeight, totalHeight);
+    // this.splitDataByPages();
   }
 
   createFiller(realHeight: number) {
@@ -65,7 +71,7 @@ export class Vsb {
     this.elem.append(vsbFillerHTML);
   }
 
-  countTotalPages(totalHeight: number) {
+  countTotalPages(listLength: number, itemHeight: number, totalHeight: number) {
     // this.totalHeight = totalHeight;
     const formattedTotalListHeight = new Intl.NumberFormat('ru-RU').format(
       totalHeight
@@ -79,12 +85,50 @@ export class Vsb {
     console.log(typeof formattedSafeLimit);
     console.log({ standartLimit, formattedSafeLimit });
 
-    this.totalPages = Math.round(totalHeight / this.safeLimit);
+    // TODO: this is a fake, don't belive it
+    this.totalPages = Math.ceil(totalHeight / this.safeLimit);
+    console.log('(fake) this.totalPages', this.totalPages);
+
+    const onePageSize = Math.round(this.safeLimit / itemHeight);
+    const lastPageSize = listLength % onePageSize;
+
+    console.log('onePageSize', onePageSize);
+    console.log('lastPageSize', lastPageSize);
+
+    const additionalPageCounter = lastPageSize === 0 ? 0 : 1;
+
+    const computedTotalPages =
+      (listLength - lastPageSize) / onePageSize + additionalPageCounter;
+    // 500 - 0 / 100 == 5 + 1 = 6
+    // 420 - 20 / 100 == 4 + 1 =  5
+    // 287 - 87 / 100 == 2 + 1 = 3
+    console.log('computedTotalPages', computedTotalPages, this.totalPages);
+
+    const controlCheck = computedTotalPages === this.totalPages;
+
+    // 500 === 100 * 5 + 0
+    // 500 === 100 * 5 - 0
+
+    // 420 == 100 * 4 + 20
+    // 480 == 100 * 5 - 20
+
+    console.log('controlCheck', controlCheck);
+
+    if (controlCheck) {
+      console.log('Всё сходится');
+    } else {
+      console.warn('controlCheck не пройден!!!');
+    }
+
+    this.totalPages = computedTotalPages;
+
+    return computedTotalPages;
   }
 
   handleScroll(e) {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
+    console.log(scroll);
     this.scroll = scroll;
     this.getPageByScroll();
   }
@@ -98,16 +142,24 @@ export class Vsb {
   getPageByScroll() {
     // this.scroll
 
-    // 0 - 1
-    // 0.5 - 77
-    // 1 - 153
+    // 0 = 1
+    // 0.01 = 1 === 0.01 * 5 = 0.05
+    // 0.19 = 1 === 0.19 * 5 = 0.95
+    // 0.20 = 2 === 0.2 * 5 = 1
+    // 0.39 = 2
+    // 0.4 = 3  === 0.4 * 5 = 2
+    // 0.59 = 3
+    // 0.6 = 4 --- 0.6 * 5 = 3
+    // 0.79 = 4           3.95
+    // 0.8 = 5 --- 0.8 * 5 = 4
+    // 1 = 5 --- 1 * 5 = 5
 
-    // console.log(this.fillerHeight, this.scroll);
+    console.log(this.fillerHeight, this.scroll);
 
     const percent = this.scroll / this.fillerHeight;
     // console.log('percent', percent);
 
-    const currentPage = Math.floor(percent * this.totalPages + 1);
+    const currentPage = Math.ceil(percent * this.totalPages) || 1;
 
     console.log('currentPage', currentPage);
   }
