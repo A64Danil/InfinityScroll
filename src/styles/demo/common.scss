@@ -20,6 +20,29 @@ html {
   //padding-bottom: 400px;
 }
 
+.middleWrapper {
+  position: relative;
+  overflow: scroll;
+  height: 100%;
+}
+
+.vSrcollbar {
+  position: absolute;
+  //left: 50px;
+  top: 0;
+  right: -10px;
+  transform: translate(100%, 0px);
+  width: 20px;
+  height: 100%;
+  overflow: scroll;
+}
+
+.vScrollbarFiller {
+  width: 10px;
+  height: 10000000px;
+  background-color: red;
+}
+
 section {
   margin-bottom: 60px;
   padding: 0 15px;
