@@ -1,7 +1,10 @@
 // Virtual Scroll Bar
 export class Vsb {
-  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
+  // Ссылка на html элемент со скроллом (виртуал скролл)
   public readonly elem;
+
+  // Ссылка на элмент с оригинальным скроллом
+  public origScrollElem: HTMLElement | undefined;
 
   // private readonly vsbFillerHTML;
 
@@ -49,13 +52,17 @@ export class Vsb {
     realHeight,
     listLength,
     itemHeight,
+    origScrollElem,
   }: {
     totalHeight: number;
     realHeight: number;
     listLength: number;
     itemHeight: number;
+    origScrollElem: HTMLElement;
   }) {
     console.log('totalHeight', totalHeight);
+
+    this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
     this.countTotalPages(listLength, itemHeight, totalHeight);
     // this.splitDataByPages();
@@ -131,6 +138,25 @@ export class Vsb {
     console.log(scroll);
     this.scroll = scroll;
     this.getPageByScroll();
+    console.log(this.safeLimit);
+    console.log(this.origScrollElem);
+
+    // 1 - 5% // 1
+    // 19 - 95%
+    // 20 - 100% // 1
+    // 21 - 5% // 2
+    // 40 - 100% // 2
+    // 41 - 5% // 3
+
+    // 20 / 1 = 20
+    // 40 / 2 = 20
+    // 60 / 3 = 20
+
+    const fullScroll = scroll * this.totalPages; // 20 * 5 === 100
+    const pagedOffsetScroll = this.safeLimit * (this.currentPage - 1);
+    const remainingScroll = fullScroll - pagedOffsetScroll; // 20 * 2 = 40
+    console.log(fullScroll, remainingScroll);
+    this.origScrollElem.scrollTop = remainingScroll;
   }
 
   setScroll(outerScroll: number) {
@@ -154,13 +180,13 @@ export class Vsb {
     // 0.8 = 5 --- 0.8 * 5 = 4
     // 1 = 5 --- 1 * 5 = 5
 
-    console.log(this.fillerHeight, this.scroll);
+    // console.log(this.fillerHeight, this.scroll);
 
     const percent = this.scroll / this.fillerHeight;
     // console.log('percent', percent);
 
-    const currentPage = Math.ceil(percent * this.totalPages) || 1;
+    this.currentPage = Math.ceil(percent * this.totalPages) || 1;
 
-    console.log('currentPage', currentPage);
+    console.log('currentPage', this.currentPage);
   }
 }
