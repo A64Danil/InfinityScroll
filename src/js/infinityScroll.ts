@@ -366,6 +366,7 @@ class InfinityScroll {
       listLength: this.list.length,
       totalHeight,
       realHeight,
+      origScrollElem: this.middleWrapper,
     });
 
     // this.list.getPaginatedData(this.vsb.totalPages, this.vsb.safeLimit);
@@ -375,7 +376,7 @@ class InfinityScroll {
   async calcCurrentDOMRender(e: Event): Promise<void> {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
-    this.vsb.setScroll(scroll);
+    // this.vsb.setScroll(scroll);
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 
