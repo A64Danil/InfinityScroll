@@ -124,7 +124,7 @@ pre {
 }
 
 .attention {
-  margin-top: calc((var(--mb) - 4px) * -1);
+  margin-top: calc(-1 * (var(--mb) - 4px));
 }
 
 .code + .attention {
