@@ -18,7 +18,7 @@ export class RenderController {
     chunkAmount: number;
     tailingElementsAmount: number;
   }) {
-    this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM;
+    this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM; // TODO: now - useless?
     this.lastRenderIndex = renderProps.lastRenderIndex;
     this.listLength = renderProps.listLength;
     this.chunkAmount = renderProps.chunkAmount;
@@ -31,7 +31,7 @@ export class RenderController {
    * Косаемся начала списка двигаясь сверху
    */
   isBeginOfListFromTop(startRenderIndex: number): boolean {
-    return startRenderIndex < this.halfOfExistingSizeInDOM;
+    return startRenderIndex <= this.chunkAmount;
   }
 
   /**
@@ -61,25 +61,44 @@ export class RenderController {
     direction: IScrollDirection,
     startRenderIndex: number
   ): boolean {
-    if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
-      console.log('Пока рендерить не надо. Вы в самом верху списка.');
+    // if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
+    //   console.log('Пока рендерить не надо. Вы в самом верху списка.');
+    //   return false;
+    // }
+    //
+    // if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
+    //   console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+    //   return false;
+    // }
+
+    if (
+      direction === 'down' &&
+      (this.isEndOfListFromTop(startRenderIndex) ||
+        this.isBeginOfListFromTop(startRenderIndex))
+    ) {
+      console.log('двигались вниз от самого верха, но рендерить не надо');
       return false;
     }
 
-    if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
-      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-      return false;
-    }
+    //
+    // if (direction === 'up' && this.isBeginOfListFromBottom(startRenderIndex)) {
+    //   console.log(
+    //     'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
+    //   );
+    //   return false;
+    // }
 
-    if (direction === 'up' && this.isBeginOfListFromBottom(startRenderIndex)) {
-      console.log(
-        'Пока рендерить не надо (up). Вы в самом низу списка. Это сообщение мы должны видеть 2 раза'
-      );
-      return false;
-    }
+    // if (direction === 'up' && this.isEndOfListFromBottom(startRenderIndex)) {
+    //   console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+    //   return false;
+    // }
 
-    if (direction === 'up' && this.isEndOfListFromBottom(startRenderIndex)) {
-      console.log('Уже рендерить не надо (up). Вы в самом верху списка.');
+    if (
+      direction === 'up' &&
+      (this.isBeginOfListFromBottom(startRenderIndex) ||
+        this.isEndOfListFromBottom(startRenderIndex))
+    ) {
+      console.log('Двигались наверх от самого низа - пока рендерить не надо');
       return false;
     }
 
