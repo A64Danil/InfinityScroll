@@ -317,7 +317,7 @@ class InfinityScroll {
       this.list.wrapperHeight / this.list.itemHeight
     );
 
-    this.list.existingSizeInDOM = this.chunk.amount * 4;
+    this.list.existingSizeInDOM = this.chunk.amount * 4; // TODO: может быть ситуация, когда деток меньше чем (чанк * 4) - сделать сеттер или проверку (лучше сеттер)
     this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
     this.chunk.lastRenderIndex =
       this.list.length - this.list.halfOfExistingSizeInDOM;
@@ -512,7 +512,7 @@ class InfinityScroll {
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
       this.list.data = data as [];
-      newLength = data && data.length;
+      newLength = this.forcedListLength || (data && data.length);
     } else {
       const dataUrl = data as DataURLType;
       const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
