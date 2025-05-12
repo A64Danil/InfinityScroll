@@ -5,7 +5,9 @@ export const REMOTE_LAZY_DUMMYJSON_API_PROPS: InfinityScrollPropTypes = {
     `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
   selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
   subDir: 'products',
-  forcedListLength: 194, // TODO: temportary
+  // forcedListLength: 40, // TODO: temportary
+  forcedListLength: 15, // TODO: temportary
+  // forcedListLength: 194, // TODO: temportary
   templateString: ({ item, templateCb }) => {
     const {
       thumbnail = '',
