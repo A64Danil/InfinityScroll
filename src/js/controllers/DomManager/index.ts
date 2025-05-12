@@ -210,6 +210,7 @@ export class DomManager {
     const isReachTopLimit =
       isGoingFromBottom &&
       isStartOfList &&
+      tailingElementsAmount !== 0 &&
       i + sequenceNumber >= tailingElementsAmount;
 
     const isReachBottomLimit =
