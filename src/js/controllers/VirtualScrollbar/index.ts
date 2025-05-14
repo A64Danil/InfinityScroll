@@ -61,6 +61,12 @@ export class Vsb {
     origScrollElem: HTMLElement;
   }) {
     console.log('totalHeight', totalHeight);
+    console.log('this.safeLimit', this.safeLimit, itemHeight);
+
+    // TODO: temportary, for tests
+    this.safeLimit = itemHeight * 100;
+
+    console.log('this.safeLimit', this.safeLimit, itemHeight);
 
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
@@ -135,11 +141,11 @@ export class Vsb {
   handleScroll(e) {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
-    console.log(scroll);
+    // console.log(scroll);
     this.scroll = scroll;
     this.getPageByScroll();
-    console.log(this.safeLimit);
-    console.log(this.origScrollElem);
+    // console.log(this.safeLimit);
+    // console.log(this.origScrollElem);
 
     // 1 - 5% // 1
     // 19 - 95%
@@ -155,7 +161,7 @@ export class Vsb {
     const fullScroll = scroll * this.totalPages; // 20 * 5 === 100
     const pagedOffsetScroll = this.safeLimit * (this.currentPage - 1);
     const remainingScroll = fullScroll - pagedOffsetScroll; // 20 * 2 = 40
-    console.log(fullScroll, remainingScroll);
+    // console.log(fullScroll, remainingScroll);
     this.origScrollElem.scrollTop = remainingScroll;
   }
 
@@ -187,6 +193,6 @@ export class Vsb {
 
     this.currentPage = Math.ceil(percent * this.totalPages) || 1;
 
-    console.log('currentPage', this.currentPage);
+    // console.log('currentPage', this.currentPage);
   }
 }
