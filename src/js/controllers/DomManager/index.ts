@@ -149,18 +149,29 @@ export class DomManager {
     direction: IScrollDirection,
     halfOfExistingSizeInDOM: number,
     startRenderIndex: number,
-    chunkAmount: number
+    chunkAmount: number,
+    // TODO: item index?
+    itemIndex: number
   ) {
     let precalcSequence =
       direction === 'down'
         ? startRenderIndex + halfOfExistingSizeInDOM
         : startRenderIndex - chunkAmount;
 
+    const precalcSequence2 =
+      direction === 'down'
+        ? itemIndex + halfOfExistingSizeInDOM
+        : itemIndex - chunkAmount;
+
+    console.log('precalcSequence', precalcSequence);
+    console.log('precalcSequence2', precalcSequence2);
+
     if (precalcSequence < 0) precalcSequence = 0;
 
     return precalcSequence;
   }
 
+  // TODO: itemIndex instead of currentPage
   resetAllList(
     chunk: ChunkController,
     startRenderIndex: number,
@@ -172,6 +183,7 @@ export class DomManager {
     const templateFragment = document.createDocumentFragment();
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
+      console.log('sequenceStart', sequenceStart);
       const elemNum = i + sequenceStart;
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
@@ -240,7 +252,8 @@ export class DomManager {
     tailingElementsAmount: number,
     listLength: number,
     data: Rec[],
-    childPosition: 'firstChild' | 'lastChild'
+    childPosition: 'firstChild' | 'lastChild',
+    itemIndex: number
   ): DocumentFragment {
     const templateFragment = document.createDocumentFragment();
 
@@ -256,7 +269,7 @@ export class DomManager {
 
       if (allowToChange) {
         // add items
-        const elemNum = i + sequenceNumber;
+        const elemNum = i + itemIndex;
         const elemData = data[elemNum];
         templateFragment.append(this.createItem(elemData, elemNum));
         // remove items
@@ -278,11 +291,13 @@ export class DomManager {
     }
   }
 
+  // TODO: itemIndex instead of currentPage?
   changeItemsInList(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
     direction: IScrollDirection,
-    isGoingFromBottom: boolean
+    isGoingFromBottom: boolean,
+    currentPage: number
   ): void {
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
@@ -291,8 +306,12 @@ export class DomManager {
       direction,
       list.halfOfExistingSizeInDOM,
       chunk.startRenderIndex,
-      chunk.amount
+      chunk.amount,
+      chunk.itemIndex
     );
+    // TODO: this is good
+    const sequenceNumberByPage =
+      (currentPage - 1) * list.length + sequenceNumber;
 
     if (list.data === undefined) {
       throw new Error('Your list.data is undefined');
@@ -306,7 +325,8 @@ export class DomManager {
       list.tailingElementsAmount,
       list.length,
       list.data,
-      childPosition
+      childPosition,
+      sequenceNumberByPage
     );
 
     this.putElementsToList(direction, templateFragments);
@@ -315,13 +335,21 @@ export class DomManager {
   /**
    * Change list in DOM, change offset of list
    */
+  // TODO: itemIndex instead of currentPage
   modifyCurrentDOM(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
     direction: IScrollDirection,
-    isGoingFromBottom: boolean
+    isGoingFromBottom: boolean,
+    currentPage: number
   ): void {
-    this.changeItemsInList(chunk, list, direction, isGoingFromBottom);
+    this.changeItemsInList(
+      chunk,
+      list,
+      direction,
+      isGoingFromBottom,
+      currentPage
+    );
     this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
 
     if (process.env.NODE_ENV === 'development') {
