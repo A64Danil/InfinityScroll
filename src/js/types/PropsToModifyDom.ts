@@ -1,6 +1,7 @@
 import { Rec } from './utils';
 
 type ChunkPropsToModifyDom = {
+  itemIndex: number;
   startRenderIndex: number;
   amount: number;
   htmlHeight: number;
