@@ -199,6 +199,21 @@ class InfinityScroll {
       );
     }
 
+    this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+    console.log('this.list.itemHeight)', this.list.itemHeight);
+    console.log('this.list.length', this.list.length);
+    if (this.list.length > this.list.data.length) {
+      this.list.length = this.list.data.length;
+    } else if (this.list.length <= 0) {
+      // TODO: only for tests?
+      this.list.length = this.list.data.length;
+    }
+    console.log(this.list.itemHeight);
+
+    this.chunk.lastRenderIndex =
+      this.list.length - this.list.halfOfExistingSizeInDOM;
+    console.log('this.chunk.lastRenderIndex', this.chunk.lastRenderIndex);
+
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
@@ -206,6 +221,7 @@ class InfinityScroll {
       chunkAmount: this.chunk.amount,
       tailingElementsAmount: this.list.tailingElementsAmount,
     };
+    console.log(renderProps);
     if (isPropsUndefined(renderProps)) {
       throw new Error(errors.undefinedProps);
     }
@@ -327,6 +343,7 @@ class InfinityScroll {
 
     
 .${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}`;
+
     const styleELem = document.createElement('style');
     styleELem.appendChild(document.createTextNode(cssText));
     this.wrapperEl.prepend(styleELem);
@@ -351,7 +368,7 @@ class InfinityScroll {
 
     this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
 
-    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
+    this.list.tailingElementsAmount = this.list.length % this.chunk.amount; // TODO: возможно уже не нужно после включения VSB
 
     if (listItem) {
       this.domMngr.removeItem('firstChild');
@@ -363,12 +380,53 @@ class InfinityScroll {
     const realHeight = this.listEl.offsetHeight;
     this.vsb.init({
       itemHeight: this.list.itemHeight,
-      listLength: this.list.length,
+      fullLength: this.list.fullLength,
       totalHeight,
       realHeight,
       origScrollElem: this.middleWrapper,
     });
 
+    // this.list.lengthByPage = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+    //
+
+    // this.list.fullLength = this.list.length;
+    console.log(this.vsb.safeLimit, this.list.itemHeight);
+    // TODO: вот это надо вынести ДО запуска функции getAllSizes
+    // TODO: эти расчёты уже сделаны внутри VSB
+    this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+    if (this.list.length > this.list.fullLength) {
+      this.list.length = this.list.fullLength;
+    }
+    console.log('this.list.itemHeight)', this.list.itemHeight);
+    console.log('this.list.length', this.list.length);
+    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
+
+    console.log(
+      'this.list.tailingElementsAmount',
+      this.list.tailingElementsAmount
+    );
+
+    this.chunk.lastRenderIndex =
+      this.list.length - this.list.halfOfExistingSizeInDOM;
+    // this.list.length = newLength;
+    // TODO: это важно и нужно
+    if (this.render) {
+      this.render.reInitValues(
+        this.chunk.lastRenderIndex,
+        this.list.length,
+        this.list.tailingElementsAmount
+      );
+    }
+
+    this.skeleton.setListHeight(this.list.fullLength);
+
+    this.list.startIndexOfLastPart =
+      this.list.length - this.list.existingSizeInDOM;
+    this.chunk.lastOrderNumber = Math.floor(
+      this.list.length / this.chunk.amount
+    );
+
+    // console.log(this.list.lengthByPage)
     // this.list.getPaginatedData(this.vsb.totalPages, this.vsb.safeLimit);
     this.middleWrapper?.after(this.vsb.elem);
   }
@@ -413,7 +471,12 @@ class InfinityScroll {
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
-      this.chunk.startRenderIndex = resultIndex;
+      // this.chunk.startRenderIndex = resultIndex;
+      this.chunk.setRenderIndex(
+        resultIndex,
+        this.vsb.currentPage,
+        this.list.length
+      );
       console.log(
         `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
       );
@@ -428,6 +491,8 @@ class InfinityScroll {
 
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
+          // itemIndex is good
+          itemIndex: this.chunk.itemIndex,
           startRenderIndex: this.chunk.startRenderIndex,
           amount: this.chunk.amount,
           htmlHeight: this.chunk.htmlHeight,
@@ -435,8 +500,10 @@ class InfinityScroll {
 
         // Fetch new DATA
         if (this.isLazy && !isBigDiff) {
+          // TODO: itemIndex??
           const [sequenceStart, sequenceEnd] = this.getSequence(
             this.chunk.startRenderIndex
+            // this.chunk.itemIndex
           );
           const unfoundedRanges = this.checkItemForLoad(
             sequenceStart,
@@ -463,7 +530,8 @@ class InfinityScroll {
           mainChunkProps,
           mainListProps,
           this.scroll.direction,
-          this.scroll.isGoingFromBottom
+          this.scroll.isGoingFromBottom,
+          this.vsb.currentPage
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
@@ -489,8 +557,10 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
+        // itemIndex
         const [sequenceStart, sequenceEnd] = this.getSequence(
-          this.chunk.startRenderIndex,
+          this.chunk.itemIndex,
+          // this.chunk.startRenderIndex,
           true
         );
 
@@ -509,17 +579,24 @@ class InfinityScroll {
           return;
         }
         console.log('Восстанавливаем значение this.chunk.startRenderIndex');
-        this.chunk.startRenderIndex = renderIndex;
+        this.chunk.setRenderIndex(
+          renderIndex,
+          this.vsb.currentPage,
+          this.list.length
+        );
         console.log(
           `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
         );
         // END Fetch new DATA
+
+        // TODO: itemIndex??? - instead of currentPage
         this.domMngr.resetAllList(
           this.chunk,
           renderIndex,
           sequenceStart,
           this.list,
-          this.scroll.direction
+          this.scroll.direction,
+          this.vsb.currentPage
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 3
@@ -591,10 +668,14 @@ class InfinityScroll {
     if (!newLength) {
       throw new Error(errors.zeroListSize);
     }
+
+    console.log('newLength', newLength);
+    this.list.fullLength = newLength;
     this.list.length = newLength;
     this.skeleton.setListHeight(this.list.length);
   }
 
+  // TODO: renderIndex or itemIndex ???
   getSequence(renderIndex: number, isFetchToReset = false): number[] {
     let sequenceStart;
     let sequenceEnd;
@@ -611,8 +692,12 @@ class InfinityScroll {
       sequenceStart = tempStartIndex > 0 ? tempStartIndex : 0;
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
-    const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-    const lastEndIndex = this.list.length;
+    // TODO: нужен комбинированный вариант, который считает индексы с учётом текущей страницы
+    const lastStartIndex = this.list.fullLength - this.list.existingSizeInDOM;
+    const lastEndIndex = this.list.fullLength;
+    // const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
+    // const lastEndIndex = this.list.length;
+    console.log(lastStartIndex, lastEndIndex);
     if (sequenceStart > lastStartIndex) {
       console.log('Случай сложный');
       [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
