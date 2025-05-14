@@ -12,8 +12,11 @@ export class ChunkController {
   // Номер, с которого начинается первый элемент в предпоследнем чанке (после которого все элементы уже загружены)
   public lastRenderIndex = 0;
 
-  // Номер, c которого мы будем рендерить следующуй элемент
+  // Номер, c которого мы будем рендерить следующуй элемент (в пределах одной страницы)
   public startRenderIndex = 0;
+
+  // Номер элемента среди всего массива данных (в пределах всех страниц)
+  public itemIndex = 0;
 
   constructor() {
     console.log('start ChunkController');
@@ -31,5 +34,10 @@ export class ChunkController {
   calcRenderIndex(chunkOrderNumber: number): number {
     const renderIndex = chunkOrderNumber * this.amount;
     return renderIndex;
+  }
+
+  setRenderIndex(renderIndex: number, currentPage: number, listLength: number) {
+    this.startRenderIndex = renderIndex;
+    this.itemIndex = listLength * (currentPage - 1) + renderIndex;
   }
 }
