@@ -44,17 +44,19 @@ export class RenderController {
   /**
    * Косаемся начала списка двигаясь снизу
    */
+  // eslint-disable-next-line class-methods-use-this
   isBeginOfListFromBottom(startRenderIndex: number): boolean {
-    return startRenderIndex >= this.listLength - this.chunkAmount * 3;
+    return (
+      // startRenderIndex === 0 || startRenderIndex < this.tailingElementsAmount;
+      startRenderIndex === 0 || startRenderIndex < 0
+    );
   }
 
   /**
    * Косаемся конца списка двигаясь снизу
    */
   isEndOfListFromBottom(startRenderIndex: number): boolean {
-    return (
-      startRenderIndex === 0 || startRenderIndex < this.tailingElementsAmount
-    );
+    return startRenderIndex >= this.listLength - this.chunkAmount * 3;
   }
 
   isAllowRenderNearBorder(
