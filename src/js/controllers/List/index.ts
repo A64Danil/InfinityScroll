@@ -34,7 +34,7 @@ export class ListController {
   }
 
   getTotalListHeight(): number {
-    const totalListHeight = this.itemHeight * this.length;
+    const totalListHeight = this.itemHeight * this.fullLength;
     return totalListHeight;
   }
 }
