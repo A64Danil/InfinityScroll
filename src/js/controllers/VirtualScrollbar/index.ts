@@ -36,6 +36,7 @@ export class Vsb {
 
     // this.safeLimit = 10000000;
     this.safeLimit = 11100;
+    // this.safeLimit = 10;
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
@@ -50,13 +51,13 @@ export class Vsb {
   init({
     totalHeight,
     realHeight,
-    listLength,
+    fullLength,
     itemHeight,
     origScrollElem,
   }: {
     totalHeight: number;
     realHeight: number;
-    listLength: number;
+    fullLength: number;
     itemHeight: number;
     origScrollElem: HTMLElement;
   }) {
@@ -70,7 +71,7 @@ export class Vsb {
 
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
-    this.countTotalPages(listLength, itemHeight, totalHeight);
+    this.countTotalPages(fullLength, itemHeight, totalHeight);
     // this.splitDataByPages();
   }
 
@@ -84,7 +85,7 @@ export class Vsb {
     this.elem.append(vsbFillerHTML);
   }
 
-  countTotalPages(listLength: number, itemHeight: number, totalHeight: number) {
+  countTotalPages(fullLength: number, itemHeight: number, totalHeight: number) {
     // this.totalHeight = totalHeight;
     const formattedTotalListHeight = new Intl.NumberFormat('ru-RU').format(
       totalHeight
@@ -102,16 +103,20 @@ export class Vsb {
     this.totalPages = Math.ceil(totalHeight / this.safeLimit);
     console.log('(fake) this.totalPages', this.totalPages);
 
-    const onePageSize = Math.round(this.safeLimit / itemHeight);
-    const lastPageSize = listLength % onePageSize;
+    let onePageSize = Math.round(this.safeLimit / itemHeight);
+    if (onePageSize > fullLength) {
+      onePageSize = fullLength;
+    }
+    const lastPageSize = fullLength % onePageSize;
 
     console.log('onePageSize', onePageSize);
     console.log('lastPageSize', lastPageSize);
 
     const additionalPageCounter = lastPageSize === 0 ? 0 : 1;
 
+    console.log(fullLength);
     const computedTotalPages =
-      (listLength - lastPageSize) / onePageSize + additionalPageCounter;
+      (fullLength - lastPageSize) / onePageSize + additionalPageCounter;
     // 500 - 0 / 100 == 5 + 1 = 6
     // 420 - 20 / 100 == 4 + 1 =  5
     // 287 - 87 / 100 == 2 + 1 = 3
