@@ -3,13 +3,13 @@ import { IScrollDirection } from '../../types/IScrollDirection';
 export class RenderController {
   private readonly halfOfExistingSizeInDOM: number;
 
-  private readonly lastRenderIndex: number;
+  private lastRenderIndex: number;
 
-  private readonly listLength: number;
+  private listLength: number;
 
   private readonly chunkAmount: number;
 
-  private readonly tailingElementsAmount: number;
+  private tailingElementsAmount: number;
 
   constructor(renderProps: {
     halfOfExistingSizeInDOM: number;
@@ -24,6 +24,16 @@ export class RenderController {
     this.chunkAmount = renderProps.chunkAmount;
     this.tailingElementsAmount = renderProps.tailingElementsAmount;
     console.log(this);
+  }
+
+  reInitValues(
+    lastRenderIndex: number,
+    length: number,
+    tailingElementsAmount: number
+  ) {
+    this.lastRenderIndex = lastRenderIndex;
+    this.listLength = length;
+    this.tailingElementsAmount = tailingElementsAmount;
   }
 
   // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям
