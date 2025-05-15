@@ -376,31 +376,17 @@ class InfinityScroll {
   }
 
   createVirtualScroll() {
-    const totalHeight = this.list.getTotalListHeight();
-    const realHeight = this.listEl.offsetHeight;
-    this.vsb.init({
-      itemHeight: this.list.itemHeight,
-      fullLength: this.list.fullLength,
-      totalHeight,
-      realHeight,
-      origScrollElem: this.middleWrapper,
-    });
+    // TODO: эти расчёты уже сделаны внутри VSB?
+    console.log('this.vsb.safeLimit', this.vsb.safeLimit);
 
-    // this.list.lengthByPage = Math.round(this.vsb.safeLimit / this.list.itemHeight);
-    //
-
-    // this.list.fullLength = this.list.length;
-    console.log(this.vsb.safeLimit, this.list.itemHeight);
-    // TODO: вот это надо вынести ДО запуска функции getAllSizes
-    // TODO: эти расчёты уже сделаны внутри VSB
     this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
     if (this.list.length > this.list.fullLength) {
       this.list.length = this.list.fullLength;
     }
     console.log('this.list.itemHeight)', this.list.itemHeight);
     console.log('this.list.length', this.list.length);
-    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
 
+    this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
     console.log(
       'this.list.tailingElementsAmount',
       this.list.tailingElementsAmount
@@ -418,6 +404,8 @@ class InfinityScroll {
       );
     }
 
+    this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+
     this.skeleton.setListHeight(this.list.fullLength);
 
     this.list.startIndexOfLastPart =
@@ -426,6 +414,16 @@ class InfinityScroll {
       this.list.length / this.chunk.amount
     );
 
+    const totalHeight = this.list.getTotalListHeight();
+    const realHeight = this.listEl.offsetHeight;
+    console.log('realHeight', realHeight);
+    this.vsb.init({
+      itemHeight: this.list.itemHeight,
+      fullLength: this.list.fullLength,
+      totalHeight,
+      realHeight,
+      origScrollElem: this.middleWrapper,
+    });
     // console.log(this.list.lengthByPage)
     // this.list.getPaginatedData(this.vsb.totalPages, this.vsb.safeLimit);
     this.middleWrapper?.after(this.vsb.elem);
@@ -478,7 +476,7 @@ class InfinityScroll {
         this.list.length
       );
       console.log(
-        `====== this.chunk.startRenderIndex поменялся ${this.chunk.startRenderIndex} ======`
+        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage} ======`
       );
 
       if (!this.render) {
@@ -500,10 +498,8 @@ class InfinityScroll {
 
         // Fetch new DATA
         if (this.isLazy && !isBigDiff) {
-          // TODO: itemIndex??
           const [sequenceStart, sequenceEnd] = this.getSequence(
-            this.chunk.startRenderIndex
-            // this.chunk.itemIndex
+            this.chunk.itemIndex
           );
           const unfoundedRanges = this.checkItemForLoad(
             sequenceStart,
@@ -706,7 +702,7 @@ class InfinityScroll {
   }
 
   fetchUnfoundedRanges(unfoundedRanges: NumRange[]): void {
-    console.log(unfoundedRanges);
+    console.log(`Try to fetch: ${unfoundedRanges.flat().join(' - ')}`);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       const [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
