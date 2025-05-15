@@ -65,7 +65,7 @@ export class Vsb {
     console.log('this.safeLimit', this.safeLimit, itemHeight);
 
     // TODO: temportary, for tests
-    this.safeLimit = itemHeight * 100;
+    // this.safeLimit = itemHeight * 100;
 
     console.log('this.safeLimit', this.safeLimit, itemHeight);
 
