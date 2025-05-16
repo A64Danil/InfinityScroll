@@ -149,29 +149,18 @@ export class DomManager {
     direction: IScrollDirection,
     halfOfExistingSizeInDOM: number,
     startRenderIndex: number,
-    chunkAmount: number,
-    // TODO: item index?
-    itemIndex: number
+    chunkAmount: number
   ) {
     let precalcSequence =
       direction === 'down'
         ? startRenderIndex + halfOfExistingSizeInDOM
         : startRenderIndex - chunkAmount;
 
-    const precalcSequence2 =
-      direction === 'down'
-        ? itemIndex + halfOfExistingSizeInDOM
-        : itemIndex - chunkAmount;
-
-    console.log('precalcSequence', precalcSequence);
-    console.log('precalcSequence2', precalcSequence2);
-
     if (precalcSequence < 0) precalcSequence = 0;
 
     return precalcSequence;
   }
 
-  // TODO: itemIndex instead of currentPage
   resetAllList(
     chunk: ChunkController,
     startRenderIndex: number,
@@ -291,7 +280,6 @@ export class DomManager {
     }
   }
 
-  // TODO: itemIndex instead of currentPage?
   changeItemsInList(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
@@ -306,10 +294,8 @@ export class DomManager {
       direction,
       list.halfOfExistingSizeInDOM,
       chunk.startRenderIndex,
-      chunk.amount,
-      chunk.itemIndex
+      chunk.amount
     );
-    // TODO: this is good
     const sequenceNumberByPage =
       (currentPage - 1) * list.length + sequenceNumber;
 
@@ -335,7 +321,6 @@ export class DomManager {
   /**
    * Change list in DOM, change offset of list
    */
-  // TODO: itemIndex instead of currentPage
   modifyCurrentDOM(
     chunk: ChunkPropsToModifyDom,
     list: ListPropsToModifyDom,
