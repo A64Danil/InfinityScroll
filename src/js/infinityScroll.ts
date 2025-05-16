@@ -585,14 +585,12 @@ class InfinityScroll {
         );
         // END Fetch new DATA
 
-        // TODO: itemIndex??? - instead of currentPage
         this.domMngr.resetAllList(
           this.chunk,
           renderIndex,
           sequenceStart,
           this.list,
-          this.scroll.direction,
-          this.vsb.currentPage
+          this.scroll.direction
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 3
@@ -671,7 +669,7 @@ class InfinityScroll {
     this.skeleton.setListHeight(this.list.length);
   }
 
-  // TODO: renderIndex or itemIndex ???
+  // TODO: renderIndex or itemIndex ??? -> truly this is itemIndex, but name is no difference?
   getSequence(renderIndex: number, isFetchToReset = false): number[] {
     let sequenceStart;
     let sequenceEnd;
