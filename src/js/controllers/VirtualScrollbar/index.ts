@@ -23,6 +23,12 @@ export class Vsb {
   // Size of one page - height of list in PX
   safeLimit: number;
 
+  // Current scroll offset in percents
+  scrollPercent: number;
+
+  // Amount of percents (from 100%) by one page
+  sizeOfPercentByOnePage: number;
+
   constructor() {
     console.log('start VSB');
 
@@ -35,8 +41,13 @@ export class Vsb {
     this.scroll = 1;
 
     // this.safeLimit = 10000000;
+    // this.safeLimit = 8000000;
     this.safeLimit = 11100;
     // this.safeLimit = 10;
+
+    this.scrollPercent = 0;
+
+    this.sizeOfPercentByOnePage = 1;
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
@@ -72,7 +83,7 @@ export class Vsb {
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
     this.countTotalPages(fullLength, itemHeight, totalHeight);
-    // this.splitDataByPages();
+    this.sizeOfPercentByOnePage = 1 / this.totalPages;
   }
 
   createFiller(realHeight: number) {
@@ -143,10 +154,9 @@ export class Vsb {
     return computedTotalPages;
   }
 
-  handleScroll(e) {
+  handleScroll(e: Event) {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
-    // console.log(scroll);
     this.scroll = scroll;
     this.getPageByScroll();
     // console.log(this.safeLimit);
@@ -163,10 +173,19 @@ export class Vsb {
     // 40 / 2 = 20
     // 60 / 3 = 20
 
-    const fullScroll = scroll * this.totalPages; // 20 * 5 === 100
-    const pagedOffsetScroll = this.safeLimit * (this.currentPage - 1);
-    const remainingScroll = fullScroll - pagedOffsetScroll; // 20 * 2 = 40
-    // console.log(fullScroll, remainingScroll);
+    // TODO: тут надо учитывать что последняя страница может быть иного размера
+
+    /* Процент на страницы которые мы уже проошли  */
+    const percentByPreviousPages =
+      (this.currentPage - 1) * this.sizeOfPercentByOnePage; // (5 - 1) * 0.2 == 0.8 (80%)
+    /* Оставшийся процент после учёта проёденных */
+    const remainingPercent = this.scrollPercent - percentByPreviousPages; // 93% - 80% == 13%
+    /* Процент на текущую страницу */
+    const percentOnCurrentPage = remainingPercent * this.totalPages;
+    /* Оставшийся скролл для VSB */
+    const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
+    console.log(remainingScroll);
+
     this.origScrollElem.scrollTop = remainingScroll;
   }
 
@@ -193,11 +212,9 @@ export class Vsb {
 
     // console.log(this.fillerHeight, this.scroll);
 
-    const percent = this.scroll / this.fillerHeight;
-    // console.log('percent', percent);
+    this.scrollPercent =
+      this.scroll / (this.fillerHeight - this.origScrollElem?.clientHeight);
 
-    this.currentPage = Math.ceil(percent * this.totalPages) || 1;
-
-    // console.log('currentPage', this.currentPage);
+    this.currentPage = Math.ceil(this.scrollPercent * this.totalPages) || 1;
   }
 }
