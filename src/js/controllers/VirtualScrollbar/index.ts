@@ -29,6 +29,9 @@ export class Vsb {
   // Amount of percents (from 100%) by one page
   sizeOfPercentByOnePage: number;
 
+  // True is new page number is not like previous
+  isPageChanged: boolean;
+
   constructor() {
     console.log('start VSB');
 
@@ -48,6 +51,8 @@ export class Vsb {
     this.scrollPercent = 0;
 
     this.sizeOfPercentByOnePage = 1;
+
+    this.isPageChanged = false;
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
@@ -158,7 +163,10 @@ export class Vsb {
     const eventTarget = e.target as HTMLElement;
     const scroll = eventTarget.scrollTop;
     this.scroll = scroll;
-    this.getPageByScroll();
+    this.setScrollPercent();
+    const newCurrentPage = this.getPageByScroll();
+    this.isPageChanged = this.currentPage !== newCurrentPage;
+    this.currentPage = newCurrentPage;
     // console.log(this.safeLimit);
     // console.log(this.origScrollElem);
 
@@ -196,6 +204,11 @@ export class Vsb {
     this.getPageByScroll();
   }
 
+  setScrollPercent() {
+    this.scrollPercent =
+      this.scroll / (this.fillerHeight - this.origScrollElem?.clientHeight);
+  }
+
   getPageByScroll() {
     // this.scroll
 
@@ -213,9 +226,7 @@ export class Vsb {
 
     // console.log(this.fillerHeight, this.scroll);
 
-    this.scrollPercent =
-      this.scroll / (this.fillerHeight - this.origScrollElem?.clientHeight);
-
-    this.currentPage = Math.ceil(this.scrollPercent * this.totalPages) || 1;
+    const currentPage = Math.ceil(this.scrollPercent * this.totalPages) || 1;
+    return currentPage;
   }
 }
