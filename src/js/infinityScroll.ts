@@ -462,7 +462,7 @@ class InfinityScroll {
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff) {
-      // console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
+      console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
       clearTimeout(this.timerIdRefreshList);
       this.setTimerToRefreshList();
     }
@@ -553,6 +553,7 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
+        console.log('renderIndex', renderIndex);
         // itemIndex
         const [sequenceStart, sequenceEnd] = this.getSequence(
           this.chunk.itemIndex,
@@ -575,6 +576,8 @@ class InfinityScroll {
           return;
         }
         console.log('Восстанавливаем значение this.chunk.startRenderIndex');
+        console.log('renderIndex', renderIndex);
+        // if(renderIndex === 94)  renderIndex = 90;
         this.chunk.setRenderIndex(
           renderIndex,
           this.vsb.currentPage,
@@ -683,15 +686,25 @@ class InfinityScroll {
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
       const tempStartIndex = renderIndex - this.chunk.amount;
-      sequenceStart = tempStartIndex > 0 ? tempStartIndex : 0;
+      const lowestIndexByPage = this.list.length * (this.vsb.currentPage - 1);
+      const hightestIndexByPage =
+        this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
+      // console.log(lowestIndexByPage, hightestIndexByPage);
+      sequenceStart =
+        tempStartIndex > lowestIndexByPage ? tempStartIndex : lowestIndexByPage;
+      // console.log(sequenceStart);
+
+      if (sequenceStart > hightestIndexByPage) {
+        sequenceStart = hightestIndexByPage;
+      }
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
-    // TODO: нужен комбинированный вариант, который считает индексы с учётом текущей страницы
     const lastStartIndex = this.list.fullLength - this.list.existingSizeInDOM;
     const lastEndIndex = this.list.fullLength;
     // const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
     // const lastEndIndex = this.list.length;
-    console.log(lastStartIndex, lastEndIndex);
+
+    // console.log(lastStartIndex, lastEndIndex);
     if (sequenceStart > lastStartIndex) {
       console.log('Случай сложный');
       [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
