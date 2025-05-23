@@ -121,7 +121,7 @@ export class DomManager {
     for (
       let i = 0;
       i < 1000 &&
-      i < list.length - 1 &&
+      i < list.length &&
       this.GLOBAL_ITEM_COUNTER < list.length &&
       this.GLOBAL_ITEM_COUNTER < list.existingSizeInDOM;
       i++
@@ -137,11 +137,6 @@ export class DomManager {
     }
 
     this.targetElem.append(templateFragment);
-
-    this.fillListTimerId = window.setTimeout(
-      () => this.fillList(list),
-      this.delay
-    );
   }
 
   // eslint-disable-next-line class-methods-use-this
