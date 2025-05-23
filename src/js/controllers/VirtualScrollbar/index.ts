@@ -91,7 +91,7 @@ export class Vsb {
     vsbFillerHTML.classList.add('vScrollbarFiller');
     vsbFillerHTML.style.height = `${realHeight}px`;
 
-    this.fillerHeight = realHeight;
+    this.fillerHeight = realHeight - this.origScrollElem?.clientHeight;
 
     this.elem.append(vsbFillerHTML);
   }
@@ -183,8 +183,9 @@ export class Vsb {
     /* Процент на текущую страницу */
     const percentOnCurrentPage = remainingPercent * this.totalPages;
     /* Оставшийся скролл для VSB */
-    const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
-    console.log(remainingScroll);
+    // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
+    const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
+    // console.log(remainingScroll);
 
     this.origScrollElem.scrollTop = remainingScroll;
   }
