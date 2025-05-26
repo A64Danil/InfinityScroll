@@ -18,6 +18,9 @@ export class ChunkController {
   // Номер элемента среди всего массива данных (в пределах всех страниц)
   public itemIndex = 0;
 
+  // Номер индекса который нужен при переходе на предыдущую страницу
+  public prevPageRenderIndex = 0;
+
   constructor() {
     console.log('start ChunkController');
   }
