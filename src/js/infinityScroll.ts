@@ -210,9 +210,10 @@ class InfinityScroll {
     }
     console.log(this.list.itemHeight);
 
-    this.chunk.lastRenderIndex =
-      this.list.length - this.list.halfOfExistingSizeInDOM;
-    console.log('this.chunk.lastRenderIndex', this.chunk.lastRenderIndex);
+    // TODO: кажется тут это не нужно, попробуем пока без этого
+    // this.chunk.lastRenderIndex =
+    //   this.list.length - this.list.halfOfExistingSizeInDOM;
+    // console.log('this.chunk.lastRenderIndex', this.chunk.lastRenderIndex);
 
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
@@ -394,6 +395,12 @@ class InfinityScroll {
 
     this.chunk.lastRenderIndex =
       this.list.length - this.list.halfOfExistingSizeInDOM;
+
+    this.chunk.prevPageRenderIndex =
+      this.chunk.lastRenderIndex +
+      this.chunk.amount -
+      (this.chunk.lastRenderIndex % this.chunk.amount);
+
     // this.list.length = newLength;
     // TODO: это важно и нужно
     if (this.render) {
@@ -461,16 +468,15 @@ class InfinityScroll {
 
     if (this.scroll.direction === 'up') {
       if (resultIndex > this.chunk.prevPageRenderIndex) {
-        console.log('Перезаписываем resultIndex');
         resultIndex = this.list.length - this.chunk.amount * 3;
-        console.log('resultIndex', resultIndex);
+        console.log('Перезаписываем resultIndex', resultIndex);
       }
     }
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff) {
-      console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
+      // console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
       clearTimeout(this.timerIdRefreshList);
       this.setTimerToRefreshList();
     }
@@ -494,22 +500,6 @@ class InfinityScroll {
         this.scroll.direction,
         this.chunk.startRenderIndex
       );
-
-      if (
-        !this.chunk.prevPageRenderIndex &&
-        !isAllowRender &&
-        this.scroll.direction === 'down' &&
-        this.chunk.startRenderIndex > this.chunk.amount
-      ) {
-        console.log(
-          'момент когда должны сохранить this.chunk.prevPageRenderIndex'
-        );
-        this.chunk.prevPageRenderIndex = this.chunk.startRenderIndex;
-        console.warn(
-          'this.chunk.prevPageRenderIndex',
-          this.chunk.prevPageRenderIndex
-        );
-      }
 
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
@@ -577,7 +567,7 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
-        console.log('renderIndex', renderIndex);
+        // console.log('renderIndex', renderIndex);
         // itemIndex
         const [sequenceStart, sequenceEnd] = this.getSequence(
           this.chunk.itemIndex,
@@ -592,15 +582,17 @@ class InfinityScroll {
           }
 
           const ranges: NumRange = [sequenceStart, sequenceEnd];
-          console.log('ranges', ranges);
+          // console.log('ranges', ranges);
 
           this.fetchUnfoundedRanges([ranges]);
         }
         if (timerID !== this.timerIdRefreshList) {
           return;
         }
-        console.log('Восстанавливаем значение this.chunk.startRenderIndex');
-        console.log('renderIndex', renderIndex);
+        console.log(
+          'Восстанавливаем значение this.chunk.startRenderIndex (renderIndex)',
+          renderIndex
+        );
         // if(renderIndex === 94)  renderIndex = 90;
         this.chunk.setRenderIndex(
           renderIndex,
@@ -621,7 +613,7 @@ class InfinityScroll {
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 3
-          console.log('BEFORE checkIndexOrdering (reset list)');
+          // console.log('BEFORE checkIndexOrdering (reset list)');
           this.checkIndexOrdering();
           console.log('AFTER checkIndexOrdering  (reset list)');
         }
@@ -737,7 +729,7 @@ class InfinityScroll {
   }
 
   fetchUnfoundedRanges(unfoundedRanges: NumRange[]): void {
-    console.log(`Try to fetch: ${unfoundedRanges.flat().join(' - ')}`);
+    // console.log(`Try to fetch: ${unfoundedRanges.flat().join(' - ')}`);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       const [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
@@ -753,7 +745,7 @@ class InfinityScroll {
         endFetchIndex
       ).then((data): void => {
         const extractedData = this.extractResponse(data);
-        console.log(`Loaded from: ${startFetchIndex}, to: ${endFetchIndex}`);
+        // console.log(`Loaded from: ${startFetchIndex}, to: ${endFetchIndex}`);
         this.addNewItemsToDataList(sequenceStart, extractedData);
         this.updateSkeletonItems(sequenceStart, extractedData);
       });
