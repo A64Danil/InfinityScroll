@@ -45,6 +45,7 @@ export class Vsb {
 
     // this.safeLimit = 10000000;
     // this.safeLimit = 8000000;
+    // this.safeLimit = 111000;
     this.safeLimit = 11100;
     // this.safeLimit = 10;
 
@@ -97,6 +98,7 @@ export class Vsb {
     vsbFillerHTML.style.height = `${realHeight}px`;
 
     this.fillerHeight = realHeight - this.origScrollElem?.clientHeight;
+    // this.fillerHeight = realHeight;
 
     this.elem.append(vsbFillerHTML);
   }
@@ -112,7 +114,6 @@ export class Vsb {
     );
 
     console.log('totalListHeight', formattedTotalListHeight);
-    console.log(typeof formattedSafeLimit);
     console.log({ standartLimit, formattedSafeLimit });
 
     // TODO: this is a fake, don't belive it

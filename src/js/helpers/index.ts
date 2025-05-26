@@ -14,7 +14,7 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
 }
 
 export function getRemoteData(url: string): Promise<Rec[]> {
-  console.log('try to get data from', url);
+  // console.log('try to get data from', url);
 
   return fetch(url).then((response) =>
     response
@@ -33,7 +33,7 @@ export function getRemoteDataByRange(
   limit = end - start
 ) {
   const fetchURL = dataUrl({ start, end, limit });
-  console.log(fetchURL);
+  // console.log(fetchURL);
   return getRemoteData(fetchURL);
 }
 

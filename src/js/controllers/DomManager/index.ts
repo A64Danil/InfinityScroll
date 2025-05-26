@@ -167,7 +167,7 @@ export class DomManager {
     const templateFragment = document.createDocumentFragment();
     for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
       // add items
-      console.log('sequenceStart', sequenceStart);
+      // console.log('sequenceStart', sequenceStart);
       const elemNum = i + sequenceStart;
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
