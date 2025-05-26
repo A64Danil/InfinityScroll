@@ -455,9 +455,17 @@ class InfinityScroll {
       chunkOrderNumber
     );
 
-    const resultIndex =
+    let resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
+
+    if (this.scroll.direction === 'up') {
+      if (resultIndex > this.chunk.prevPageRenderIndex) {
+        console.log('Перезаписываем resultIndex');
+        resultIndex = this.list.length - this.chunk.amount * 3;
+        console.log('resultIndex', resultIndex);
+      }
+    }
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
@@ -476,7 +484,7 @@ class InfinityScroll {
         this.list.length
       );
       console.log(
-        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage} ======`
+        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (${this.scroll.direction}) ======`
       );
 
       if (!this.render) {
@@ -486,6 +494,22 @@ class InfinityScroll {
         this.scroll.direction,
         this.chunk.startRenderIndex
       );
+
+      if (
+        !this.chunk.prevPageRenderIndex &&
+        !isAllowRender &&
+        this.scroll.direction === 'down' &&
+        this.chunk.startRenderIndex > this.chunk.amount
+      ) {
+        console.log(
+          'момент когда должны сохранить this.chunk.prevPageRenderIndex'
+        );
+        this.chunk.prevPageRenderIndex = this.chunk.startRenderIndex;
+        console.warn(
+          'this.chunk.prevPageRenderIndex',
+          this.chunk.prevPageRenderIndex
+        );
+      }
 
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
