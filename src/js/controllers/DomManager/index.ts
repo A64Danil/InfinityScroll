@@ -1,6 +1,7 @@
 import { ListController } from '../List';
 import { ChunkController } from '../Chunk';
 import { Skeleton } from '../Skeleton';
+import { Vsb } from '../VirtualScrollbar';
 import { IScrollDirection } from '../../types/IScrollDirection';
 import { TemplateStringFunction } from '../../types/TemplateStringFunction';
 import {
@@ -45,10 +46,17 @@ export class DomManager {
   setPaddingToList(
     list: ListPropsToModifyDom,
     chunkHtmlHeight: number,
+    vsb: Vsb,
     offset = 0
   ): void {
-    let paddingBottom =
-      list.length * list.itemHeight - chunkHtmlHeight * 4 - offset;
+    let { length } = list;
+
+    if (vsb && vsb.currentPage === vsb.totalPages) {
+      length = list.lastPageLength;
+    }
+
+    console.log('length', length);
+    let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
 
     if (paddingBottom < 0) {
       paddingBottom = 0;
@@ -80,7 +88,8 @@ export class DomManager {
     chunk: ChunkPropsToModifyDom,
     startRenderIndex: number,
     list: ListPropsToModifyDom,
-    direction: IScrollDirection
+    direction: IScrollDirection,
+    vsb: Vsb
   ): void {
     const startOffsetIndex = this.calcStartOffsetIndex(
       chunk.startRenderIndex,
@@ -91,7 +100,7 @@ export class DomManager {
     const offset = startOffsetIndex * list.itemHeight;
 
     this.targetElem.style.transform = `translate(0,${offset}px)`;
-    this.setPaddingToList(list, chunk.htmlHeight, offset);
+    this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
   }
 
   createItem(elemData: Rec, elemNum: number): HTMLElement {
@@ -161,7 +170,8 @@ export class DomManager {
     startRenderIndex: number,
     sequenceStart: number,
     list: ListController,
-    direction: IScrollDirection
+    direction: IScrollDirection,
+    vsb: Vsb
     // isAllowRenderNearBorder: boolean
   ): void {
     const templateFragment = document.createDocumentFragment();
@@ -185,7 +195,8 @@ export class DomManager {
       chunk,
       startRenderIndex,
       list,
-      direction
+      direction,
+      vsb
       // newOffset,
       // isAllowRenderNearBorder
     );
