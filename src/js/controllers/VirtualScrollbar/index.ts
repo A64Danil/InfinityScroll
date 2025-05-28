@@ -1,3 +1,5 @@
+import { IScrollDirection } from '../../types/IScrollDirection';
+
 // Virtual Scroll Bar
 export class Vsb {
   // Ссылка на html элемент со скроллом (виртуал скролл)
@@ -166,51 +168,46 @@ export class Vsb {
     return computedTotalPages;
   }
 
-  handleScroll(isSyncing?: boolean) {
-    const scroll = this.elem.scrollTop;
-    this.scroll = scroll;
-    this.setScrollPercent();
-    this.setCurrentPage();
-
-    // 1 - 5% // 1
-    // 19 - 95%
-    // 20 - 100% // 1
-    // 21 - 5% // 2
-    // 40 - 100% // 2
-    // 41 - 5% // 3
-
-    // 20 / 1 = 20
-    // 40 / 2 = 20
-    // 60 / 3 = 20
-    if (isSyncing) {
-      return;
-    }
-    this.setScrollToOrigScrollElem();
+  handleScroll() {
+    this.scroll = this.elem.scrollTop;
+    this.syncScrollState();
   }
 
-  setScroll(outerScroll: number) {
+  setScrollFromOuterSrc(outerScroll: number, direction: IScrollDirection) {
     const vsbPagedScroll =
       this.sizeOfScrollByOnePage * (this.currentPage - 1) +
       outerScroll / this.totalPages;
 
     let delta = 0;
 
-    if (outerScroll >= this.fillerHeight) {
+    if (direction === 'down' && outerScroll >= this.fillerHeight) {
       console.log('Достигли конца списка — можно перелистнуть ВПЕРЁД');
       delta = 2;
-    } else if (outerScroll <= 1) {
+    } else if (direction === 'up' && outerScroll <= 1) {
       console.log('Достигли начала списка — можно перелистнуть НАЗАД');
       delta = -1;
     }
+
+    // const delta2 =
+    //   // eslint-disable-next-line no-nested-ternary
+    //   direction === 'down' && outerScroll >= this.fillerHeight
+    //     ? 2
+    //     : direction === 'up' && outerScroll <= 1
+    //     ? -1
+    //     : 0;
 
     this.scroll = vsbPagedScroll + delta;
     this.elem.scrollTop = this.scroll;
 
     if (delta !== 0) {
-      this.setScrollPercent();
-      this.setCurrentPage();
-      this.setScrollToOrigScrollElem();
+      this.syncScrollState();
     }
+  }
+
+  syncScrollState() {
+    this.setScrollPercent();
+    this.setCurrentPage();
+    this.setScrollToOrigScrollElem();
   }
 
   setCurrentPage() {
