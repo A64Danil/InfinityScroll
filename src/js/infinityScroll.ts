@@ -104,6 +104,8 @@ class InfinityScroll {
 
   private basedIndex: 0 | 1;
 
+  private isSyncing: boolean;
+
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
@@ -148,7 +150,21 @@ class InfinityScroll {
 
     this.list = new ListController();
 
-    this.vsb = new Vsb();
+    this.vsb = new Vsb(() => {
+      if (this.isSyncing) {
+        console.log('Внещний скролл, поэтому не тригерим handleScroll');
+        return;
+      }
+
+      this.isSyncing = true;
+
+      this.vsb.handleScroll();
+      this.calcCurrentDOMRender();
+
+      setTimeout(() => {
+        this.isSyncing = false;
+      }, 0);
+    });
 
     this.skeleton = new Skeleton({
       template: props.templateString,
@@ -171,6 +187,8 @@ class InfinityScroll {
     this.includeEnd = false;
 
     this.basedIndex = 1;
+
+    this.isSyncing = false;
 
     console.log(props.data);
 
@@ -233,10 +251,25 @@ class InfinityScroll {
     this.createVirtualScroll();
 
     // this.wrapperEl.addEventListener(
-    this.middleWrapper.addEventListener(
-      'scroll',
-      this.calcCurrentDOMRender.bind(this)
-    );
+    // this.middleWrapper.addEventListener(
+    //     'scroll',
+    //     this.calcCurrentDOMRender.bind(this)
+    // );
+    this.middleWrapper.addEventListener('scroll', (e) => {
+      if (this.isSyncing) {
+        console.log('Отключаем стандартынй скролл эвент');
+        return;
+      }
+
+      this.isSyncing = true;
+      this.calcCurrentDOMRender();
+      this.vsb.setScroll(e.target.scrollTop);
+      this.vsb.handleScroll(this.isSyncing);
+      setTimeout(() => {
+        this.isSyncing = false;
+      }, 0);
+    });
+    //
   }
 
   setDefaultStyles() {
@@ -436,10 +469,9 @@ class InfinityScroll {
     this.middleWrapper?.after(this.vsb.elem);
   }
 
-  async calcCurrentDOMRender(e: Event): Promise<void> {
-    const eventTarget = e.target as HTMLElement;
+  async calcCurrentDOMRender(): Promise<void> {
+    const eventTarget = this.middleWrapper;
     const scroll = eventTarget.scrollTop;
-    // this.vsb.setScroll(scroll);
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 

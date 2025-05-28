@@ -32,7 +32,7 @@ export class Vsb {
   // True is new page number is not like previous
   isPageChanged: boolean;
 
-  constructor() {
+  constructor(scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
     this.currentPage = 1;
@@ -58,7 +58,7 @@ export class Vsb {
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
 
-    this.elem.addEventListener('scroll', this.handleScroll.bind(this));
+    this.elem.addEventListener('scroll', scrollTrigger);
 
     // const totalHeight = this.listEl.offsetHeight;
 
@@ -160,9 +160,8 @@ export class Vsb {
     return computedTotalPages;
   }
 
-  handleScroll(e: Event) {
-    const eventTarget = e.target as HTMLElement;
-    const scroll = eventTarget.scrollTop;
+  handleScroll(isSyncing?: boolean) {
+    const scroll = this.elem.scrollTop;
     this.scroll = scroll;
     this.setScrollPercent();
     const newCurrentPage = this.getPageByScroll();
@@ -181,6 +180,9 @@ export class Vsb {
     // 20 / 1 = 20
     // 40 / 2 = 20
     // 60 / 3 = 20
+    if (isSyncing) {
+      return;
+    }
 
     // TODO: тут надо учитывать что последняя страница может быть иного размера
 
@@ -195,14 +197,17 @@ export class Vsb {
     // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
     const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
     // console.log(remainingScroll);
-
     this.origScrollElem.scrollTop = remainingScroll;
   }
 
   setScroll(outerScroll: number) {
     this.scroll = outerScroll / this.totalPages;
     this.elem.scrollTop = this.scroll;
-    this.getPageByScroll();
+
+    // TOOD: setCurrentPage?
+    const newCurrentPage = this.getPageByScroll();
+    this.isPageChanged = this.currentPage !== newCurrentPage;
+    this.currentPage = newCurrentPage;
   }
 
   setScrollPercent() {
