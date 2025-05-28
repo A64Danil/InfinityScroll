@@ -29,6 +29,9 @@ export class Vsb {
   // Amount of percents (from 100%) by one page
   sizeOfPercentByOnePage: number;
 
+  // Amount of pixels (from 100% of fillerHeight) by one page
+  sizeOfScrollByOnePage: number;
+
   // True is new page number is not like previous
   isPageChanged: boolean;
 
@@ -52,6 +55,8 @@ export class Vsb {
     this.scrollPercent = 0;
 
     this.sizeOfPercentByOnePage = 1;
+
+    this.sizeOfScrollByOnePage = 1;
 
     this.isPageChanged = false;
 
@@ -90,6 +95,7 @@ export class Vsb {
     this.createFiller(realHeight);
     this.countTotalPages(fullLength, itemHeight, totalHeight);
     this.sizeOfPercentByOnePage = 1 / this.totalPages;
+    this.sizeOfScrollByOnePage = Math.ceil(this.fillerHeight / this.totalPages);
   }
 
   createFiller(realHeight: number) {
@@ -183,14 +189,30 @@ export class Vsb {
   }
 
   setScroll(outerScroll: number) {
-    if (outerScroll >= this.fillerHeight) {
-      console.log('Достигли когнца списка и можем перелистывать страницу');
-      // outerScroll += 10;
-    }
-    this.scroll = outerScroll / this.totalPages;
+    this.scroll =
+      this.sizeOfScrollByOnePage * (this.currentPage - 1) +
+      outerScroll / this.totalPages;
     this.elem.scrollTop = this.scroll;
 
-    this.setCurrentPage();
+    if (outerScroll >= this.fillerHeight) {
+      console.log(
+        'Достигли когнца списка и можем перелистывать страницу ВПЕРЕД'
+      );
+      this.scroll += 2;
+      this.elem.scrollTop = this.scroll;
+      this.setScrollPercent();
+      this.setCurrentPage();
+      this.setScrollToOrigScrollElem();
+    } else if (outerScroll <= 1) {
+      console.log(
+        'Достигли когнца списка и можем перелистывать страницу НАЗАД'
+      );
+      this.scroll -= 1;
+      this.elem.scrollTop = this.scroll;
+      this.setScrollPercent();
+      this.setCurrentPage();
+      this.setScrollToOrigScrollElem();
+    }
   }
 
   setCurrentPage() {
@@ -218,8 +240,7 @@ export class Vsb {
   }
 
   setScrollPercent() {
-    this.scrollPercent =
-      this.scroll / (this.fillerHeight - this.origScrollElem?.clientHeight);
+    this.scrollPercent = this.scroll / this.fillerHeight;
   }
 
   getPageByScroll() {

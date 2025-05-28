@@ -263,8 +263,8 @@ class InfinityScroll {
 
       this.isSyncing = true;
       this.calcCurrentDOMRender();
-      this.vsb.setScroll(e.target.scrollTop);
       this.vsb.handleScroll(this.isSyncing);
+      this.vsb.setScroll(e.target.scrollTop);
       setTimeout(() => {
         this.isSyncing = false;
       }, 0);
