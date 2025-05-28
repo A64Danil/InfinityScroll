@@ -179,21 +179,7 @@ export class Vsb {
     if (isSyncing) {
       return;
     }
-
-    // TODO: тут надо учитывать что последняя страница может быть иного размера
-
-    /* Процент на страницы которые мы уже проошли  */
-    const percentByPreviousPages =
-      (this.currentPage - 1) * this.sizeOfPercentByOnePage; // (5 - 1) * 0.2 == 0.8 (80%)
-    /* Оставшийся процент после учёта проёденных */
-    const remainingPercent = this.scrollPercent - percentByPreviousPages; // 93% - 80% == 13%
-    /* Процент на текущую страницу */
-    const percentOnCurrentPage = remainingPercent * this.totalPages;
-    /* Оставшийся скролл для VSB */
-    // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
-    const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
-    // console.log(remainingScroll);
-    this.origScrollElem.scrollTop = remainingScroll;
+    this.setScrollToOrigScrollElem();
   }
 
   setScroll(outerScroll: number) {
@@ -212,6 +198,23 @@ export class Vsb {
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
     console.log(this.currentPage);
+  }
+
+  setScrollToOrigScrollElem() {
+    // TODO: тут надо учитывать что последняя страница может быть иного размера
+
+    /* Процент на страницы которые мы уже проошли  */
+    const percentByPreviousPages =
+      (this.currentPage - 1) * this.sizeOfPercentByOnePage; // (5 - 1) * 0.2 == 0.8 (80%)
+    /* Оставшийся процент после учёта проёденных */
+    const remainingPercent = this.scrollPercent - percentByPreviousPages; // 93% - 80% == 13%
+    /* Процент на текущую страницу */
+    const percentOnCurrentPage = remainingPercent * this.totalPages;
+    /* Оставшийся скролл для VSB */
+    // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
+    const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
+    // console.log(remainingScroll);
+    this.origScrollElem.scrollTop = remainingScroll;
   }
 
   setScrollPercent() {
