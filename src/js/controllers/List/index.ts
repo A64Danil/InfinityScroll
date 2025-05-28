@@ -10,6 +10,9 @@ export class ListController {
   // Длина списка (на одну страницу)
   length = 0;
 
+  // Size of last page
+  lastPageLength = 0;
+
   // Размер списка в ДОМ (вычисляется как "чанк * 4")
   existingSizeInDOM = 0;
 

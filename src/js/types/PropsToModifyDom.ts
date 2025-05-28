@@ -15,6 +15,7 @@ type ListPropsToModifyDom = {
   data: Rec[] | undefined;
   startIndexOfLastPart: number;
   itemHeight: number;
+  lastPageLength: number;
 };
 
 export { ChunkPropsToModifyDom, ListPropsToModifyDom };
