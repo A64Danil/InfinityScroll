@@ -189,26 +189,24 @@ export class Vsb {
   }
 
   setScroll(outerScroll: number) {
-    this.scroll =
+    const vsbPagedScroll =
       this.sizeOfScrollByOnePage * (this.currentPage - 1) +
       outerScroll / this.totalPages;
-    this.elem.scrollTop = this.scroll;
+
+    let delta = 0;
 
     if (outerScroll >= this.fillerHeight) {
-      console.log(
-        'Достигли когнца списка и можем перелистывать страницу ВПЕРЕД'
-      );
-      this.scroll += 2;
-      this.elem.scrollTop = this.scroll;
-      this.setScrollPercent();
-      this.setCurrentPage();
-      this.setScrollToOrigScrollElem();
+      console.log('Достигли конца списка — можно перелистнуть ВПЕРЁД');
+      delta = 2;
     } else if (outerScroll <= 1) {
-      console.log(
-        'Достигли когнца списка и можем перелистывать страницу НАЗАД'
-      );
-      this.scroll -= 1;
-      this.elem.scrollTop = this.scroll;
+      console.log('Достигли начала списка — можно перелистнуть НАЗАД');
+      delta = -1;
+    }
+
+    this.scroll = vsbPagedScroll + delta;
+    this.elem.scrollTop = this.scroll;
+
+    if (delta !== 0) {
       this.setScrollPercent();
       this.setCurrentPage();
       this.setScrollToOrigScrollElem();
