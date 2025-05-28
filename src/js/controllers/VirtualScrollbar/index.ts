@@ -164,11 +164,7 @@ export class Vsb {
     const scroll = this.elem.scrollTop;
     this.scroll = scroll;
     this.setScrollPercent();
-    const newCurrentPage = this.getPageByScroll();
-    this.isPageChanged = this.currentPage !== newCurrentPage;
-    this.currentPage = newCurrentPage;
-    // console.log(this.safeLimit);
-    // console.log(this.origScrollElem);
+    this.setCurrentPage();
 
     // 1 - 5% // 1
     // 19 - 95%
@@ -201,13 +197,21 @@ export class Vsb {
   }
 
   setScroll(outerScroll: number) {
+    if (outerScroll >= this.fillerHeight) {
+      console.log('Достигли когнца списка и можем перелистывать страницу');
+      // outerScroll += 10;
+    }
     this.scroll = outerScroll / this.totalPages;
     this.elem.scrollTop = this.scroll;
 
-    // TOOD: setCurrentPage?
+    this.setCurrentPage();
+  }
+
+  setCurrentPage() {
     const newCurrentPage = this.getPageByScroll();
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
+    console.log(this.currentPage);
   }
 
   setScrollPercent() {
