@@ -226,7 +226,7 @@ class InfinityScroll {
       // TODO: only for tests?
       this.list.length = this.list.data.length;
     }
-    console.log(this.list.itemHeight);
+    this.list.lastPageLength = this.list.fullLength % this.list.length;
 
     // TODO: кажется тут это не нужно, попробуем пока без этого
     // this.chunk.lastRenderIndex =
@@ -457,10 +457,10 @@ class InfinityScroll {
     const realHeight = this.listEl.offsetHeight;
     console.log('realHeight', realHeight);
     this.vsb.init({
-      itemHeight: this.list.itemHeight,
-      fullLength: this.list.fullLength,
       totalHeight,
       realHeight,
+      fullLength: this.list.fullLength,
+      listLength: this.list.length,
       origScrollElem: this.middleWrapper,
     });
     // console.log(this.list.lengthByPage)
@@ -640,7 +640,8 @@ class InfinityScroll {
           renderIndex,
           sequenceStart,
           this.list,
-          this.scroll.direction
+          this.scroll.direction,
+          this.vsb
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 3
@@ -683,7 +684,8 @@ class InfinityScroll {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
           const extractedData = this.extractResponse(fetchedData);
           this.list.data = extractedData;
-          newLength = extractedData && extractedData.length;
+          newLength =
+            this.forcedListLength || (extractedData && extractedData.length);
         });
       } else {
         this.isLazy = true;
@@ -752,10 +754,11 @@ class InfinityScroll {
     // const lastEndIndex = this.list.length;
 
     // console.log(lastStartIndex, lastEndIndex);
-    if (sequenceStart > lastStartIndex) {
-      console.log('Случай сложный');
-      [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
-    }
+    // TODO: возможно это всё еще нужно - проверить на разных тестах при одной большой странице
+    // if (sequenceStart > lastStartIndex) {
+    //   console.log('Случай сложный');
+    //   [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
+    // }
     return [sequenceStart, sequenceEnd];
   }
 
