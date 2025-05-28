@@ -76,26 +76,20 @@ export class Vsb {
     totalHeight,
     realHeight,
     fullLength,
-    itemHeight,
+    listLength,
     origScrollElem,
   }: {
     totalHeight: number;
     realHeight: number;
     fullLength: number;
-    itemHeight: number;
+    listLength: number;
     origScrollElem: HTMLElement;
   }) {
     console.log('totalHeight', totalHeight);
-    console.log('this.safeLimit', this.safeLimit, itemHeight);
-
-    // TODO: temportary, for tests
-    // this.safeLimit = itemHeight * 100;
-
-    console.log('this.safeLimit', this.safeLimit, itemHeight);
 
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
-    this.countTotalPages(fullLength, itemHeight, totalHeight);
+    this.countTotalPages(fullLength, listLength, totalHeight);
     this.sizeOfPercentByOnePage = 1 / this.totalPages;
     this.sizeOfScrollByOnePage = Math.ceil(this.fillerHeight / this.totalPages);
   }
@@ -111,7 +105,7 @@ export class Vsb {
     this.elem.append(vsbFillerHTML);
   }
 
-  countTotalPages(fullLength: number, itemHeight: number, totalHeight: number) {
+  countTotalPages(fullLength: number, listLength: number, totalHeight: number) {
     // this.totalHeight = totalHeight;
     const formattedTotalListHeight = new Intl.NumberFormat('ru-RU').format(
       totalHeight
@@ -128,7 +122,7 @@ export class Vsb {
     this.totalPages = Math.ceil(totalHeight / this.safeLimit);
     console.log('(fake) this.totalPages', this.totalPages);
 
-    let onePageSize = Math.round(this.safeLimit / itemHeight);
+    let onePageSize = listLength;
     if (onePageSize > fullLength) {
       onePageSize = fullLength;
     }
@@ -214,7 +208,7 @@ export class Vsb {
     const newCurrentPage = this.getPageByScroll();
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
-    console.log(this.currentPage);
+    // console.log(this.currentPage);
   }
 
   setScrollToOrigScrollElem() {
