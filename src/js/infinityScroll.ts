@@ -236,6 +236,7 @@ class InfinityScroll {
       lastRenderIndex: this.chunk.lastRenderIndex,
       lastPageLastRenderIndex: this.chunk.lastPageLastRenderIndex,
       listLength: this.list.length,
+      listlastPageLength: this.list.lastPageLength,
       chunkAmount: this.chunk.amount,
       tailingElementsAmount: this.list.tailingElementsAmount,
     };

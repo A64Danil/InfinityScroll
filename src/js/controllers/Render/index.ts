@@ -9,6 +9,8 @@ export class RenderController {
 
   private listLength: number;
 
+  private readonly listlastPageLength: number;
+
   private readonly chunkAmount: number;
 
   private tailingElementsAmount: number;
@@ -18,6 +20,7 @@ export class RenderController {
     lastRenderIndex: number;
     lastPageLastRenderIndex: number;
     listLength: number;
+    listlastPageLength: number;
     chunkAmount: number;
     tailingElementsAmount: number;
   }) {
@@ -25,6 +28,7 @@ export class RenderController {
     this.lastRenderIndex = renderProps.lastRenderIndex;
     this.lastPageLastRenderIndex = renderProps.lastPageLastRenderIndex;
     this.listLength = renderProps.listLength;
+    this.listlastPageLength = renderProps.listlastPageLength;
     this.chunkAmount = renderProps.chunkAmount;
     this.tailingElementsAmount = renderProps.tailingElementsAmount;
     console.log(this);
@@ -80,6 +84,13 @@ export class RenderController {
     return startRenderIndex >= this.listLength - this.chunkAmount * 3;
   }
 
+  /**
+   * Косаемся конца списка двигаясь снизу на последней странице
+   */
+  isEndOfListLastPageFromBottom(startRenderIndex: number): boolean {
+    return startRenderIndex >= this.listlastPageLength - this.chunkAmount * 3;
+  }
+
   isAllowRenderNearBorder(
     direction: IScrollDirection,
     startRenderIndex: number,
@@ -131,7 +142,8 @@ export class RenderController {
     if (
       direction === 'up' &&
       (this.isBeginOfListFromBottom(startRenderIndex) ||
-        this.isEndOfListFromBottom(startRenderIndex))
+        this.isEndOfListFromBottom(startRenderIndex) ||
+        (isLastPage && this.isEndOfListLastPageFromBottom(startRenderIndex)))
     ) {
       console.log('Двигались наверх от самого низа - пока рендерить не надо');
       return false;
