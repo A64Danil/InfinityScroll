@@ -152,7 +152,7 @@ class InfinityScroll {
 
     this.vsb = new Vsb(() => {
       if (this.isSyncing) {
-        console.log('Внещний скролл, поэтому не тригерим handleScroll');
+        // console.log('Внещний скролл, поэтому не тригерим handleScroll');
         return;
       }
 
@@ -536,6 +536,8 @@ class InfinityScroll {
     let resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
+    console.log('resultIndex', resultIndex);
+    console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (this.scroll.direction === 'up') {
       if (resultIndex > this.chunk.prevPageRenderIndex) {
@@ -571,7 +573,21 @@ class InfinityScroll {
         this.scroll.direction,
         this.chunk.startRenderIndex
       );
-
+      if (this.chunk.prevPageRenderIndex === this.chunk.startRenderIndex) {
+        if (this.domMngr.targetElemSavedOffset <= 0) {
+          const t = this.domMngr.targetElem;
+          this.domMngr.targetElemSavedOffset = this.domMngr.targetElem.offsetHeight;
+          console.warn(
+            'Save targetElemSavedOffset',
+            this.domMngr.targetElemSavedOffset
+          );
+          console.warn(
+            t.offsetHeight,
+            t.style.paddingBottom,
+            t.style.transform
+          );
+        }
+      }
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
           // itemIndex is good

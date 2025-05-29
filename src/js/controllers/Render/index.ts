@@ -73,24 +73,24 @@ export class RenderController {
     direction: IScrollDirection,
     startRenderIndex: number
   ): boolean {
-    // if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
-    //   console.log('Пока рендерить не надо. Вы в самом верху списка.');
-    //   return false;
-    // }
-    //
-    // if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
-    //   console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
-    //   return false;
-    // }
-
-    if (
-      direction === 'down' &&
-      (this.isEndOfListFromTop(startRenderIndex) ||
-        this.isBeginOfListFromTop(startRenderIndex))
-    ) {
-      console.log('двигались вниз от самого верха, но рендерить не надо');
+    if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
+      console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return false;
     }
+
+    if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
+      console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+      return false;
+    }
+
+    // if (
+    //   direction === 'down' &&
+    //   (this.isEndOfListFromTop(startRenderIndex) ||
+    //     this.isBeginOfListFromTop(startRenderIndex))
+    // ) {
+    //   console.log('двигались вниз от самого верха, но рендерить не надо');
+    //   return false;
+    // }
 
     //
     // if (direction === 'up' && this.isBeginOfListFromBottom(startRenderIndex)) {

@@ -195,6 +195,9 @@ export class Vsb {
 
     if (delta !== 0) {
       this.syncScrollState();
+
+      console.log(this.scrollPercent);
+      console.log(this.currentPage);
     }
   }
 
@@ -208,7 +211,6 @@ export class Vsb {
     const newCurrentPage = this.getPageByScroll();
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
-    // console.log(this.currentPage);
   }
 
   setScrollToOrigScrollElem() {

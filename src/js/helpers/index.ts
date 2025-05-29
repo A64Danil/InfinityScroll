@@ -3,9 +3,9 @@ import { DataUrlFunction } from '../types/DataUrlFunction';
 import { Rec } from '../types/utils';
 
 export const checkChildrenAmount = (length: number, fullSize: number): void => {
-  if (length !== fullSize) {
-    console.error('%cКоличесвто деток: ', 'color: tomato', length);
-  }
+  // if (length !== fullSize) {
+  //   console.error('%cКоличесвто деток: ', 'color: tomato', length);
+  // }
 };
 
 export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
