@@ -24,6 +24,8 @@ export class DomManager {
 
   readonly targetElem;
 
+  targetElemSavedOffset = 0;
+
   // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
   private readonly template;
 
@@ -46,7 +48,7 @@ export class DomManager {
   setPaddingToList(
     list: ListPropsToModifyDom,
     chunkHtmlHeight: number,
-    vsb: Vsb,
+    vsb?: Vsb,
     offset = 0
   ): void {
     let { length } = list;
@@ -69,14 +71,26 @@ export class DomManager {
     startRenderIndex: number,
     chunkAmount: number,
     direction: IScrollDirection,
-    startIndexOfLastPart: number
+    // startIndexOfLastPart: number
+    list: ListController,
+    vsb: Vsb
   ): number {
     let startOffsetIndex = startRenderIndex - chunkAmount;
     if (startOffsetIndex < 0) {
       startOffsetIndex = 0;
     }
-    if (direction === 'down' && startOffsetIndex > startIndexOfLastPart) {
-      startOffsetIndex = startIndexOfLastPart;
+    if (direction === 'down') {
+      if (
+        vsb.currentPage !== vsb.totalPages &&
+        startOffsetIndex > list.startIndexOfLastPart
+      ) {
+        startOffsetIndex = list.startIndexOfLastPart;
+      } else if (
+        vsb.currentPage === vsb.totalPages &&
+        startOffsetIndex > list.lastPageLength
+      ) {
+        startOffsetIndex = list.lastPageLength;
+      }
     }
     return startOffsetIndex;
   }
@@ -87,7 +101,7 @@ export class DomManager {
   setOffsetToList(
     chunk: ChunkPropsToModifyDom,
     startRenderIndex: number,
-    list: ListPropsToModifyDom,
+    list: ListController,
     direction: IScrollDirection,
     vsb: Vsb
   ): void {
@@ -95,7 +109,8 @@ export class DomManager {
       chunk.startRenderIndex,
       chunk.amount,
       direction,
-      list.startIndexOfLastPart
+      list,
+      vsb
     );
     const offset = startOffsetIndex * list.itemHeight;
 
@@ -175,7 +190,14 @@ export class DomManager {
     // isAllowRenderNearBorder: boolean
   ): void {
     const templateFragment = document.createDocumentFragment();
-    for (let i = 0; i < 1000 && i < list.existingSizeInDOM; i++) {
+    let fillLimit = list.existingSizeInDOM;
+    if (
+      vsb.currentPage === vsb.totalPages &&
+      list.lastPageLength < list.existingSizeInDOM
+    ) {
+      fillLimit = list.lastPageLength;
+    }
+    for (let i = 0; i < 1000 && i < fillLimit; i++) {
       // add items
       // console.log('sequenceStart', sequenceStart);
       const elemNum = i + sequenceStart;
@@ -191,6 +213,7 @@ export class DomManager {
     this.targetElem.innerHTML = '';
     this.targetElem.append(templateFragment);
     // console.log('before setOffset', startRenderIndex, newOffset);
+    console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
     this.setOffsetToList(
       chunk,
       startRenderIndex,
@@ -200,6 +223,7 @@ export class DomManager {
       // newOffset,
       // isAllowRenderNearBorder
     );
+    console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
   }
 
   // Это важная функция, без нее конец списка тупит
@@ -209,19 +233,23 @@ export class DomManager {
     sequenceNumber: number,
     isGoingFromBottom: boolean,
     i: number,
-    tailingElementsAmount: number,
-    listLength: number
+    list: ListController,
+    // tailingElementsAmount: number,
+    // listLength: number
+    vsb: Vsb
   ): boolean {
     const isStartOfList = direction === 'up' && sequenceNumber === 0;
 
     const isReachTopLimit =
       isGoingFromBottom &&
       isStartOfList &&
-      tailingElementsAmount !== 0 &&
-      i + sequenceNumber >= tailingElementsAmount;
+      list.tailingElementsAmount !== 0 &&
+      i + sequenceNumber >= list.tailingElementsAmount;
 
     const isReachBottomLimit =
-      direction === 'down' && i + sequenceNumber >= listLength;
+      direction === 'down' && vsb.currentPage !== vsb.totalPages
+        ? i + sequenceNumber >= list.length
+        : i + sequenceNumber >= list.lastPageLength;
 
     // console.log(i + sequenceNumber, listLength);
     // Это нужно чтобы мы не риисовали лишние элементы в начале И в конце списка
@@ -244,9 +272,11 @@ export class DomManager {
     direction: IScrollDirection,
     sequenceNumber: number,
     isGoingFromBottom: boolean,
-    tailingElementsAmount: number,
-    listLength: number,
-    data: Rec[],
+    list: ListController,
+    // tailingElementsAmount: number,
+    // listLength: number,
+    // data: Rec[],
+    vsb: Vsb,
     childPosition: 'firstChild' | 'lastChild',
     itemIndex: number
   ): DocumentFragment {
@@ -258,14 +288,16 @@ export class DomManager {
         sequenceNumber,
         isGoingFromBottom,
         i,
-        tailingElementsAmount,
-        listLength
+        list,
+        // tailingElementsAmount,
+        // listLength
+        vsb
       );
 
       if (allowToChange) {
         // add items
         const elemNum = i + itemIndex;
-        const elemData = data[elemNum];
+        const elemData = list.data[elemNum];
         templateFragment.append(this.createItem(elemData, elemNum));
         // remove items
         this.removeItem(childPosition);
@@ -288,10 +320,10 @@ export class DomManager {
 
   changeItemsInList(
     chunk: ChunkPropsToModifyDom,
-    list: ListPropsToModifyDom,
+    list: ListController,
     direction: IScrollDirection,
     isGoingFromBottom: boolean,
-    currentPage: number
+    vsb: Vsb
   ): void {
     // for removeItems
     const childPosition = direction === 'down' ? 'firstChild' : 'lastChild';
@@ -303,7 +335,7 @@ export class DomManager {
       chunk.amount
     );
     const sequenceNumberByPage =
-      (currentPage - 1) * list.length + sequenceNumber;
+      (vsb.currentPage - 1) * list.length + sequenceNumber;
 
     if (list.data === undefined) {
       throw new Error('Your list.data is undefined');
@@ -314,9 +346,11 @@ export class DomManager {
       direction,
       sequenceNumber,
       isGoingFromBottom,
-      list.tailingElementsAmount,
-      list.length,
-      list.data,
+      list,
+      // list.tailingElementsAmount,
+      // list.length,
+      // list.data,
+      vsb,
       childPosition,
       sequenceNumberByPage
     );
@@ -329,19 +363,13 @@ export class DomManager {
    */
   modifyCurrentDOM(
     chunk: ChunkPropsToModifyDom,
-    list: ListPropsToModifyDom,
+    list: ListController,
     direction: IScrollDirection,
     isGoingFromBottom: boolean,
-    currentPage: number
+    vsb: Vsb
   ): void {
-    this.changeItemsInList(
-      chunk,
-      list,
-      direction,
-      isGoingFromBottom,
-      currentPage
-    );
-    this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction);
+    this.changeItemsInList(chunk, list, direction, isGoingFromBottom, vsb);
+    this.setOffsetToList(chunk, chunk.startRenderIndex, list, direction, vsb);
 
     if (process.env.NODE_ENV === 'development') {
       checkChildrenAmount(
