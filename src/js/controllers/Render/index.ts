@@ -5,6 +5,8 @@ export class RenderController {
 
   private lastRenderIndex: number;
 
+  private readonly lastPageLastRenderIndex: number;
+
   private listLength: number;
 
   private readonly chunkAmount: number;
@@ -14,12 +16,14 @@ export class RenderController {
   constructor(renderProps: {
     halfOfExistingSizeInDOM: number;
     lastRenderIndex: number;
+    lastPageLastRenderIndex: number;
     listLength: number;
     chunkAmount: number;
     tailingElementsAmount: number;
   }) {
     this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM; // TODO: now - useless?
     this.lastRenderIndex = renderProps.lastRenderIndex;
+    this.lastPageLastRenderIndex = renderProps.lastPageLastRenderIndex;
     this.listLength = renderProps.listLength;
     this.chunkAmount = renderProps.chunkAmount;
     this.tailingElementsAmount = renderProps.tailingElementsAmount;
@@ -36,7 +40,7 @@ export class RenderController {
     this.tailingElementsAmount = tailingElementsAmount;
   }
 
-  // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям
+  // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям - скорее всего надо писать "больше или равно"
   /**
    * Косаемся начала списка двигаясь сверху
    */
@@ -49,6 +53,13 @@ export class RenderController {
    */
   isEndOfListFromTop(startRenderIndex: number): boolean {
     return startRenderIndex > this.lastRenderIndex;
+  }
+
+  /**
+   * Косаемся конца списка двигаясь сверху
+   */
+  isEndOfListLastPageFromTop(startRenderIndex: number): boolean {
+    return startRenderIndex >= this.lastPageLastRenderIndex;
   }
 
   /**
@@ -71,7 +82,8 @@ export class RenderController {
 
   isAllowRenderNearBorder(
     direction: IScrollDirection,
-    startRenderIndex: number
+    startRenderIndex: number,
+    isLastPage: boolean
   ): boolean {
     if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
@@ -80,6 +92,17 @@ export class RenderController {
 
     if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
       console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
+      return false;
+    }
+
+    if (
+      direction === 'down' &&
+      isLastPage &&
+      this.isEndOfListLastPageFromTop(startRenderIndex)
+    ) {
+      console.log(
+        'УЖЕ рендерить не надо.  Вы в самом низу последней страницы списка.'
+      );
       return false;
     }
 
