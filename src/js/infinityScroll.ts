@@ -228,14 +228,13 @@ class InfinityScroll {
     }
     this.list.lastPageLength = this.list.fullLength % this.list.length;
 
-    // TODO: кажется тут это не нужно, попробуем пока без этого
-    // this.chunk.lastRenderIndex =
-    //   this.list.length - this.list.halfOfExistingSizeInDOM;
-    // console.log('this.chunk.lastRenderIndex', this.chunk.lastRenderIndex);
+    this.chunk.lastPageLastRenderIndex =
+      this.list.lastPageLength - this.list.halfOfExistingSizeInDOM;
 
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
+      lastPageLastRenderIndex: this.chunk.lastPageLastRenderIndex,
       listLength: this.list.length,
       chunkAmount: this.chunk.amount,
       tailingElementsAmount: this.list.tailingElementsAmount,
@@ -568,7 +567,8 @@ class InfinityScroll {
       }
       const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
-        this.chunk.startRenderIndex
+        this.chunk.startRenderIndex,
+        this.vsb.currentPage === this.vsb.totalPages
       );
       if (this.chunk.prevPageRenderIndex === this.chunk.startRenderIndex) {
         if (this.domMngr.targetElemSavedOffset <= 0) {
