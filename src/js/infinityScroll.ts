@@ -260,9 +260,36 @@ class InfinityScroll {
         console.log('Отключаем стандартынй скролл эвент');
         return;
       }
+      if (
+        this.chunk.startRenderIndex === 0 &&
+        this.scroll.direction === 'up' &&
+        this.vsb.currentPage !== 1 &&
+        this.domMngr.targetElem.offsetHeight !==
+          this.domMngr.targetElemSavedOffset &&
+        this.vsb.currentPage !== this.vsb.totalPages
+      ) {
+        //   this.domMngr.setOffsetToList(
+        //     this.chunk,
+        //     this.chunk.prevPageRenderIndex,
+        //     this.list,
+        //     'down',
+        //     this.vsb
+        //   );
+        const t = this.domMngr.targetElem;
+        //   console.warn(
+        //     'Restore this.domMngr.targetElem.offsetHeight',
+        //     t.offsetHeight
+        //   );
+        //   console.warn(t.offsetHeight, t.style.paddingBottom, t.style.transform);
+        // // 8436 + 2664 ???
+        //   t.style.transform = `translate(0, 7104px)`;
+        //   t.style.paddingBottom = `1332px`; // 8436px
+        //   console.warn(t.offsetHeight, t.style.paddingBottom, t.style.transform);
+      }
 
       this.isSyncing = true;
       this.calcCurrentDOMRender();
+      // console.log(e.target.scrollTop);
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       setTimeout(() => {
         this.isSyncing = false;
@@ -433,6 +460,11 @@ class InfinityScroll {
       this.chunk.amount -
       (this.chunk.lastRenderIndex % this.chunk.amount);
 
+    this.chunk.lastPageLastRenderIndex =
+      this.list.lastPageLength > this.list.halfOfExistingSizeInDOM
+        ? this.list.length - this.list.halfOfExistingSizeInDOM
+        : 1;
+
     // this.list.length = newLength;
     // TODO: это важно и нужно
     if (this.render) {
@@ -449,6 +481,14 @@ class InfinityScroll {
 
     this.list.startIndexOfLastPart =
       this.list.length - this.list.existingSizeInDOM;
+
+    this.list.lastPageStartIndexOfLastPart =
+      this.list.lastPageLength - this.list.existingSizeInDOM;
+
+    if (this.list.lastPageStartIndexOfLastPart < 0) {
+      this.list.lastPageStartIndexOfLastPart = 0;
+    }
+
     this.chunk.lastOrderNumber = Math.floor(
       this.list.length / this.chunk.amount
     );
@@ -569,10 +609,10 @@ class InfinityScroll {
         };
         this.domMngr.modifyCurrentDOM(
           mainChunkProps,
-          mainListProps,
+          this.list,
           this.scroll.direction,
           this.scroll.isGoingFromBottom,
-          this.vsb.currentPage
+          this.vsb
         );
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
