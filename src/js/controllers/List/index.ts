@@ -31,6 +31,9 @@ export class ListController {
   // Стартовый индекс последней части списка
   public startIndexOfLastPart = 0;
 
+  // Стартовый индекс последней части списка
+  public lastPageStartIndexOfLastPart = 0;
+
   constructor() {
     console.log('Start List Controller', this);
     this.data = [];
