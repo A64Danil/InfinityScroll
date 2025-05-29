@@ -194,16 +194,25 @@ export class Vsb {
     this.elem.scrollTop = this.scroll;
 
     if (delta !== 0) {
-      this.syncScrollState();
+      this.syncScrollState(direction);
 
       console.log(this.scrollPercent);
       console.log(this.currentPage);
     }
   }
 
-  syncScrollState() {
+  syncScrollState(direction?: IScrollDirection) {
     this.setScrollPercent();
     this.setCurrentPage();
+    if (
+      this.isPageChanged &&
+      this.currentPage === this.totalPages - 1 &&
+      direction === 'up'
+    ) {
+      console.clear();
+      console.warn('Мы на предпоследней странице - отменяет сет скролл');
+      // return
+    }
     this.setScrollToOrigScrollElem();
   }
 
@@ -226,7 +235,8 @@ export class Vsb {
     /* Оставшийся скролл для VSB */
     // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
     const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
-    // console.log(remainingScroll);
+    console.log('remainingScroll', remainingScroll);
+    console.log('this.origScrollElem.scrollTop', this.origScrollElem.scrollTop);
     this.origScrollElem.scrollTop = remainingScroll;
   }
 

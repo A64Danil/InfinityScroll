@@ -261,30 +261,27 @@ class InfinityScroll {
         return;
       }
       if (
-        this.chunk.startRenderIndex === 0 &&
-        this.scroll.direction === 'up' &&
-        this.vsb.currentPage !== 1 &&
         this.domMngr.targetElem.offsetHeight !==
           this.domMngr.targetElemSavedOffset &&
-        this.vsb.currentPage !== this.vsb.totalPages
+        this.vsb.isPageChanged &&
+        this.vsb.currentPage === this.vsb.totalPages - 1 &&
+        this.scroll.direction === 'up'
       ) {
-        //   this.domMngr.setOffsetToList(
-        //     this.chunk,
-        //     this.chunk.prevPageRenderIndex,
-        //     this.list,
-        //     'down',
-        //     this.vsb
-        //   );
-        const t = this.domMngr.targetElem;
-        //   console.warn(
-        //     'Restore this.domMngr.targetElem.offsetHeight',
-        //     t.offsetHeight
-        //   );
-        //   console.warn(t.offsetHeight, t.style.paddingBottom, t.style.transform);
-        // // 8436 + 2664 ???
-        //   t.style.transform = `translate(0, 7104px)`;
-        //   t.style.paddingBottom = `1332px`; // 8436px
-        //   console.warn(t.offsetHeight, t.style.paddingBottom, t.style.transform);
+        console.warn('Предпоследняя страница, надо всё чинить');
+
+        const hightestIndexByPage =
+          this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
+
+        this.domMngr.resetAllList(
+          this.chunk,
+          this.chunk.prevPageRenderIndex,
+          hightestIndexByPage,
+          this.list,
+          this.scroll.direction,
+          this.vsb
+        );
+        this.vsb.setScrollToOrigScrollElem();
+        this.vsb.isPageChanged = false;
       }
 
       this.isSyncing = true;
@@ -536,8 +533,8 @@ class InfinityScroll {
     let resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
-    console.log('resultIndex', resultIndex);
-    console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
+    // console.log('resultIndex', resultIndex);
+    // console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (this.scroll.direction === 'up') {
       if (resultIndex > this.chunk.prevPageRenderIndex) {
