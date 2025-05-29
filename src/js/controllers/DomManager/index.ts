@@ -246,10 +246,28 @@ export class DomManager {
       list.tailingElementsAmount !== 0 &&
       i + sequenceNumber >= list.tailingElementsAmount;
 
-    const isReachBottomLimit =
-      direction === 'down' && vsb.currentPage !== vsb.totalPages
-        ? i + sequenceNumber >= list.length
-        : i + sequenceNumber >= list.lastPageLength;
+    let isReachBottomLimit = false;
+
+    if (direction === 'down' && i + sequenceNumber >= list.length) {
+      isReachBottomLimit = true;
+    }
+
+    if (
+      direction === 'down' &&
+      vsb.currentPage === vsb.totalPages &&
+      i + sequenceNumber >= list.lastPageLength
+    ) {
+      console.log('last page case');
+      isReachBottomLimit = true;
+    }
+
+    // const isReachBottomLimit =
+    //   direction === 'down' && vsb.currentPage !== vsb.totalPages
+    //     ? i + sequenceNumber >= list.length
+    //     : i + sequenceNumber >= list.lastPageLength;
+
+    // const isReachBottomLimit =
+    //     direction === 'down' && i + sequenceNumber >= list.length;
 
     // console.log(i + sequenceNumber, listLength);
     // Это нужно чтобы мы не риисовали лишние элементы в начале И в конце списка
