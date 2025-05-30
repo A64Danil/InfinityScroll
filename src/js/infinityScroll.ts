@@ -571,20 +571,15 @@ class InfinityScroll {
         this.chunk.startRenderIndex,
         this.vsb.currentPage === this.vsb.totalPages
       );
-      if (this.chunk.prevPageRenderIndex === this.chunk.startRenderIndex) {
-        if (this.domMngr.targetElemSavedOffset <= 0) {
-          const t = this.domMngr.targetElem;
-          this.domMngr.targetElemSavedOffset = this.domMngr.targetElem.offsetHeight;
-          console.warn(
-            'Save targetElemSavedOffset',
-            this.domMngr.targetElemSavedOffset
-          );
-          console.warn(
-            t.offsetHeight,
-            t.style.paddingBottom,
-            t.style.transform
-          );
-        }
+      if (
+        this.domMngr.targetElemSavedOffset <= 0 &&
+        this.chunk.prevPageRenderIndex === this.chunk.startRenderIndex
+      ) {
+        this.domMngr.targetElemSavedOffset = this.domMngr.targetElem.offsetHeight;
+        console.warn(
+          'Save targetElemSavedOffset',
+          this.domMngr.targetElemSavedOffset
+        );
       }
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
