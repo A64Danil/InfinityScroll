@@ -498,6 +498,7 @@ class InfinityScroll {
       realHeight,
       fullLength: this.list.fullLength,
       listLength: this.list.length,
+      lastPageLength: this.list.lastPageLength,
       origScrollElem: this.middleWrapper,
     });
     // console.log(this.list.lengthByPage)

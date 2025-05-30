@@ -37,6 +37,9 @@ export class Vsb {
   // True is new page number is not like previous
   isPageChanged: boolean;
 
+  // Ration of full and not_full pages to have good scroll length
+  scrollRatio: number;
+
   constructor(scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
@@ -62,6 +65,8 @@ export class Vsb {
 
     this.isPageChanged = false;
 
+    this.scrollRatio = 1;
+
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
 
@@ -77,12 +82,14 @@ export class Vsb {
     realHeight,
     fullLength,
     listLength,
+    lastPageLength,
     origScrollElem,
   }: {
     totalHeight: number;
     realHeight: number;
     fullLength: number;
     listLength: number;
+    lastPageLength: number;
     origScrollElem: HTMLElement;
   }) {
     console.log('totalHeight', totalHeight);
@@ -92,6 +99,8 @@ export class Vsb {
     this.countTotalPages(fullLength, listLength, totalHeight);
     this.sizeOfPercentByOnePage = 1 / this.totalPages;
     this.sizeOfScrollByOnePage = Math.ceil(this.fillerHeight / this.totalPages);
+
+    this.setScrollRatio(fullLength, listLength, lastPageLength);
   }
 
   createFiller(realHeight: number) {
@@ -255,5 +264,17 @@ export class Vsb {
 
     const currentPage = Math.ceil(this.scrollPercent * this.totalPages) || 1;
     return currentPage;
+  }
+
+  setScrollRatio(
+    fullLength: number,
+    listLength: number,
+    lastPageLength: number
+  ) {
+    const completedPagesLength = listLength * this.totalPages;
+    const incompletedPagesLength = fullLength;
+    console.log(completedPagesLength, incompletedPagesLength);
+    this.scrollRatio = completedPagesLength / incompletedPagesLength;
+    console.log('set scroll ratio', this.scrollRatio);
   }
 }
