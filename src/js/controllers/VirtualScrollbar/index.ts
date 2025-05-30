@@ -174,6 +174,7 @@ export class Vsb {
 
     let delta = 0;
 
+    // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
     if (direction === 'down' && outerScroll >= this.fillerHeight) {
       console.log('Достигли конца списка — можно перелистнуть ВПЕРЁД');
       delta = 2;
@@ -204,15 +205,6 @@ export class Vsb {
   syncScrollState(direction?: IScrollDirection) {
     this.setScrollPercent();
     this.setCurrentPage();
-    if (
-      this.isPageChanged &&
-      this.currentPage === this.totalPages - 1 &&
-      direction === 'up'
-    ) {
-      console.clear();
-      console.warn('Мы на предпоследней странице - отменяет сет скролл');
-      // return
-    }
     this.setScrollToOrigScrollElem();
   }
 
@@ -223,7 +215,7 @@ export class Vsb {
   }
 
   setScrollToOrigScrollElem() {
-    // TODO: тут надо учитывать что последняя страница может быть иного размера
+    // TODO: попробовать статические данные вместо динамики?
 
     /* Процент на страницы которые мы уже проошли  */
     const percentByPreviousPages =
