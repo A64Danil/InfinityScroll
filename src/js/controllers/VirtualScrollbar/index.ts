@@ -31,8 +31,14 @@ export class Vsb {
   // Amount of percents (from 100%) by one page
   sizeOfPercentByOnePage: number;
 
+  // Amount of percents (from 100%) by last page
+  sizeOfPercentByLastPage = 0;
+
   // Amount of pixels (from 100% of fillerHeight) by one page
   sizeOfScrollByOnePage: number;
+
+  // Amount of pixels (from 100% of fillerHeight) by last page
+  sizeOfScrollByLastPage = 0;
 
   // True is new page number is not like previous
   isPageChanged: boolean;
@@ -97,10 +103,26 @@ export class Vsb {
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
     this.countTotalPages(fullLength, listLength, totalHeight);
-    this.sizeOfPercentByOnePage = 1 / this.totalPages;
-    this.sizeOfScrollByOnePage = Math.ceil(this.fillerHeight / this.totalPages);
 
     this.setScrollRatio(fullLength, listLength, lastPageLength);
+
+    this.sizeOfPercentByOnePage = (1 / this.totalPages) * this.scrollRatio;
+    this.sizeOfScrollByOnePage = Math.ceil(
+      (this.fillerHeight / this.totalPages) * this.scrollRatio
+    );
+
+    this.sizeOfPercentByLastPage =
+      1 - this.sizeOfPercentByOnePage * (this.totalPages - 1);
+    this.sizeOfScrollByLastPage =
+      this.fillerHeight - this.sizeOfScrollByOnePage * (this.totalPages - 1);
+
+    const percentSizeCheck =
+      this.sizeOfPercentByOnePage * 4 + this.sizeOfPercentByLastPage;
+    console.log('percentSizeCheck', percentSizeCheck === 1);
+
+    const scrollSizeCheck =
+      this.sizeOfScrollByOnePage * 4 + this.sizeOfScrollByLastPage;
+    console.log('scrollSizeCheck', scrollSizeCheck === this.fillerHeight);
   }
 
   createFiller(realHeight: number) {
