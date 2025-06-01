@@ -201,43 +201,57 @@ export class Vsb {
         outerScroll
       );
       needToChangePage = true;
+      this.currentPage++;
     } else if (direction === 'up' && outerScroll <= 1 && this.currentPage > 1) {
       console.log('Достигли начала списка — можно перелистнуть НАЗАД');
       needToChangePage = true;
+      this.currentPage--;
     }
 
     this.scroll = vsbPagedScroll;
     this.elem.scrollTop = this.scroll;
 
     if (needToChangePage) {
-      console.log('needToChangePage == true');
-      this.syncScrollState(direction);
+      // console.log('needToChangePage == true');
+      //
+      // console.log(this.scrollPercent);
+      // console.log(this.currentPage);
 
-      console.log(this.scrollPercent);
-      console.log(this.currentPage);
+      this.setScrollPercent();
+      // TODO: почему отключение не ломает скрипт?
+      // this.isPageChanged = true;
+      this.setScrollToOrigScrollElem(direction, needToChangePage);
+
+      // console.log(this.scrollPercent);
+      // console.log(this.currentPage);
     }
   }
 
   syncScrollState(direction?: IScrollDirection) {
     this.setScrollPercent();
 
-    console.log(this.scrollPercent);
+    // console.log(this.scrollPercent);
+    // console.log(this.currentPage);
+    this.setCurrentPage();
+
     console.log(this.currentPage);
-    this.setCurrentPage(direction);
     this.setScrollToOrigScrollElem(direction);
   }
 
-  setCurrentPage(direction: IScrollDirection) {
-    const newCurrentPage = this.getPageByScroll(direction);
+  setCurrentPage() {
+    const newCurrentPage = this.getPageByScroll();
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
   }
 
-  setScrollToOrigScrollElem(direction?: IScrollDirection) {
+  setScrollToOrigScrollElem(
+    direction?: IScrollDirection,
+    forceChange?: boolean
+  ) {
     // TODO: попробовать статические данные вместо динамики?
-    console.log('this.isPageChanged', this.isPageChanged);
+    // console.log('this.isPageChanged', this.isPageChanged);
 
-    if (this.isPageChanged) {
+    if (forceChange) {
       if (direction === 'down') {
         console.log('in down case');
         this.origScrollElem.scrollTop = 0;
@@ -259,8 +273,8 @@ export class Vsb {
     // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
     const remainingScroll =
       (this.fillerHeight * percentOnCurrentPage) / this.scrollRatio; // 20 * 2 = 40
-    console.log('remainingScroll', remainingScroll);
-    console.log('this.origScrollElem.scrollTop', this.origScrollElem.scrollTop);
+    // console.log('remainingScroll', remainingScroll);
+    // console.log('this.origScrollElem.scrollTop', this.origScrollElem.scrollTop);
     this.origScrollElem.scrollTop = remainingScroll;
   }
 
@@ -268,7 +282,7 @@ export class Vsb {
     this.scrollPercent = this.scroll / this.fillerHeight;
   }
 
-  getPageByScroll(direction: IScrollDirection) {
+  getPageByScroll() {
     // this.scroll
 
     // 0 = 1
@@ -283,28 +297,16 @@ export class Vsb {
     // 0.8 = 5 --- 0.8 * 5 = 4
     // 1 = 5 --- 1 * 5 = 5
 
-    const delta = direction === 'down' ? 1 : 0;
+    // const delta = direction === 'down' ? 1 : 0;
 
     // 0.000007286922940556722 = 0.07680416779346785 / 10540
-    console.log(this.scroll, this.fillerHeight);
-    // this.scrollPercent = 0.000007286922940556722 * 2;
-    // 0.07680368424504311
-    console.log('this.scrollPercent', this.scrollPercent); // 0.000007286922940556722
-    console.log(
-      'Orig page num',
-      (this.scrollPercent * this.totalPages) / this.scrollRatio
-    );
-    const precalcPageNum = (
-      (this.scrollPercent * this.totalPages) /
-      this.scrollRatio
-    ).toFixed(3);
-    console.log('precalcPageNum', precalcPageNum);
-    const precalcPageNum2 =
-      (this.scrollPercent * this.totalPages) / this.scrollRatio2;
-    console.log('precalcPageNum2', precalcPageNum2);
-    const currentPage =
-      Math.floor((this.scrollPercent * this.totalPages) / this.scrollRatio) +
-      delta;
+    // console.log(this.scroll, this.fillerHeight);
+
+    const origPageNum =
+      (this.scrollPercent * this.totalPages) / this.scrollRatio;
+    // console.log('Orig page num', origPageNum);
+
+    const currentPage = Math.ceil(origPageNum) || 1;
     return currentPage;
   }
 
@@ -317,8 +319,6 @@ export class Vsb {
     const incompletedPagesLength = fullLength;
     console.log(completedPagesLength, incompletedPagesLength);
     this.scrollRatio = completedPagesLength / incompletedPagesLength;
-    this.scrollRatio2 = Number(this.scrollRatio.toFixed(4));
     console.log('set scroll ratio', this.scrollRatio);
-    console.log('set scroll ratio', this.scrollRatio2);
   }
 }
