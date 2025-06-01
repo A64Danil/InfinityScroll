@@ -107,22 +107,9 @@ export class Vsb {
     this.setScrollRatio(fullLength, listLength, lastPageLength);
 
     this.sizeOfPercentByOnePage = (1 / this.totalPages) * this.scrollRatio;
-    this.sizeOfScrollByOnePage = Math.ceil(
-      (this.fillerHeight / this.totalPages) * this.scrollRatio
-    );
-    //
-    // this.sizeOfPercentByLastPage =
-    //   1 - this.sizeOfPercentByOnePage * (this.totalPages - 1);
-    // this.sizeOfScrollByLastPage =
-    //   this.fillerHeight - this.sizeOfScrollByOnePage * (this.totalPages - 1);
-    //
-    // const percentSizeCheck =
-    //   this.sizeOfPercentByOnePage * 4 + this.sizeOfPercentByLastPage;
-    // console.log('percentSizeCheck', percentSizeCheck === 1);
-    //
-    // const scrollSizeCheck =
-    //   this.sizeOfScrollByOnePage * 4 + this.sizeOfScrollByLastPage;
-    // console.log('scrollSizeCheck', scrollSizeCheck === this.fillerHeight);
+
+    this.sizeOfScrollByOnePage =
+      (this.fillerHeight / this.totalPages) * this.scrollRatio;
   }
 
   createFiller(realHeight: number) {
@@ -204,33 +191,26 @@ export class Vsb {
       this.sizeOfScrollByOnePage * (this.currentPage - 1) +
       (outerScroll * this.scrollRatio) / this.totalPages;
 
-    let delta = 0;
+    let needToChangePage = false;
 
-    console.log('outerScroll', outerScroll);
+    // console.log('outerScroll', outerScroll);
     // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
     if (direction === 'down' && outerScroll >= this.fillerHeight) {
       console.log(
         'Достигли конца списка — можно перелистнуть ВПЕРЁД',
         outerScroll
       );
-      delta = 2;
-    } else if (direction === 'up' && outerScroll <= 1) {
+      needToChangePage = true;
+    } else if (direction === 'up' && outerScroll <= 1 && this.currentPage > 1) {
       console.log('Достигли начала списка — можно перелистнуть НАЗАД');
-      delta = -1;
+      needToChangePage = true;
     }
 
-    // const delta2 =
-    //   // eslint-disable-next-line no-nested-ternary
-    //   direction === 'down' && outerScroll >= this.fillerHeight
-    //     ? 2
-    //     : direction === 'up' && outerScroll <= 1
-    //     ? -1
-    //     : 0;
-
-    this.scroll = vsbPagedScroll + delta;
+    this.scroll = vsbPagedScroll;
     this.elem.scrollTop = this.scroll;
 
-    if (delta !== 0) {
+    if (needToChangePage) {
+      console.log('needToChangePage == true');
       this.syncScrollState(direction);
 
       console.log(this.scrollPercent);
@@ -240,12 +220,15 @@ export class Vsb {
 
   syncScrollState(direction?: IScrollDirection) {
     this.setScrollPercent();
-    this.setCurrentPage();
+
+    console.log(this.scrollPercent);
+    console.log(this.currentPage);
+    this.setCurrentPage(direction);
     this.setScrollToOrigScrollElem(direction);
   }
 
-  setCurrentPage() {
-    const newCurrentPage = this.getPageByScroll();
+  setCurrentPage(direction: IScrollDirection) {
+    const newCurrentPage = this.getPageByScroll(direction);
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
   }
@@ -285,7 +268,7 @@ export class Vsb {
     this.scrollPercent = this.scroll / this.fillerHeight;
   }
 
-  getPageByScroll() {
+  getPageByScroll(direction: IScrollDirection) {
     // this.scroll
 
     // 0 = 1
@@ -300,8 +283,13 @@ export class Vsb {
     // 0.8 = 5 --- 0.8 * 5 = 4
     // 1 = 5 --- 1 * 5 = 5
 
-    // console.log(this.fillerHeight, this.scroll);
+    const delta = direction === 'down' ? 1 : 0;
 
+    // 0.000007286922940556722 = 0.07680416779346785 / 10540
+    console.log(this.scroll, this.fillerHeight);
+    // this.scrollPercent = 0.000007286922940556722 * 2;
+    // 0.07680368424504311
+    console.log('this.scrollPercent', this.scrollPercent); // 0.000007286922940556722
     console.log(
       'Orig page num',
       (this.scrollPercent * this.totalPages) / this.scrollRatio
@@ -314,7 +302,9 @@ export class Vsb {
     const precalcPageNum2 =
       (this.scrollPercent * this.totalPages) / this.scrollRatio2;
     console.log('precalcPageNum2', precalcPageNum2);
-    const currentPage = Math.ceil(precalcPageNum) || 1;
+    const currentPage =
+      Math.floor((this.scrollPercent * this.totalPages) / this.scrollRatio) +
+      delta;
     return currentPage;
   }
 
