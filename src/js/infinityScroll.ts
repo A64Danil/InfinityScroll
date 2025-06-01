@@ -265,7 +265,7 @@ class InfinityScroll {
     // );
     this.middleWrapper.addEventListener('scroll', (e) => {
       if (this.isSyncing) {
-        console.log('Отключаем стандартынй скролл эвент');
+        // console.log('Отключаем стандартынй скролл эвент');
         return;
       }
       if (
@@ -656,7 +656,12 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       if (this.render) {
         const renderIndex = this.chunk.startRenderIndex;
-        // console.log('renderIndex', renderIndex);
+        console.log('renderIndex', renderIndex);
+        this.chunk.setRenderIndex(
+          renderIndex,
+          this.vsb.currentPage,
+          this.list.length
+        );
         // itemIndex
         const [sequenceStart, sequenceEnd] = this.getSequence(
           this.chunk.itemIndex,
@@ -683,13 +688,13 @@ class InfinityScroll {
           renderIndex
         );
         // if(renderIndex === 94)  renderIndex = 90;
-        this.chunk.setRenderIndex(
-          renderIndex,
-          this.vsb.currentPage,
-          this.list.length
-        );
+        // this.chunk.setRenderIndex(
+        //   renderIndex,
+        //   this.vsb.currentPage,
+        //   this.list.length
+        // );
         console.log(
-          `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex} ======`
+          `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (seq: ${sequenceStart}) ======`
         );
         // END Fetch new DATA
 
