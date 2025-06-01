@@ -110,19 +110,19 @@ export class Vsb {
     this.sizeOfScrollByOnePage = Math.ceil(
       (this.fillerHeight / this.totalPages) * this.scrollRatio
     );
-
-    this.sizeOfPercentByLastPage =
-      1 - this.sizeOfPercentByOnePage * (this.totalPages - 1);
-    this.sizeOfScrollByLastPage =
-      this.fillerHeight - this.sizeOfScrollByOnePage * (this.totalPages - 1);
-
-    const percentSizeCheck =
-      this.sizeOfPercentByOnePage * 4 + this.sizeOfPercentByLastPage;
-    console.log('percentSizeCheck', percentSizeCheck === 1);
-
-    const scrollSizeCheck =
-      this.sizeOfScrollByOnePage * 4 + this.sizeOfScrollByLastPage;
-    console.log('scrollSizeCheck', scrollSizeCheck === this.fillerHeight);
+    //
+    // this.sizeOfPercentByLastPage =
+    //   1 - this.sizeOfPercentByOnePage * (this.totalPages - 1);
+    // this.sizeOfScrollByLastPage =
+    //   this.fillerHeight - this.sizeOfScrollByOnePage * (this.totalPages - 1);
+    //
+    // const percentSizeCheck =
+    //   this.sizeOfPercentByOnePage * 4 + this.sizeOfPercentByLastPage;
+    // console.log('percentSizeCheck', percentSizeCheck === 1);
+    //
+    // const scrollSizeCheck =
+    //   this.sizeOfScrollByOnePage * 4 + this.sizeOfScrollByLastPage;
+    // console.log('scrollSizeCheck', scrollSizeCheck === this.fillerHeight);
   }
 
   createFiller(realHeight: number) {
@@ -131,6 +131,7 @@ export class Vsb {
     vsbFillerHTML.style.height = `${realHeight}px`;
 
     this.fillerHeight = realHeight - this.origScrollElem?.clientHeight;
+    console.log(realHeight, this.origScrollElem?.clientHeight);
     // this.fillerHeight = realHeight;
 
     this.elem.append(vsbFillerHTML);
@@ -201,13 +202,17 @@ export class Vsb {
   setScrollFromOuterSrc(outerScroll: number, direction: IScrollDirection) {
     const vsbPagedScroll =
       this.sizeOfScrollByOnePage * (this.currentPage - 1) +
-      outerScroll / this.totalPages;
+      (outerScroll * this.scrollRatio) / this.totalPages;
 
     let delta = 0;
 
+    console.log('outerScroll', outerScroll);
     // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
     if (direction === 'down' && outerScroll >= this.fillerHeight) {
-      console.log('Достигли конца списка — можно перелистнуть ВПЕРЁД');
+      console.log(
+        'Достигли конца списка — можно перелистнуть ВПЕРЁД',
+        outerScroll
+      );
       delta = 2;
     } else if (direction === 'up' && outerScroll <= 1) {
       console.log('Достигли начала списка — можно перелистнуть НАЗАД');
@@ -236,7 +241,7 @@ export class Vsb {
   syncScrollState(direction?: IScrollDirection) {
     this.setScrollPercent();
     this.setCurrentPage();
-    this.setScrollToOrigScrollElem();
+    this.setScrollToOrigScrollElem(direction);
   }
 
   setCurrentPage() {
@@ -245,8 +250,20 @@ export class Vsb {
     this.currentPage = newCurrentPage;
   }
 
-  setScrollToOrigScrollElem() {
+  setScrollToOrigScrollElem(direction?: IScrollDirection) {
     // TODO: попробовать статические данные вместо динамики?
+    console.log('this.isPageChanged', this.isPageChanged);
+
+    if (this.isPageChanged) {
+      if (direction === 'down') {
+        console.log('in down case');
+        this.origScrollElem.scrollTop = 0;
+      } else {
+        console.log(this.fillerHeight - 1);
+        this.origScrollElem.scrollTop = this.fillerHeight - 1;
+      }
+      return;
+    }
 
     /* Процент на страницы которые мы уже проошли  */
     const percentByPreviousPages =
@@ -257,7 +274,8 @@ export class Vsb {
     const percentOnCurrentPage = remainingPercent * this.totalPages;
     /* Оставшийся скролл для VSB */
     // const remainingScroll = this.safeLimit * percentOnCurrentPage; // 20 * 2 = 40
-    const remainingScroll = this.fillerHeight * percentOnCurrentPage; // 20 * 2 = 40
+    const remainingScroll =
+      (this.fillerHeight * percentOnCurrentPage) / this.scrollRatio; // 20 * 2 = 40
     console.log('remainingScroll', remainingScroll);
     console.log('this.origScrollElem.scrollTop', this.origScrollElem.scrollTop);
     this.origScrollElem.scrollTop = remainingScroll;
@@ -284,7 +302,19 @@ export class Vsb {
 
     // console.log(this.fillerHeight, this.scroll);
 
-    const currentPage = Math.ceil(this.scrollPercent * this.totalPages) || 1;
+    console.log(
+      'Orig page num',
+      (this.scrollPercent * this.totalPages) / this.scrollRatio
+    );
+    const precalcPageNum = (
+      (this.scrollPercent * this.totalPages) /
+      this.scrollRatio
+    ).toFixed(3);
+    console.log('precalcPageNum', precalcPageNum);
+    const precalcPageNum2 =
+      (this.scrollPercent * this.totalPages) / this.scrollRatio2;
+    console.log('precalcPageNum2', precalcPageNum2);
+    const currentPage = Math.ceil(precalcPageNum) || 1;
     return currentPage;
   }
 
@@ -297,6 +327,8 @@ export class Vsb {
     const incompletedPagesLength = fullLength;
     console.log(completedPagesLength, incompletedPagesLength);
     this.scrollRatio = completedPagesLength / incompletedPagesLength;
+    this.scrollRatio2 = Number(this.scrollRatio.toFixed(4));
     console.log('set scroll ratio', this.scrollRatio);
+    console.log('set scroll ratio', this.scrollRatio2);
   }
 }
