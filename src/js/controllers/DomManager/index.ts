@@ -34,6 +34,8 @@ export class DomManager {
 
   private readonly skeleton: Skeleton;
 
+  offsetElem: HTMLElement | null;
+
   constructor(props: {
     skeleton: Skeleton;
     template: TemplateStringFunction;
@@ -43,8 +45,10 @@ export class DomManager {
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
     this.template = props.template;
+    this.offsetElem = null;
   }
 
+  // TODO: rename to setHeight
   setPaddingToList(
     list: ListPropsToModifyDom,
     chunkHtmlHeight: number,
@@ -58,12 +62,14 @@ export class DomManager {
     }
 
     console.log('length', length);
-    let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
+    // let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
+    const height = length * list.itemHeight - offset;
 
-    if (paddingBottom < 0) {
-      paddingBottom = 0;
-    }
-    this.targetElem.style.paddingBottom = `${paddingBottom}px`;
+    // if (paddingBottom < 0) {
+    //   paddingBottom = 0;
+    // }
+    // this.targetElem.style.paddingBottom = `${paddingBottom}px`;
+    this.targetElem.style.height = `${height}px`;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -113,8 +119,8 @@ export class DomManager {
       vsb
     );
     const offset = startOffsetIndex * list.itemHeight;
-
-    this.targetElem.style.transform = `translate(0,${offset}px)`;
+    // this.targetElem.style.transform = `translate(0,${offset}px)`;
+    this.offsetElem.style.height = `${offset}px`;
     this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
   }
 
