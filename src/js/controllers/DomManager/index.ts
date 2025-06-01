@@ -61,7 +61,7 @@ export class DomManager {
       length = list.lastPageLength;
     }
 
-    console.log('length', length);
+    // console.log('length', length);
     // let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
     const height = length * list.itemHeight - offset;
 
@@ -219,7 +219,7 @@ export class DomManager {
     this.targetElem.innerHTML = '';
     this.targetElem.append(templateFragment);
     // console.log('before setOffset', startRenderIndex, newOffset);
-    console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
+    // console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
     this.setOffsetToList(
       chunk,
       startRenderIndex,
@@ -229,7 +229,7 @@ export class DomManager {
       // newOffset,
       // isAllowRenderNearBorder
     );
-    console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
+    // console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
   }
 
   // Это важная функция, без нее конец списка тупит
