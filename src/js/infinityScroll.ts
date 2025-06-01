@@ -554,7 +554,7 @@ class InfinityScroll {
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
-    if (isBigDiff) {
+    if (isBigDiff || this.vsb.isPageChanged) {
       // console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
       clearTimeout(this.timerIdRefreshList);
       this.setTimerToRefreshList();
