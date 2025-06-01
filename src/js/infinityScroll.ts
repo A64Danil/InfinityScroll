@@ -109,6 +109,9 @@ class InfinityScroll {
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
+  // Содержит генерируемый элемент внутри корневого для задания искусственного отступа
+  private readonly offsetElem: HTMLElement | undefined;
+
   private readonly domMngr: DomManager;
 
   private scroll: ScrollDetector;
@@ -206,6 +209,11 @@ class InfinityScroll {
 
     this.setDefaultStyles();
     this.getAllSizes();
+
+    this.offsetElem = document.createElement('div');
+    this.offsetElem.classList.add('offsetElem');
+    this.middleWrapper.prepend(this.offsetElem);
+    this.domMngr.offsetElem = this.offsetElem;
 
     if (this.isLazy) {
       const startIdx = this.basedIndex + 1;
