@@ -226,12 +226,9 @@ class InfinityScroll {
     }
 
     this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
-    console.log('this.list.itemHeight)', this.list.itemHeight);
-    console.log('this.list.length', this.list.length);
-    if (this.list.length > this.list.data.length) {
+    if (!this.isLazy && this.list.length > this.list.data.length) {
       this.list.length = this.list.data.length;
     } else if (this.list.length <= 0) {
-      // TODO: only for tests?
       this.list.length = this.list.data.length;
     }
     this.list.lastPageLength = this.list.fullLength % this.list.length;
