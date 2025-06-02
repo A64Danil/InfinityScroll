@@ -46,6 +46,9 @@ export class Vsb {
   // Ration of full and not_full pages to have good scroll length
   scrollRatio: number;
 
+  // Callback to set height to offsetElement
+  setHeight: (() => void) | undefined;
+
   constructor(scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
@@ -212,17 +215,14 @@ export class Vsb {
     this.elem.scrollTop = this.scroll;
 
     if (needToChangePage) {
-      // console.log('needToChangePage == true');
-      //
-      // console.log(this.scrollPercent);
-      // console.log(this.currentPage);
-
       this.setScrollPercent();
       this.isPageChanged = true;
+      const isBackFromLastPage =
+        direction === 'up' && this.currentPage === this.totalPages - 1;
+      if (this.setHeight && isBackFromLastPage) {
+        this.setHeight();
+      }
       this.setScrollToOrigScrollElem(direction, needToChangePage);
-
-      // console.log(this.scrollPercent);
-      // console.log(this.currentPage);
     }
   }
 

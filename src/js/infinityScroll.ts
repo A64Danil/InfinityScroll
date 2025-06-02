@@ -233,6 +233,11 @@ class InfinityScroll {
     }
     this.list.lastPageLength = this.list.fullLength % this.list.length;
 
+    if (this.list.lastPageLength !== 0) {
+      this.vsb.setHeight = () =>
+        this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    }
+
     this.chunk.lastPageLastRenderIndex =
       this.list.lastPageLength - this.list.halfOfExistingSizeInDOM;
 
@@ -255,37 +260,14 @@ class InfinityScroll {
 
     this.createVirtualScroll();
 
-    // this.wrapperEl.addEventListener(
-    // this.middleWrapper.addEventListener(
-    //     'scroll',
-    //     this.calcCurrentDOMRender.bind(this)
-    // );
     this.middleWrapper.addEventListener('scroll', (e) => {
       if (this.isSyncing) {
         console.log('Отключаем стандартынй скролл эвент');
         return;
       }
-
       this.isSyncing = true;
-      if (
-        this.list.lastPageLength !== 0 &&
-        this.vsb.isPageChanged &&
-        this.vsb.currentPage === this.vsb.totalPages - 1 &&
-        this.scroll.direction === 'up'
-      ) {
-        console.warn('Предпоследняя страница, надо всё чинить');
-
-        this.vsb.setScrollToOrigScrollElem();
-        this.vsb.isPageChanged = false;
-      } else {
-        this.vsb.setScrollFromOuterSrc(
-          e.target.scrollTop,
-          this.scroll.direction
-        );
-      }
-
+      this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       this.calcCurrentDOMRender();
-      // console.log(e.target.scrollTop);
       setTimeout(() => {
         this.isSyncing = false;
       }, 0);
