@@ -266,6 +266,9 @@ class InfinityScroll {
         return;
       }
       this.isSyncing = true;
+      if (!this.vsb.isPageChanged) {
+        this.scroll.setScrollDirection(this.middleWrapper.scrollTop);
+      }
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       this.calcCurrentDOMRender();
       // setTimeout(() => {
@@ -500,8 +503,6 @@ class InfinityScroll {
     }
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
     const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
-    this.scroll.setScrollDirection(scroll);
-
     const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
 
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
