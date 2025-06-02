@@ -218,8 +218,7 @@ export class Vsb {
       // console.log(this.currentPage);
 
       this.setScrollPercent();
-      // TODO: почему отключение не ломает скрипт?
-      // this.isPageChanged = true;
+      this.isPageChanged = true;
       this.setScrollToOrigScrollElem(direction, needToChangePage);
 
       // console.log(this.scrollPercent);

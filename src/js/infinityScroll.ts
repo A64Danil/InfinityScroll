@@ -265,37 +265,30 @@ class InfinityScroll {
     // );
     this.middleWrapper.addEventListener('scroll', (e) => {
       if (this.isSyncing) {
-        // console.log('Отключаем стандартынй скролл эвент');
+        console.log('Отключаем стандартынй скролл эвент');
         return;
       }
+
+      this.isSyncing = true;
       if (
-        this.domMngr.targetElem.offsetHeight !==
-          this.domMngr.targetElemSavedOffset &&
+        this.list.lastPageLength !== 0 &&
         this.vsb.isPageChanged &&
         this.vsb.currentPage === this.vsb.totalPages - 1 &&
         this.scroll.direction === 'up'
       ) {
         console.warn('Предпоследняя страница, надо всё чинить');
 
-        const hightestIndexByPage =
-          this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
-
-        this.domMngr.resetAllList(
-          this.chunk,
-          this.chunk.prevPageRenderIndex,
-          hightestIndexByPage,
-          this.list,
-          this.scroll.direction,
-          this.vsb
-        );
         this.vsb.setScrollToOrigScrollElem();
         this.vsb.isPageChanged = false;
+      } else {
+        this.vsb.setScrollFromOuterSrc(
+          e.target.scrollTop,
+          this.scroll.direction
+        );
       }
 
-      this.isSyncing = true;
       this.calcCurrentDOMRender();
       // console.log(e.target.scrollTop);
-      this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       setTimeout(() => {
         this.isSyncing = false;
       }, 0);
@@ -580,16 +573,6 @@ class InfinityScroll {
         this.chunk.startRenderIndex,
         this.vsb.currentPage === this.vsb.totalPages
       );
-      if (
-        this.domMngr.targetElemSavedOffset <= 0 &&
-        this.chunk.prevPageRenderIndex === this.chunk.startRenderIndex
-      ) {
-        this.domMngr.targetElemSavedOffset = this.domMngr.targetElem.offsetHeight;
-        console.warn(
-          'Save targetElemSavedOffset',
-          this.domMngr.targetElemSavedOffset
-        );
-      }
       if (isAllowRender && this.domMngr) {
         const mainChunkProps = {
           // itemIndex is good
