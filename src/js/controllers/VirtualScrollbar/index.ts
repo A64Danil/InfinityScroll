@@ -252,10 +252,8 @@ export class Vsb {
 
     if (forceChange) {
       if (direction === 'down') {
-        console.log('in down case');
-        this.origScrollElem.scrollTop = 0;
+        this.origScrollElem.scrollTop = 1;
       } else {
-        console.log(this.fillerHeight - 1);
         this.origScrollElem.scrollTop = this.fillerHeight - 1;
       }
       return;
