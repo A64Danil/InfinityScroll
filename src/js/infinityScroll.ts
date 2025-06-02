@@ -164,9 +164,9 @@ class InfinityScroll {
       this.vsb.handleScroll();
       this.calcCurrentDOMRender();
 
-      setTimeout(() => {
-        this.isSyncing = false;
-      }, 0);
+      // setTimeout(() => {
+      this.isSyncing = false;
+      // }, 0);
     });
 
     this.skeleton = new Skeleton({
@@ -268,9 +268,9 @@ class InfinityScroll {
       this.isSyncing = true;
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       this.calcCurrentDOMRender();
-      setTimeout(() => {
-        this.isSyncing = false;
-      }, 0);
+      // setTimeout(() => {
+      this.isSyncing = false;
+      // }, 0);
     });
     //
   }
