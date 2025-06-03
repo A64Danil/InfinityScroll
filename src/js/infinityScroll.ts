@@ -270,7 +270,15 @@ class InfinityScroll {
         this.scroll.setScrollDirection(this.middleWrapper.scrollTop);
       }
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
-      this.calcCurrentDOMRender();
+      if (this.vsb.isPageChanged) {
+        console.log('else case', e.target.scrollTop);
+        const chunkOrderNumber = this.chunk.getOrderNumber(e.target.scrollTop);
+        const newRenderIndex = this.chunk.calcRenderIndex(chunkOrderNumber);
+        console.log(newRenderIndex);
+        this.refreshList();
+      } else {
+        this.calcCurrentDOMRender();
+      }
       setTimeout(() => {
         this.vsb.isPageChanged = false;
         this.isSyncing = false;
@@ -623,7 +631,7 @@ class InfinityScroll {
 
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  refreshList(timerID: number) {
+  refreshList(timerID?: number) {
     if (this.render) {
       const renderIndex = this.chunk.startRenderIndex;
       console.log('renderIndex', renderIndex);
