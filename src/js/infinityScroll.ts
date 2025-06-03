@@ -623,67 +623,71 @@ class InfinityScroll {
 
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+  refreshList(timerID: number) {
+    if (this.render) {
+      const renderIndex = this.chunk.startRenderIndex;
+      console.log('renderIndex', renderIndex);
+      this.chunk.setRenderIndex(
+        renderIndex,
+        this.vsb.currentPage,
+        this.list.length
+      );
+      // itemIndex
+      const [sequenceStart, sequenceEnd] = this.getSequence(
+        this.chunk.itemIndex,
+        // this.chunk.startRenderIndex,
+        true
+      );
+
+      if (this.isLazy) {
+        if (process.env.NODE_ENV === 'development') {
+          // For tests - 2
+          // await this.sleep(3000);
+        }
+
+        const ranges: NumRange = [sequenceStart, sequenceEnd];
+        // console.log('ranges', ranges);
+
+        this.fetchUnfoundedRanges([ranges]);
+      }
+      if (timerID && timerID !== this.timerIdRefreshList) {
+        return;
+      }
+      console.log(
+        'Восстанавливаем значение this.chunk.startRenderIndex (renderIndex)',
+        renderIndex
+      );
+      // if(renderIndex === 94)  renderIndex = 90;
+      // this.chunk.setRenderIndex(
+      //   renderIndex,
+      //   this.vsb.currentPage,
+      //   this.list.length
+      // );
+      console.log(
+        `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (seq: ${sequenceStart}) ======`
+      );
+      // END Fetch new DATA
+
+      this.domMngr.resetAllList(
+        this.chunk,
+        renderIndex,
+        sequenceStart,
+        this.list,
+        this.scroll.direction,
+        this.vsb
+      );
+      if (process.env.NODE_ENV === 'development') {
+        // For tests - 3
+        // console.log('BEFORE checkIndexOrdering (reset list)');
+        this.checkIndexOrdering();
+        console.log('AFTER checkIndexOrdering  (reset list)');
+      }
+    }
+  }
+
   setTimerToRefreshList() {
     const timerID = window.setTimeout(async () => {
-      if (this.render) {
-        const renderIndex = this.chunk.startRenderIndex;
-        console.log('renderIndex', renderIndex);
-        this.chunk.setRenderIndex(
-          renderIndex,
-          this.vsb.currentPage,
-          this.list.length
-        );
-        // itemIndex
-        const [sequenceStart, sequenceEnd] = this.getSequence(
-          this.chunk.itemIndex,
-          // this.chunk.startRenderIndex,
-          true
-        );
-
-        if (this.isLazy) {
-          if (process.env.NODE_ENV === 'development') {
-            // For tests - 2
-            // await this.sleep(3000);
-          }
-
-          const ranges: NumRange = [sequenceStart, sequenceEnd];
-          // console.log('ranges', ranges);
-
-          this.fetchUnfoundedRanges([ranges]);
-        }
-        if (timerID !== this.timerIdRefreshList) {
-          return;
-        }
-        console.log(
-          'Восстанавливаем значение this.chunk.startRenderIndex (renderIndex)',
-          renderIndex
-        );
-        // if(renderIndex === 94)  renderIndex = 90;
-        // this.chunk.setRenderIndex(
-        //   renderIndex,
-        //   this.vsb.currentPage,
-        //   this.list.length
-        // );
-        console.log(
-          `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (seq: ${sequenceStart}) ======`
-        );
-        // END Fetch new DATA
-
-        this.domMngr.resetAllList(
-          this.chunk,
-          renderIndex,
-          sequenceStart,
-          this.list,
-          this.scroll.direction,
-          this.vsb
-        );
-        if (process.env.NODE_ENV === 'development') {
-          // For tests - 3
-          // console.log('BEFORE checkIndexOrdering (reset list)');
-          this.checkIndexOrdering();
-          console.log('AFTER checkIndexOrdering  (reset list)');
-        }
-      }
+      this.refreshList(timerID);
     }, 30);
     this.timerIdRefreshList = timerID;
     // console.log('Timer started by id', this.timerIdRefreshList);
