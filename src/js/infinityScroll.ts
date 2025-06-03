@@ -498,9 +498,7 @@ class InfinityScroll {
     this.middleWrapper?.after(this.vsb.elem);
   }
 
-  async calcCurrentDOMRender(): Promise<void> {
-    const eventTarget = this.middleWrapper;
-    const scroll = eventTarget.scrollTop;
+  calcRenderIndex(scroll: number) {
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 
@@ -512,7 +510,6 @@ class InfinityScroll {
     }
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
     const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
-    const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
 
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
@@ -540,6 +537,16 @@ class InfinityScroll {
         );
       }
     }
+    return [resultIndex, newRenderIndex];
+  }
+
+  async calcCurrentDOMRender(): Promise<void> {
+    const eventTarget = this.middleWrapper;
+    const scroll = eventTarget.scrollTop;
+
+    const [resultIndex, newRenderIndex] = this.calcRenderIndex(scroll);
+
+    const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
