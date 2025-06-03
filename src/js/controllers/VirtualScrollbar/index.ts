@@ -196,11 +196,6 @@ export class Vsb {
 
     let needToChangePage = false;
 
-    if (outerScroll < 5) {
-      console.log('outerScroll', outerScroll);
-      console.log('direction', direction);
-      console.log('this.currentPage', this.currentPage);
-    }
     // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
     if (direction === 'down' && outerScroll >= this.fillerHeight) {
       console.log(

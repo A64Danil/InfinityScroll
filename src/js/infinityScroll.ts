@@ -271,10 +271,12 @@ class InfinityScroll {
       }
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       if (this.vsb.isPageChanged) {
-        console.log('else case', e.target.scrollTop);
-        const chunkOrderNumber = this.chunk.getOrderNumber(e.target.scrollTop);
-        const newRenderIndex = this.chunk.calcRenderIndex(chunkOrderNumber);
-        console.log(newRenderIndex);
+        const [resultIndex] = this.calcRenderIndex(e.target.scrollTop);
+        this.chunk.setRenderIndex(
+          resultIndex,
+          this.vsb.currentPage,
+          this.list.length
+        );
         this.refreshList();
       } else {
         this.calcCurrentDOMRender();
