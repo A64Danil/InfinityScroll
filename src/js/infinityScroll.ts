@@ -276,6 +276,14 @@ class InfinityScroll {
           this.list.length
         );
         this.refreshList();
+
+        if (this.scroll.direction === 'up') {
+          this.chunk.setRenderIndex(
+            this.chunk.prevPageRenderIndex,
+            this.vsb.currentPage,
+            this.list.length
+          );
+        }
       } else {
         this.calcCurrentDOMRender();
       }
