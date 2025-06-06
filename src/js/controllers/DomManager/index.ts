@@ -112,7 +112,7 @@ export class DomManager {
     vsb: Vsb
   ): void {
     const startOffsetIndex = this.calcStartOffsetIndex(
-      chunk.startRenderIndex,
+      startRenderIndex,
       chunk.amount,
       direction,
       list,

@@ -28,6 +28,7 @@ import { calcSequenceByDirection } from './helpers/calcSequence';
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
 import { DataUrlFunction } from './types/DataUrlFunction';
+import { IScrollDirection } from './types/IScrollDirection';
 
 type NameToTagObj = {
   [key: string]: string;
@@ -567,13 +568,11 @@ class InfinityScroll {
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
       // this.chunk.startRenderIndex = resultIndex;
+      const oldIndex = this.chunk.startRenderIndex;
       this.chunk.setRenderIndex(
         resultIndex,
         this.vsb.currentPage,
         this.list.length
-      );
-      console.log(
-        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (${this.scroll.direction}) ======`
       );
 
       if (!this.render) {
@@ -585,6 +584,58 @@ class InfinityScroll {
         this.vsb.currentPage === this.vsb.totalPages
       );
       if (isAllowRender && this.domMngr) {
+        let tempDirection: IScrollDirection;
+        if (!this.timerIdRefreshList) {
+          if (this.chunk.startRenderIndex < oldIndex) {
+            console.log(
+              'Ождиаем что мы движемся вверх',
+              oldIndex,
+              this.chunk.startRenderIndex
+            );
+            tempDirection = 'up';
+            // const expectedIndex = oldIndex - this.chunk.amount*2;
+            // const expectedIndex2 = oldIndex;
+            // if (expectedIndex2 !== this.chunk.startRenderIndex) {
+            //   console.warn(
+            //     '(up) Ожидаемый индекс отличается от реального',
+            //     expectedIndex2
+            //   );
+            // }
+          } else {
+            console.log(
+              'Ождиаем что мы движемся вниз',
+              oldIndex,
+              this.chunk.startRenderIndex
+            );
+            tempDirection = 'down';
+            const expectedIndex = oldIndex + this.chunk.amount;
+            if (expectedIndex !== this.chunk.startRenderIndex) {
+              console.warn(
+                '(down) Ожидаемый индекс отличается от реального, исправляем',
+                expectedIndex
+              );
+              this.chunk.setRenderIndex(
+                expectedIndex,
+                this.vsb.currentPage,
+                this.list.length
+              );
+            }
+          }
+
+          if (tempDirection && tempDirection !== this.scroll.direction) {
+            // console.warn('Направления не совпадают, стоит исправить? ');
+            console.warn(
+              'Направления не совпадают, стоит исправить? Исправляем =)'
+            );
+
+            this.scroll.direction = tempDirection;
+          }
+        }
+
+        console.log(
+          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ) ======`
+        );
+
         const mainChunkProps = {
           // itemIndex is good
           itemIndex: this.chunk.itemIndex,
@@ -687,7 +738,7 @@ class InfinityScroll {
       //   this.list.length
       // );
       console.log(
-        `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (seq: ${sequenceStart}) ======`
+        `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (dir: ${this.scroll.direction}) ======`
       );
       // END Fetch new DATA
 
@@ -699,10 +750,12 @@ class InfinityScroll {
         this.scroll.direction,
         this.vsb
       );
+      this.timerIdRefreshList = null;
       if (process.env.NODE_ENV === 'development') {
         // For tests - 3
         // console.log('BEFORE checkIndexOrdering (reset list)');
         this.checkIndexOrdering();
+        console.clear();
         console.log('AFTER checkIndexOrdering  (reset list)');
       }
     }
@@ -711,7 +764,8 @@ class InfinityScroll {
   setTimerToRefreshList() {
     const timerID = window.setTimeout(async () => {
       this.refreshList(timerID);
-    }, 30);
+    }, 0);
+    // }, 30);
     this.timerIdRefreshList = timerID;
     // console.log('Timer started by id', this.timerIdRefreshList);
   }
