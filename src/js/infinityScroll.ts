@@ -277,14 +277,14 @@ class InfinityScroll {
         );
         this.refreshList();
 
-        // TODO: проверить, нужно ли это?
-        if (this.scroll.direction === 'up') {
-          this.chunk.setRenderIndex(
-            this.chunk.prevPageRenderIndex,
-            this.vsb.currentPage,
-            this.list.length
-          );
-        }
+        // TODO: кажется это не нужно
+        // if (this.scroll.direction === 'up') {
+        //   this.chunk.setRenderIndex(
+        //     this.chunk.prevPageRenderIndex,
+        //     this.vsb.currentPage,
+        //     this.list.length
+        //   );
+        // }
       } else {
         this.calcCurrentDOMRender();
       }
@@ -689,19 +689,6 @@ class InfinityScroll {
         return;
       }
       // TODO: проверить с выключенным fixOrdering
-      console.log(
-        'Восстанавливаем значение this.chunk.startRenderIndex (renderIndex)',
-        renderIndex
-      );
-      // if(renderIndex === 94)  renderIndex = 90;
-      // this.chunk.setRenderIndex(
-      //   renderIndex,
-      //   this.vsb.currentPage,
-      //   this.list.length
-      // );
-      console.log(
-        `====== this.chunk.startRenderIndex форсированно поменялся ${this.chunk.startRenderIndex}, (dir: ${this.scroll.direction}) ======`
-      );
       // END Fetch new DATA
 
       this.domMngr.resetAllList(
@@ -717,7 +704,7 @@ class InfinityScroll {
         // For tests - 3
         // console.log('BEFORE checkIndexOrdering (reset list)');
         this.checkIndexOrdering();
-        console.clear();
+        // console.clear();
         console.log('AFTER checkIndexOrdering  (reset list)');
       }
     }
