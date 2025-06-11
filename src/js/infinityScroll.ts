@@ -587,13 +587,12 @@ class InfinityScroll {
         let tempDirection: IScrollDirection;
         if (!this.timerIdRefreshList) {
           if (this.chunk.startRenderIndex < oldIndex) {
-            console.log(
-              'Ождиаем что мы движемся вверх',
-              oldIndex,
-              this.chunk.startRenderIndex
-            );
+            // console.log(
+            //   'Ождиаем что мы движемся вверх',
+            //   oldIndex,
+            //   this.chunk.startRenderIndex
+            // );
             tempDirection = 'up';
-
             // const expectedIndex = oldIndex - this.chunk.amount*2;
             // const expectedIndex2 = oldIndex;
             // if (expectedIndex2 !== this.chunk.startRenderIndex) {
@@ -603,25 +602,25 @@ class InfinityScroll {
             //   );
             // }
           } else {
-            console.log(
-              'Ождиаем что мы движемся вниз',
-              oldIndex,
-              this.chunk.startRenderIndex
-            );
+            // console.log(
+            //   'Ождиаем что мы движемся вниз',
+            //   oldIndex,
+            //   this.chunk.startRenderIndex
+            // );
             tempDirection = 'down';
 
-            const expectedIndex = oldIndex + this.chunk.amount;
-            if (expectedIndex !== this.chunk.startRenderIndex) {
-              console.warn(
-                '(down) Ожидаемый индекс отличается от реального, исправляем',
-                expectedIndex
-              );
-              this.chunk.setRenderIndex(
-                expectedIndex,
-                this.vsb.currentPage,
-                this.list.length
-              );
-            }
+            // const expectedIndex = oldIndex + this.chunk.amount;
+            // if (expectedIndex !== this.chunk.startRenderIndex) {
+            //   console.warn(
+            //     '(down) Ожидаемый индекс отличается от реального, исправляем',
+            //     expectedIndex
+            //   );
+            //   this.chunk.setRenderIndex(
+            //     expectedIndex,
+            //     this.vsb.currentPage,
+            //     this.list.length
+            //   );
+            // }
           }
 
           if (tempDirection && tempDirection !== this.scroll.direction) {
@@ -680,7 +679,7 @@ class InfinityScroll {
           this.vsb
         );
 
-        this.checkElemsOrdering(this.scroll.direction);
+        this.fixElemsOrdering(this.scroll.direction);
 
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
@@ -1004,33 +1003,63 @@ class InfinityScroll {
     return res;
   }
 
-  checkElemsOrdering(direction: IScrollDirection) {
+  fixElemsOrdering(direction: IScrollDirection) {
     const firstElemPosition = Number(this.listEl.firstChild.ariaPosInSet);
     const lastElemPosition = Number(this.listEl.lastChild.ariaPosInSet);
     const sizeOfAnotherElements = this.list.existingSizeInDOM - 1;
 
+    let isOrderBreaked = false;
+    let renderIndex;
     if (direction === 'down') {
       // console.log('Если сломалось, то ориентирйся на низ списка, т.к. сломан верх!')
       // console.log('Низ правильный, а верх плохой?');
       if (lastElemPosition - sizeOfAnotherElements !== firstElemPosition) {
-        console.error('Дай угадаю - верх списка поломался?');
+        console.warn('Дай угадаю - верх списка поломался?');
         console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
         console.log(
           lastElemPosition - sizeOfAnotherElements,
           firstElemPosition
         );
+        renderIndex =
+          lastElemPosition - this.list.existingSizeInDOM + this.chunk.amount;
+        isOrderBreaked = true;
       }
     } else if (direction === 'up') {
       // console.log('Если сломалось, то ориентирйся на верх списка, т.к. сломан низ')
       // console.log('Верх правильный, а низ плохой?');
       if (firstElemPosition + sizeOfAnotherElements !== lastElemPosition) {
-        console.error('Дай угадаю - низ списка поломался?');
+        console.warn('Дай угадаю - низ списка поломался?');
         console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
         console.log(
           firstElemPosition + sizeOfAnotherElements,
           lastElemPosition
         );
+
+        renderIndex = firstElemPosition + this.chunk.amount;
+        isOrderBreaked = true;
       }
+    }
+
+    if (isOrderBreaked) {
+      renderIndex -= this.list.length * (this.vsb.currentPage - 1);
+      console.warn(
+        'Ребутаем список чтобы спасти ситацию =)',
+        renderIndex,
+        this.scroll.direction
+      );
+      // const renderIndex = firstElemPosition + this.chunk.amount;
+      const [sequenceStart, sequenceEnd] = this.getSequence(
+        this.chunk.itemIndex,
+        true
+      );
+      this.domMngr.resetAllList(
+        this.chunk,
+        renderIndex,
+        sequenceStart,
+        this.list,
+        this.scroll.direction,
+        this.vsb
+      );
     }
   }
 }
