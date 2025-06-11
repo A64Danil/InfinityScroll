@@ -593,6 +593,7 @@ class InfinityScroll {
               this.chunk.startRenderIndex
             );
             tempDirection = 'up';
+
             // const expectedIndex = oldIndex - this.chunk.amount*2;
             // const expectedIndex2 = oldIndex;
             // if (expectedIndex2 !== this.chunk.startRenderIndex) {
@@ -608,6 +609,7 @@ class InfinityScroll {
               this.chunk.startRenderIndex
             );
             tempDirection = 'down';
+
             const expectedIndex = oldIndex + this.chunk.amount;
             if (expectedIndex !== this.chunk.startRenderIndex) {
               console.warn(
@@ -677,6 +679,9 @@ class InfinityScroll {
           this.scroll.isGoingFromBottom,
           this.vsb
         );
+
+        this.checkElemsOrdering(this.scroll.direction);
+
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
           if (!isBigDiff) {
@@ -997,6 +1002,36 @@ class InfinityScroll {
       throw new Error(errors.fetchedIsNotArray);
     }
     return res;
+  }
+
+  checkElemsOrdering(direction: IScrollDirection) {
+    const firstElemPosition = Number(this.listEl.firstChild.ariaPosInSet);
+    const lastElemPosition = Number(this.listEl.lastChild.ariaPosInSet);
+    const sizeOfAnotherElements = this.list.existingSizeInDOM - 1;
+
+    if (direction === 'down') {
+      // console.log('Если сломалось, то ориентирйся на низ списка, т.к. сломан верх!')
+      // console.log('Низ правильный, а верх плохой?');
+      if (lastElemPosition - sizeOfAnotherElements !== firstElemPosition) {
+        console.error('Дай угадаю - верх списка поломался?');
+        console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
+        console.log(
+          lastElemPosition - sizeOfAnotherElements,
+          firstElemPosition
+        );
+      }
+    } else if (direction === 'up') {
+      // console.log('Если сломалось, то ориентирйся на верх списка, т.к. сломан низ')
+      // console.log('Верх правильный, а низ плохой?');
+      if (firstElemPosition + sizeOfAnotherElements !== lastElemPosition) {
+        console.error('Дай угадаю - низ списка поломался?');
+        console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
+        console.log(
+          firstElemPosition + sizeOfAnotherElements,
+          lastElemPosition
+        );
+      }
+    }
   }
 }
 
