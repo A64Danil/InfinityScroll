@@ -261,7 +261,6 @@ class InfinityScroll {
 
     this.middleWrapper.addEventListener('scroll', (e) => {
       if (this.isSyncing) {
-        console.log('Отключаем стандартынй скролл эвент');
         return;
       }
       this.isSyncing = true;
@@ -278,6 +277,7 @@ class InfinityScroll {
         );
         this.refreshList();
 
+        // TODO: проверить, нужно ли это?
         if (this.scroll.direction === 'up') {
           this.chunk.setRenderIndex(
             this.chunk.prevPageRenderIndex,
@@ -463,8 +463,6 @@ class InfinityScroll {
         ? this.list.length - this.list.halfOfExistingSizeInDOM
         : 1;
 
-    // this.list.length = newLength;
-    // TODO: это важно и нужно
     if (this.render) {
       this.render.reInitValues(
         this.chunk.lastRenderIndex,
@@ -474,9 +472,9 @@ class InfinityScroll {
     }
 
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
-
     this.skeleton.setListHeight(this.list.fullLength);
 
+    // Не нужно?
     this.list.startIndexOfLastPart =
       this.list.length - this.list.existingSizeInDOM;
 
@@ -486,6 +484,7 @@ class InfinityScroll {
     if (this.list.lastPageStartIndexOfLastPart < 0) {
       this.list.lastPageStartIndexOfLastPart = 0;
     }
+    // ----- //
 
     this.chunk.lastOrderNumber = Math.floor(
       this.list.length / this.chunk.amount
@@ -539,11 +538,6 @@ class InfinityScroll {
     ) {
       if (resultIndex > this.chunk.prevPageRenderIndex) {
         resultIndex = this.list.length - this.chunk.amount * 3;
-        console.log(
-          'Перезаписываем resultIndex',
-          resultIndex,
-          this.chunk.startRenderIndex
-        );
       }
     }
     return [resultIndex, newRenderIndex];
@@ -560,14 +554,12 @@ class InfinityScroll {
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff || this.vsb.isPageChanged) {
-      // console.log('Перезапускаем таймер, старый id', this.timerIdRefreshList);
       clearTimeout(this.timerIdRefreshList);
       this.setTimerToRefreshList();
     }
 
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
-      // this.chunk.startRenderIndex = resultIndex;
       const oldIndex = this.chunk.startRenderIndex;
       this.chunk.setRenderIndex(
         resultIndex,
@@ -587,47 +579,15 @@ class InfinityScroll {
         let tempDirection: IScrollDirection;
         if (!this.timerIdRefreshList) {
           if (this.chunk.startRenderIndex < oldIndex) {
-            // console.log(
-            //   'Ождиаем что мы движемся вверх',
-            //   oldIndex,
-            //   this.chunk.startRenderIndex
-            // );
             tempDirection = 'up';
-            // const expectedIndex = oldIndex - this.chunk.amount*2;
-            // const expectedIndex2 = oldIndex;
-            // if (expectedIndex2 !== this.chunk.startRenderIndex) {
-            //   console.warn(
-            //     '(up) Ожидаемый индекс отличается от реального',
-            //     expectedIndex2
-            //   );
-            // }
           } else {
-            // console.log(
-            //   'Ождиаем что мы движемся вниз',
-            //   oldIndex,
-            //   this.chunk.startRenderIndex
-            // );
             tempDirection = 'down';
-
-            // const expectedIndex = oldIndex + this.chunk.amount;
-            // if (expectedIndex !== this.chunk.startRenderIndex) {
-            //   console.warn(
-            //     '(down) Ожидаемый индекс отличается от реального, исправляем',
-            //     expectedIndex
-            //   );
-            //   this.chunk.setRenderIndex(
-            //     expectedIndex,
-            //     this.vsb.currentPage,
-            //     this.list.length
-            //   );
-            // }
           }
 
           if (tempDirection && tempDirection !== this.scroll.direction) {
-            // console.warn('Направления не совпадают, стоит исправить? ');
-            console.warn(
-              'Направления не совпадают, стоит исправить? Исправляем =)'
-            );
+            // console.warn(
+            //   'Направления не совпадают, стоит исправить? Исправляем =)'
+            // );
 
             this.scroll.direction = tempDirection;
           }
@@ -638,7 +598,6 @@ class InfinityScroll {
         );
 
         const mainChunkProps = {
-          // itemIndex is good
           itemIndex: this.chunk.itemIndex,
           startRenderIndex: this.chunk.startRenderIndex,
           amount: this.chunk.amount,
@@ -662,6 +621,7 @@ class InfinityScroll {
         }
         // END Fetch new DATA
 
+        // TODO: не нужно?
         const mainListProps = {
           existingSizeInDOM: this.list.existingSizeInDOM,
           halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
@@ -704,7 +664,6 @@ class InfinityScroll {
   refreshList(timerID?: number) {
     if (this.render) {
       const renderIndex = this.chunk.startRenderIndex;
-      console.log('renderIndex', renderIndex);
       this.chunk.setRenderIndex(
         renderIndex,
         this.vsb.currentPage,
@@ -713,7 +672,6 @@ class InfinityScroll {
       // itemIndex
       const [sequenceStart, sequenceEnd] = this.getSequence(
         this.chunk.itemIndex,
-        // this.chunk.startRenderIndex,
         true
       );
 
@@ -724,13 +682,13 @@ class InfinityScroll {
         }
 
         const ranges: NumRange = [sequenceStart, sequenceEnd];
-        // console.log('ranges', ranges);
 
         this.fetchUnfoundedRanges([ranges]);
       }
       if (timerID && timerID !== this.timerIdRefreshList) {
         return;
       }
+      // TODO: проверить с выключенным fixOrdering
       console.log(
         'Восстанавливаем значение this.chunk.startRenderIndex (renderIndex)',
         renderIndex
@@ -769,7 +727,6 @@ class InfinityScroll {
     const timerID = window.setTimeout(async () => {
       this.refreshList(timerID);
     }, 0);
-    // }, 30);
     this.timerIdRefreshList = timerID;
     // console.log('Timer started by id', this.timerIdRefreshList);
   }
@@ -857,10 +814,8 @@ class InfinityScroll {
       const lowestIndexByPage = this.list.length * (this.vsb.currentPage - 1);
       const hightestIndexByPage =
         this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
-      // console.log(lowestIndexByPage, hightestIndexByPage);
       sequenceStart =
         tempStartIndex > lowestIndexByPage ? tempStartIndex : lowestIndexByPage;
-      // console.log(sequenceStart);
 
       if (sequenceStart > hightestIndexByPage) {
         sequenceStart = hightestIndexByPage;
@@ -882,15 +837,11 @@ class InfinityScroll {
   }
 
   fetchUnfoundedRanges(unfoundedRanges: NumRange[]): void {
-    // console.log(`Try to fetch: ${unfoundedRanges.flat().join(' - ')}`);
     unfoundedRanges.forEach(([sequenceStart, sequenceEnd]) => {
       const [startFetchIndex, endFetchIndex] = [
         sequenceStart + this.basedIndex,
         sequenceEnd + this.basedIndex - Number(this.includeEnd),
       ];
-      // console.log(
-      //   `startFetchIndex - endFetchIndex ${startFetchIndex} - ${endFetchIndex}`
-      // );
 
       getRemoteDataByRange(
         this.dataUrl as DataUrlFunction,
@@ -898,7 +849,6 @@ class InfinityScroll {
         endFetchIndex
       ).then((data): void => {
         const extractedData = this.extractResponse(data);
-        // console.log(`Loaded from: ${startFetchIndex}, to: ${endFetchIndex}`);
         this.addNewItemsToDataList(sequenceStart, extractedData);
         this.updateSkeletonItems(sequenceStart, extractedData);
       });
@@ -922,7 +872,6 @@ class InfinityScroll {
       const element = this.domMngr.targetElem.querySelector(
         searchSelector
       ) as HTMLElement;
-      // console.log(searchSelector, dataIndex, currentIndex);
       if (element) this.skeleton.updateElement(element, data[i], dataIndex);
     }
   }
@@ -934,7 +883,6 @@ class InfinityScroll {
     const lastIndex = sequenceEnd - 1;
     for (let i = sequenceStart; i < sequenceEnd; i++) {
       const currentElem = this.list.data[i];
-      // console.log(`Check ${i}`, currentElem !== undefined);
       if (currentElem === undefined && isUndefined === false) {
         isUndefined = true;
         buffer.push(i);
@@ -960,7 +908,6 @@ class InfinityScroll {
     }
 
     let prevIndex: number | null = null;
-    // console.log('prevIndex', prevIndex);
     [...list.children].forEach((elem) => {
       const elemIndex = Number(elem.getAttribute('aria-posinset'));
       if (prevIndex !== null) {
@@ -1014,12 +961,12 @@ class InfinityScroll {
       // console.log('Если сломалось, то ориентирйся на низ списка, т.к. сломан верх!')
       // console.log('Низ правильный, а верх плохой?');
       if (lastElemPosition - sizeOfAnotherElements !== firstElemPosition) {
-        console.warn('Дай угадаю - верх списка поломался?');
-        console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
-        console.log(
-          lastElemPosition - sizeOfAnotherElements,
-          firstElemPosition
-        );
+        // console.warn('Дай угадаю - верх списка поломался?');
+        // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
+        // console.log(
+        //   lastElemPosition - sizeOfAnotherElements,
+        //   firstElemPosition
+        // );
         renderIndex =
           lastElemPosition - this.list.existingSizeInDOM + this.chunk.amount;
         isOrderBreaked = true;
@@ -1028,12 +975,12 @@ class InfinityScroll {
       // console.log('Если сломалось, то ориентирйся на верх списка, т.к. сломан низ')
       // console.log('Верх правильный, а низ плохой?');
       if (firstElemPosition + sizeOfAnotherElements !== lastElemPosition) {
-        console.warn('Дай угадаю - низ списка поломался?');
-        console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
-        console.log(
-          firstElemPosition + sizeOfAnotherElements,
-          lastElemPosition
-        );
+        // console.warn('Дай угадаю - низ списка поломался?');
+        // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
+        // console.log(
+        //   firstElemPosition + sizeOfAnotherElements,
+        //   lastElemPosition
+        // );
 
         renderIndex = firstElemPosition + this.chunk.amount;
         isOrderBreaked = true;
@@ -1047,7 +994,6 @@ class InfinityScroll {
         renderIndex,
         this.scroll.direction
       );
-      // const renderIndex = firstElemPosition + this.chunk.amount;
       const [sequenceStart, sequenceEnd] = this.getSequence(
         this.chunk.itemIndex,
         true
