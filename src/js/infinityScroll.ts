@@ -230,7 +230,11 @@ class InfinityScroll {
     } else if (this.list.length <= 0) {
       this.list.length = this.list.data.length;
     }
-    this.list.lastPageLength = this.list.fullLength % this.list.length;
+    if (this.vsb.totalPages !== 1) {
+      this.list.lastPageLength = this.list.fullLength % this.list.length;
+    } else {
+      this.list.lastPageLength = this.list.length;
+    }
 
     if (this.list.lastPageLength !== 0) {
       this.vsb.setHeight = () =>
@@ -573,7 +577,8 @@ class InfinityScroll {
       const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
         this.chunk.startRenderIndex,
-        this.vsb.currentPage === this.vsb.totalPages
+        this.vsb.currentPage !== 1 &&
+          this.vsb.currentPage === this.vsb.totalPages
       );
       if (isAllowRender && this.domMngr) {
         let tempDirection: IScrollDirection;

@@ -57,7 +57,7 @@ export class DomManager {
   ): void {
     let { length } = list;
 
-    if (vsb && vsb.currentPage === vsb.totalPages) {
+    if (vsb && vsb.currentPage !== 1 && vsb.currentPage === vsb.totalPages) {
       length = list.lastPageLength;
     }
 
@@ -92,6 +92,7 @@ export class DomManager {
       ) {
         startOffsetIndex = list.startIndexOfLastPart;
       } else if (
+        // vsb.currentPage !== 1 &&
         vsb.currentPage === vsb.totalPages &&
         startOffsetIndex > list.lastPageLength
       ) {
@@ -198,6 +199,7 @@ export class DomManager {
     const templateFragment = document.createDocumentFragment();
     let fillLimit = list.existingSizeInDOM;
     if (
+      vsb.currentPage !== 1 &&
       vsb.currentPage === vsb.totalPages &&
       list.lastPageLength < list.existingSizeInDOM
     ) {
