@@ -197,7 +197,11 @@ export class Vsb {
     let needToChangePage = false;
 
     // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
-    if (direction === 'down' && outerScroll >= this.fillerHeight) {
+    if (
+      direction === 'down' &&
+      outerScroll >= this.fillerHeight &&
+      this.currentPage < this.totalPages
+    ) {
       console.log(
         'Достигли конца списка — можно перелистнуть ВПЕРЁД',
         outerScroll
