@@ -230,16 +230,18 @@ class InfinityScroll {
     } else if (this.list.length <= 0) {
       this.list.length = this.list.data.length;
     }
-    if (this.vsb.totalPages !== 1) {
-      this.list.lastPageLength = this.list.fullLength % this.list.length;
-    } else {
+
+    this.list.lastPageLength = this.list.fullLength % this.list.length;
+
+    if (this.list.lastPageLength === 0) {
+      console.log('this.list.lastPageLength', this.list.lastPageLength);
       this.list.lastPageLength = this.list.length;
     }
 
-    if (this.list.lastPageLength !== 0) {
-      this.vsb.setHeight = () =>
-        this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
-    }
+    // if (this.list.lastPageLength !== 0) {
+    this.vsb.setHeight = () =>
+      this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    // }
 
     this.chunk.lastPageLastRenderIndex =
       this.list.lastPageLength - this.list.halfOfExistingSizeInDOM;
