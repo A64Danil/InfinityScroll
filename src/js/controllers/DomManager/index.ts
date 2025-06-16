@@ -257,11 +257,13 @@ export class DomManager {
     let isReachBottomLimit = false;
 
     if (direction === 'down' && i + sequenceNumber >= list.length) {
+      console.log(i + sequenceNumber); // проблема не тут
       isReachBottomLimit = true;
     }
 
     if (
       direction === 'down' &&
+      vsb.currentPage !== 1 &&
       vsb.currentPage === vsb.totalPages &&
       i + sequenceNumber >= list.lastPageLength
     ) {
