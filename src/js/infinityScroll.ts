@@ -225,6 +225,10 @@ class InfinityScroll {
     }
 
     this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+    if (this.list.length > this.list.fullLength) {
+      this.list.length = this.list.fullLength;
+    }
+
     if (!this.isLazy && this.list.length > this.list.data.length) {
       this.list.length = this.list.data.length;
     } else if (this.list.length <= 0) {
@@ -238,10 +242,8 @@ class InfinityScroll {
       this.list.lastPageLength = this.list.length;
     }
 
-    // if (this.list.lastPageLength !== 0) {
     this.vsb.setHeight = () =>
       this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
-    // }
 
     this.chunk.lastPageLastRenderIndex =
       this.list.lastPageLength - this.list.halfOfExistingSizeInDOM;
@@ -440,16 +442,6 @@ class InfinityScroll {
   }
 
   createVirtualScroll() {
-    // TODO: эти расчёты уже сделаны внутри VSB?
-    console.log('this.vsb.safeLimit', this.vsb.safeLimit);
-
-    this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
-    if (this.list.length > this.list.fullLength) {
-      this.list.length = this.list.fullLength;
-    }
-    console.log('this.list.itemHeight)', this.list.itemHeight);
-    console.log('this.list.length', this.list.length);
-
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
     console.log(
       'this.list.tailingElementsAmount',
