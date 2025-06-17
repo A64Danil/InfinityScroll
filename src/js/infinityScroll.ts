@@ -224,24 +224,6 @@ class InfinityScroll {
       );
     }
 
-    this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
-    if (this.list.length > this.list.fullLength) {
-      this.list.length = this.list.fullLength;
-    }
-
-    if (!this.isLazy && this.list.length > this.list.data.length) {
-      this.list.length = this.list.data.length;
-    } else if (this.list.length <= 0) {
-      this.list.length = this.list.data.length;
-    }
-
-    this.list.lastPageLength = this.list.fullLength % this.list.length;
-
-    if (this.list.lastPageLength === 0) {
-      console.log('this.list.lastPageLength', this.list.lastPageLength);
-      this.list.lastPageLength = this.list.length;
-    }
-
     this.vsb.setHeight = () =>
       this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
@@ -423,6 +405,25 @@ class InfinityScroll {
 
     this.list.existingSizeInDOM = this.chunk.amount * 4; // TODO: может быть ситуация, когда деток меньше чем (чанк * 4) - сделать сеттер или проверку (лучше сеттер)
     this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
+
+    this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+    if (this.list.length > this.list.fullLength) {
+      this.list.length = this.list.fullLength;
+    }
+
+    if (!this.isLazy && this.list.length > this.list.data.length) {
+      this.list.length = this.list.data.length;
+    } else if (this.list.length <= 0) {
+      this.list.length = this.list.data.length;
+    }
+
+    this.list.lastPageLength = this.list.fullLength % this.list.length;
+
+    if (this.list.lastPageLength === 0) {
+      console.log('this.list.lastPageLength', this.list.lastPageLength);
+      this.list.lastPageLength = this.list.length;
+    }
+
     this.chunk.lastRenderIndex =
       this.list.length - this.list.halfOfExistingSizeInDOM;
 
