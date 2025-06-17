@@ -165,7 +165,16 @@ class InfinityScroll {
       this.vsb.handleScroll();
       this.calcCurrentDOMRender();
 
-      this.isSyncing = false;
+      // this.isSyncing = false;
+
+      setTimeout(() => {
+        if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
+          // console.log(this.vsb.scroll, this.vsb.elem.scrollTop);
+          this.vsb.handleScroll();
+          // this.calcCurrentDOMRender();
+        }
+        this.isSyncing = false;
+      }, 0);
     });
 
     this.skeleton = new Skeleton({
@@ -639,8 +648,9 @@ class InfinityScroll {
           this.scroll.isGoingFromBottom,
           this.vsb
         );
-
-        this.fixElemsOrdering(this.scroll.direction);
+        if (!this.timerIdRefreshList) {
+          this.fixElemsOrdering(this.scroll.direction);
+        }
 
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
