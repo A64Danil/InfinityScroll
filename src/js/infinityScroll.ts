@@ -675,9 +675,10 @@ class InfinityScroll {
 
       if (
         this.vsb.currentPage === this.vsb.totalPages &&
-        renderIndex > this.chunk.lastPageLastRenderIndex
+        renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
       ) {
         renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
+        console.log('last page rendex index fixed', renderIndex);
       } else if (renderIndex > this.chunk.lastRenderIndex) {
         renderIndex = this.chunk.lastRenderIndex;
       }
@@ -826,6 +827,8 @@ class InfinityScroll {
       if (sequenceStart > hightestIndexByPage) {
         sequenceStart = hightestIndexByPage;
       }
+
+      console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
     const lastStartIndex = this.list.fullLength - this.list.existingSizeInDOM;
