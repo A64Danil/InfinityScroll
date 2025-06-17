@@ -237,7 +237,9 @@ class InfinityScroll {
       this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
     this.chunk.lastPageLastRenderIndex =
-      this.list.lastPageLength - this.list.halfOfExistingSizeInDOM;
+      this.list.lastPageLength > this.list.halfOfExistingSizeInDOM
+        ? this.list.lastPageLength - this.list.halfOfExistingSizeInDOM
+        : 1;
 
     const renderProps = {
       halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
@@ -459,18 +461,13 @@ class InfinityScroll {
       this.list.tailingElementsAmount
     );
 
-    this.chunk.lastRenderIndex =
-      this.list.length - this.list.halfOfExistingSizeInDOM;
+    // this.chunk.lastRenderIndex =
+    //   this.list.length - this.list.halfOfExistingSizeInDOM;
 
     this.chunk.prevPageRenderIndex =
       this.chunk.lastRenderIndex +
       this.chunk.amount -
       (this.chunk.lastRenderIndex % this.chunk.amount);
-
-    this.chunk.lastPageLastRenderIndex =
-      this.list.lastPageLength > this.list.halfOfExistingSizeInDOM
-        ? this.list.length - this.list.halfOfExistingSizeInDOM
-        : 1;
 
     if (this.render) {
       this.render.reInitValues(
@@ -674,7 +671,17 @@ class InfinityScroll {
 
   refreshList(timerID?: number) {
     if (this.render) {
-      const renderIndex = this.chunk.startRenderIndex;
+      let renderIndex = this.chunk.startRenderIndex;
+
+      if (
+        this.vsb.currentPage === this.vsb.totalPages &&
+        renderIndex > this.chunk.lastPageLastRenderIndex
+      ) {
+        renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
+      } else if (renderIndex > this.chunk.lastRenderIndex) {
+        renderIndex = this.chunk.lastRenderIndex;
+      }
+
       this.chunk.setRenderIndex(
         renderIndex,
         this.vsb.currentPage,
@@ -702,6 +709,7 @@ class InfinityScroll {
       // TODO: проверить с выключенным fixOrdering
       // END Fetch new DATA
 
+      console.log(renderIndex, sequenceStart);
       this.domMngr.resetAllList(
         this.chunk,
         renderIndex,
