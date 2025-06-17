@@ -77,15 +77,15 @@ export class DomManager {
     startRenderIndex: number,
     chunkAmount: number,
     direction: IScrollDirection,
-    // startIndexOfLastPart: number
     list: ListController,
-    vsb: Vsb
+    vsb: Vsb,
+    isAfterReset: boolean
   ): number {
     let startOffsetIndex = startRenderIndex - chunkAmount;
     if (startOffsetIndex < 0) {
       startOffsetIndex = 0;
     }
-    if (direction === 'down') {
+    if (direction === 'down' && !isAfterReset) {
       if (
         vsb.currentPage === vsb.totalPages &&
         startOffsetIndex > list.lastPageStartIndexOfLastPart
@@ -107,17 +107,34 @@ export class DomManager {
     startRenderIndex: number,
     list: ListController,
     direction: IScrollDirection,
-    vsb: Vsb
+    vsb: Vsb,
+    isAfterReset: boolean
   ): void {
     const startOffsetIndex = this.calcStartOffsetIndex(
       startRenderIndex,
       chunk.amount,
       direction,
       list,
-      vsb
+      vsb,
+      isAfterReset
     );
     const offset = startOffsetIndex * list.itemHeight;
     // this.targetElem.style.transform = `translate(0,${offset}px)`;
+
+    // height: 8436px; + height: 2664px;
+    // if (vsb.currentPage > 3) {
+    if (true) {
+      console.log('startOffsetIndex', startOffsetIndex);
+      // 98 - 78
+      // 100 - 76
+      console.log('startRenderIndex', startRenderIndex);
+      // 98 - 84
+      // 100 - 84
+      console.log('offset', offset);
+      // 98 - offset 8658
+      // 100 - offset 8436
+    }
+
     this.offsetElem.style.height = `${offset}px`;
     this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
   }
@@ -206,6 +223,9 @@ export class DomManager {
       // add items
       // console.log('sequenceStart', sequenceStart);
       const elemNum = i + sequenceStart;
+      // if (vsb.currentPage > 1) {
+      //   elemNum = elemNum - ((chunk.amount * (vsb.currentPage - 1)));
+      // }
       if (list.data === undefined) {
         throw new Error('Your list.data is undefined');
       }
@@ -219,12 +239,14 @@ export class DomManager {
     this.targetElem.append(templateFragment);
     // console.log('before setOffset', startRenderIndex, newOffset);
     // console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
+    const isAfterReset = true;
     this.setOffsetToList(
       chunk,
       startRenderIndex,
       list,
       direction,
-      vsb
+      vsb,
+      isAfterReset
       // newOffset,
       // isAllowRenderNearBorder
     );
@@ -361,6 +383,11 @@ export class DomManager {
     );
     const sequenceNumberByPage =
       (vsb.currentPage - 1) * list.length + sequenceNumber;
+
+    // console.log(vsb.currentPage);
+    // if (vsb.currentPage > 1) {
+    //   sequenceNumberByPage = sequenceNumberByPage - (chunk.amount - 1);
+    // }
 
     if (list.data === undefined) {
       throw new Error('Your list.data is undefined');
