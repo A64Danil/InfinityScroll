@@ -86,17 +86,24 @@ export class DomManager {
       startOffsetIndex = 0;
     }
     if (direction === 'down') {
-      if (
-        vsb.currentPage !== vsb.totalPages &&
-        startOffsetIndex > list.startIndexOfLastPart
-      ) {
+      // const isNotLastOrOncePage =
+      //   vsb.currentPage !== vsb.totalPages || vsb.totalPages === 1;
+      // if (
+      //   vsb.currentPage !== vsb.totalPages &&
+      //   startOffsetIndex > list.startIndexOfLastPart
+      // ) {
+      //   console.log('not a last page');
+      //   startOffsetIndex = list.startIndexOfLastPart;
+      // } else if (
+      //   // vsb.currentPage !== 1 &&
+      //   vsb.currentPage === vsb.totalPages &&
+      //   startOffsetIndex > list.lastPageLength
+      // ) {
+      //   console.log('last page');
+      //   startOffsetIndex = list.lastPageLength;
+      // }
+      if (startOffsetIndex > list.startIndexOfLastPart) {
         startOffsetIndex = list.startIndexOfLastPart;
-      } else if (
-        // vsb.currentPage !== 1 &&
-        vsb.currentPage === vsb.totalPages &&
-        startOffsetIndex > list.lastPageLength
-      ) {
-        startOffsetIndex = list.lastPageLength;
       }
     }
     return startOffsetIndex;
