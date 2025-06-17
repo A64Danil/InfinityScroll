@@ -383,6 +383,7 @@ class InfinityScroll {
 
     const cssText = `.${this.selectorId}_List {
       overflow: hidden; 
+      margin: 0;
       }
       
 .${this.selectorId}_List li { 

@@ -22,7 +22,7 @@ html {
 
 .middleWrapper {
   position: relative;
-  overflow: scroll;
+  overflow-y: scroll;
   height: 100%;
 }
 
@@ -37,7 +37,7 @@ html {
   //transform: translate(100%, 0px);
   width: 400px;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
 
   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#9dd53a+0,a1d54f+20,80c217+20,80c217+20,94c14b+40,80c217+40,80c217+40,a7bc84+60,94c14b+60,7dba14+80,7cbc0a+100 */
   //background: linear-gradient(to bottom,  #777 2%, #9dd53a 2%, #9dd53a 20%, #6bab06 20%, #6bab06 40%, #a9be87 40%, #a9be87 60%, #80c217 60%, #80c217 80%, #9dd53a 80%, #9dd53a 95%, #777 95%);
