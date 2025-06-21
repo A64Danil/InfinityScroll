@@ -5,6 +5,8 @@ export class ScrollDetector {
 
   public isGoingFromBottom = false;
 
+  public maxScroll = 0;
+
   // Предыдущая позиция скролла (нужна чтобы сравнивать с новой)
   public prevScroll = 0;
 
@@ -13,6 +15,8 @@ export class ScrollDetector {
   }
 
   setScrollDirection(scroll: number): void {
+    if (scroll === this.prevScroll) return;
+
     if (scroll > this.prevScroll) {
       this.direction = 'down';
     } else {
