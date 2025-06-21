@@ -42,8 +42,29 @@ export class ChunkController {
     return renderIndex;
   }
 
-  setRenderIndex(renderIndex: number, currentPage: number, listLength: number) {
-    this.startRenderIndex = renderIndex;
-    this.itemIndex = listLength * (currentPage - 1) + renderIndex;
+  setRenderIndex(
+    renderIndex: number,
+    currentPage: number,
+    listLength: number,
+    isLastPage?: boolean
+  ) {
+    if (
+      isLastPage &&
+      // renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
+      this.startRenderIndex > this.lastPageLastRenderIndex - this.amount
+    ) {
+      // renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
+      this.startRenderIndex = this.lastPageLastRenderIndex - this.amount;
+      console.warn(
+        'last page rendex index fixed',
+        this.startRenderIndex,
+        renderIndex
+      );
+    } else if (renderIndex > this.lastRenderIndex) {
+      this.startRenderIndex = this.lastRenderIndex;
+    } else {
+      this.startRenderIndex = renderIndex;
+    }
+    this.itemIndex = listLength * (currentPage - 1) + this.startRenderIndex;
   }
 }
