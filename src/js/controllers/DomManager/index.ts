@@ -78,24 +78,24 @@ export class DomManager {
     chunkAmount: number,
     direction: IScrollDirection,
     list: ListController,
-    vsb: Vsb,
-    isAfterReset: boolean
+    vsb: Vsb
   ): number {
     let startOffsetIndex = startRenderIndex - chunkAmount;
     if (startOffsetIndex < 0) {
       startOffsetIndex = 0;
     }
-    if (direction === 'down' && !isAfterReset) {
-      if (
-        vsb.currentPage === vsb.totalPages &&
-        startOffsetIndex > list.lastPageStartIndexOfLastPart
-      ) {
-        console.log('last page');
-        startOffsetIndex = list.lastPageStartIndexOfLastPart;
-      } else if (startOffsetIndex > list.startIndexOfLastPart) {
-        startOffsetIndex = list.startIndexOfLastPart;
-      }
+
+    // if (direction === 'down') {
+    if (
+      vsb.currentPage === vsb.totalPages &&
+      startOffsetIndex > list.lastPageStartIndexOfLastPart
+    ) {
+      console.log('last page');
+      startOffsetIndex = list.lastPageStartIndexOfLastPart;
+    } else if (startOffsetIndex > list.startIndexOfLastPart) {
+      startOffsetIndex = list.startIndexOfLastPart;
     }
+    // }
     return startOffsetIndex;
   }
 
@@ -107,33 +107,29 @@ export class DomManager {
     startRenderIndex: number,
     list: ListController,
     direction: IScrollDirection,
-    vsb: Vsb,
-    isAfterReset: boolean
+    vsb: Vsb
   ): void {
     const startOffsetIndex = this.calcStartOffsetIndex(
       startRenderIndex,
       chunk.amount,
       direction,
       list,
-      vsb,
-      isAfterReset
+      vsb
     );
     const offset = startOffsetIndex * list.itemHeight;
     // this.targetElem.style.transform = `translate(0,${offset}px)`;
 
-    // height: 8436px; + height: 2664px;
-    // if (vsb.currentPage > 3) {
-    if (true) {
-      console.log('startOffsetIndex', startOffsetIndex);
-      // 98 - 78
-      // 100 - 76
-      console.log('startRenderIndex', startRenderIndex);
-      // 98 - 84
-      // 100 - 84
-      console.log('offset', offset);
-      // 98 - offset 8658
-      // 100 - offset 8436
-    }
+    // if (startRenderIndex > 60) {
+    console.log('startOffsetIndex', startOffsetIndex);
+    // 98 - 78
+    // 100 - 76
+    console.log('startRenderIndex', startRenderIndex);
+    // 98 - 84
+    // 100 - 84
+    console.log('offset', offset);
+    // 98 - offset 8658
+    // 100 - offset 8436
+    // }
 
     this.offsetElem.style.height = `${offset}px`;
     this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
@@ -239,14 +235,12 @@ export class DomManager {
     this.targetElem.append(templateFragment);
     // console.log('before setOffset', startRenderIndex, newOffset);
     // console.log('this.targetElem.offsetHeight', this.targetElem.offsetHeight);
-    const isAfterReset = true;
     this.setOffsetToList(
       chunk,
       startRenderIndex,
       list,
       direction,
-      vsb,
-      isAfterReset
+      vsb
       // newOffset,
       // isAllowRenderNearBorder
     );
