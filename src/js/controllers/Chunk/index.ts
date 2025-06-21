@@ -50,11 +50,11 @@ export class ChunkController {
   ) {
     if (
       isLastPage &&
-      // renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
-      this.startRenderIndex > this.lastPageLastRenderIndex - this.amount
+      // renderIndex > this.lastPageLastRenderIndex - this.amount
+      renderIndex > this.lastPageLastRenderIndex
     ) {
-      // renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
-      this.startRenderIndex = this.lastPageLastRenderIndex - this.amount;
+      // this.startRenderIndex = this.lastPageLastRenderIndex - this.amount;
+      this.startRenderIndex = this.lastPageLastRenderIndex;
       console.warn(
         'last page rendex index fixed',
         this.startRenderIndex,
