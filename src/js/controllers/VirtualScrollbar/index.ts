@@ -41,7 +41,9 @@ export class Vsb {
   sizeOfScrollByLastPage = 0;
 
   // True is new page number is not like previous
-  isPageChanged: boolean;
+  isPageChanged = false;
+
+  isLastPage = false;
 
   // Ration of full and not_full pages to have good scroll length
   scrollRatio: number;
@@ -71,8 +73,6 @@ export class Vsb {
     this.sizeOfPercentByOnePage = 1;
 
     this.sizeOfScrollByOnePage = 1;
-
-    this.isPageChanged = false;
 
     this.scrollRatio = 1;
 
@@ -216,6 +216,7 @@ export class Vsb {
 
     this.scroll = vsbPagedScroll;
     this.elem.scrollTop = this.scroll;
+    this.isLastPage = this.currentPage === this.totalPages;
 
     if (needToChangePage) {
       this.setScrollPercent();
@@ -244,6 +245,7 @@ export class Vsb {
     const newCurrentPage = this.getPageByScroll();
     this.isPageChanged = this.currentPage !== newCurrentPage;
     this.currentPage = newCurrentPage;
+    this.isLastPage = this.currentPage === this.totalPages;
   }
 
   setScrollToOrigScrollElem(
