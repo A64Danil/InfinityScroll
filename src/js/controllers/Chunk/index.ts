@@ -9,6 +9,9 @@ export class ChunkController {
   // Порядковый номер последнего чанка в списке
   public lastOrderNumber = 1;
 
+  // Порядковый номер последнего чанка в списке на последней странице
+  public lastPageLastOrderNumber = 1;
+
   // Номер, с которого начинается первый элемент в предпоследнем чанке (после которого все элементы уже загружены)
   public lastRenderIndex = 0;
 

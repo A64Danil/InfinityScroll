@@ -517,6 +517,10 @@ class InfinityScroll {
       this.list.length / this.chunk.amount
     );
 
+    this.chunk.lastPageLastOrderNumber = Math.floor(
+      this.list.lastPageLength / this.chunk.amount
+    );
+
     const totalHeight = this.list.getTotalListHeight();
     const realHeight = this.listEl.offsetHeight;
     console.log('realHeight', realHeight);
@@ -546,10 +550,13 @@ class InfinityScroll {
     // Вычисляем новый индекс для рендера чанка (не путать с браузрным скроллом)
     const newRenderIndex: number = this.chunk.calcRenderIndex(chunkOrderNumber);
 
+    const lastOrderNumber = this.vsb.isLastPage
+      ? this.chunk.lastPageLastOrderNumber
+      : this.chunk.lastOrderNumber;
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
       this.chunk.firstOrderNumber,
-      this.chunk.lastOrderNumber,
+      lastOrderNumber,
       chunkOrderNumber
     );
 
