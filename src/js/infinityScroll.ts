@@ -587,6 +587,10 @@ class InfinityScroll {
       this.setTimerToRefreshList();
     }
 
+    const isEndOfList =
+      this.vsb.isLastPage &&
+      (scroll >= this.scroll.lastPageMaxScroll ||
+        resultIndex >= this.chunk.lastPageLastRenderIndex);
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
       const oldIndex = this.chunk.startRenderIndex;
@@ -673,9 +677,11 @@ class InfinityScroll {
           this.scroll.isGoingFromBottom,
           this.vsb
         );
-        if (!this.timerIdRefreshList) {
-          this.fixElemsOrdering(this.scroll.direction);
-        }
+
+        // TODO: нужна только 1 из 2?
+        // if (!this.timerIdRefreshList) {
+        //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
+        // }
 
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
@@ -684,6 +690,12 @@ class InfinityScroll {
           }
         }
       }
+    }
+
+    // TODO: не нужно?
+
+    if (!this.timerIdRefreshList && isEndOfList) {
+      this.fixElemsOrdering(this.scroll.direction, isEndOfList);
     }
   }
 
@@ -1019,18 +1031,42 @@ class InfinityScroll {
     return res;
   }
 
-  fixElemsOrdering(direction: IScrollDirection) {
+  fixElemsOrdering(direction: IScrollDirection, isEndOfList?: boolean) {
     const firstElemPosition = Number(this.listEl.firstChild.ariaPosInSet);
     const lastElemPosition = Number(this.listEl.lastChild.ariaPosInSet);
-    const sizeOfAnotherElements = this.list.existingSizeInDOM - 1;
+    const lastElemPositionByOnePage =
+      lastElemPosition - (this.vsb.currentPage - 1) * this.list.length;
 
+    const sizeOfAnotherElements = this.list.existingSizeInDOM - 1;
+    if (isEndOfList && lastElemPositionByOnePage !== this.list.lastPageLength) {
+      console.clear();
+      console.warn(
+        'Конец списка  поломан- надо ребутать по особому',
+        lastElemPositionByOnePage
+      );
+      const [sequenceStart] = this.getSequence(
+        this.chunk.itemIndex,
+        true,
+        true
+      );
+      this.domMngr.resetAllList(
+        this.chunk,
+        this.list.lastPageStartIndexOfLastPart + this.chunk.amount,
+        sequenceStart,
+        this.list,
+        this.scroll.direction,
+        this.vsb
+      );
+
+      return;
+    }
     let isOrderBreaked = false;
     let renderIndex;
     if (direction === 'down') {
       // console.log('Если сломалось, то ориентирйся на низ списка, т.к. сломан верх!')
       // console.log('Низ правильный, а верх плохой?');
       if (lastElemPosition - sizeOfAnotherElements !== firstElemPosition) {
-        // console.warn('Дай угадаю - верх списка поломался?');
+        console.warn('Дай угадаю - верх списка поломался?');
         // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
         // console.log(
         //   lastElemPosition - sizeOfAnotherElements,
@@ -1044,7 +1080,7 @@ class InfinityScroll {
       // console.log('Если сломалось, то ориентирйся на верх списка, т.к. сломан низ')
       // console.log('Верх правильный, а низ плохой?');
       if (firstElemPosition + sizeOfAnotherElements !== lastElemPosition) {
-        // console.warn('Дай угадаю - низ списка поломался?');
+        console.warn('Дай угадаю - низ списка поломался?');
         // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
         // console.log(
         //   firstElemPosition + sizeOfAnotherElements,
@@ -1061,20 +1097,23 @@ class InfinityScroll {
       console.warn(
         'Ребутаем список чтобы спасти ситацию =)',
         renderIndex,
-        this.scroll.direction
+        this.chunk.startRenderIndex,
+        this.scroll.direction,
+        isEndOfList
       );
       const [sequenceStart, sequenceEnd] = this.getSequence(
         this.chunk.itemIndex,
         true
       );
-      this.domMngr.resetAllList(
-        this.chunk,
-        renderIndex,
-        sequenceStart,
-        this.list,
-        this.scroll.direction,
-        this.vsb
-      );
+      // this.domMngr.resetAllList(
+      //   this.chunk,
+      //   // renderIndex,
+      //   this.chunk.startRenderIndex,
+      //   sequenceStart,
+      //   this.list,
+      //   this.scroll.direction,
+      //   this.vsb
+      // );
     }
   }
 }
