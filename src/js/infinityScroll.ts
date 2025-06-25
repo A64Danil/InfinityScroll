@@ -162,6 +162,11 @@ class InfinityScroll {
 
       this.isSyncing = true;
 
+      this.scroll.setScrollDirection(
+        this.middleWrapper.scrollTop,
+        this.vsb.isPageChanged,
+        this.vsb.isLastPage
+      );
       this.vsb.handleScroll();
       this.calcCurrentDOMRender();
 
@@ -265,17 +270,21 @@ class InfinityScroll {
         return;
       }
       this.isSyncing = true;
-      if (!this.vsb.isPageChanged) {
-        this.scroll.setScrollDirection(this.middleWrapper.scrollTop);
-      }
+      this.scroll.setScrollDirection(
+        this.middleWrapper.scrollTop,
+        this.vsb.isPageChanged,
+        this.vsb.isLastPage
+      );
       this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
       if (this.vsb.isPageChanged) {
         const [resultIndex] = this.calcRenderIndex(e.target.scrollTop);
         this.chunk.setRenderIndex(
           resultIndex,
           this.vsb.currentPage,
-          this.list.length
+          this.list.length,
+          this.vsb.isLastPage
         );
+        console.log('isLastPage', this.vsb.isLastPage, this.vsb.currentPage);
         this.refreshList();
 
         // TODO: кажется это не нужно
@@ -561,6 +570,11 @@ class InfinityScroll {
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff || this.vsb.isPageChanged) {
       clearTimeout(this.timerIdRefreshList);
+      console.log(
+        'this.vsb.isLastPage',
+        this.vsb.isLastPage,
+        this.vsb.currentPage
+      );
       this.setTimerToRefreshList();
     }
 
@@ -570,7 +584,8 @@ class InfinityScroll {
       this.chunk.setRenderIndex(
         resultIndex,
         this.vsb.currentPage,
-        this.list.length
+        this.list.length,
+        this.vsb.isLastPage
       );
 
       if (!this.render) {
@@ -579,8 +594,12 @@ class InfinityScroll {
       const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
         this.chunk.startRenderIndex,
-        this.vsb.currentPage !== 1 &&
-          this.vsb.currentPage === this.vsb.totalPages
+        this.vsb.currentPage !== 1 && this.vsb.isLastPage
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      // !isAllowRender &&
+      console.log(
+        ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}`
       );
       if (isAllowRender && this.domMngr) {
         let tempDirection: IScrollDirection;
@@ -601,7 +620,7 @@ class InfinityScroll {
         }
 
         console.log(
-          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ) ======`
+          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isLastPage: ${this.vsb.isLastPage} ======`
         );
 
         const mainChunkProps = {
@@ -671,27 +690,40 @@ class InfinityScroll {
 
   refreshList(timerID?: number) {
     if (this.render) {
-      let renderIndex = this.chunk.startRenderIndex;
+      const renderIndex = this.chunk.startRenderIndex;
 
-      if (
-        this.vsb.currentPage === this.vsb.totalPages &&
-        renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
-      ) {
-        renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
-        console.log('last page rendex index fixed', renderIndex);
-      } else if (renderIndex > this.chunk.lastRenderIndex) {
-        renderIndex = this.chunk.lastRenderIndex;
-      }
+      // if (
+      //   this.vsb.currentPage === this.vsb.totalPages &&
+      //   renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
+      // ) {
+      //   renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
+      //   console.log('last page rendex index fixed', renderIndex);
+      // } else if (renderIndex > this.chunk.lastRenderIndex) {
+      //   renderIndex = this.chunk.lastRenderIndex;
+      // }
 
       this.chunk.setRenderIndex(
         renderIndex,
         this.vsb.currentPage,
-        this.list.length
+        this.list.length,
+        this.vsb.isLastPage
       );
+
+      if (
+        this.vsb.currentPage === this.vsb.totalPages &&
+        !this.vsb.isLastPage
+      ) {
+        console.error(
+          this.vsb.currentPage,
+          this.vsb.currentPage === this.vsb.totalPages,
+          this.vsb.isLastPage
+        );
+      }
       // itemIndex
       const [sequenceStart, sequenceEnd] = this.getSequence(
         this.chunk.itemIndex,
-        true
+        true,
+        this.vsb.isLastPage
       );
 
       if (this.isLazy) {
@@ -805,7 +837,11 @@ class InfinityScroll {
   }
 
   // TODO: renderIndex or itemIndex ??? -> truly this is itemIndex, but name is no difference?
-  getSequence(renderIndex: number, isFetchToReset = false): number[] {
+  getSequence(
+    renderIndex: number,
+    isFetchToReset = false,
+    isLastPage = false
+  ): number[] {
     let sequenceStart;
     let sequenceEnd;
     if (!isFetchToReset) {
@@ -818,9 +854,24 @@ class InfinityScroll {
       sequenceEnd = sequenceStart + this.chunk.amount;
     } else {
       const tempStartIndex = renderIndex - this.chunk.amount;
+
       const lowestIndexByPage = this.list.length * (this.vsb.currentPage - 1);
-      const hightestIndexByPage =
-        this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
+
+      // const pageLength = !isLastPage ? this.list.length : this.list.lastPageLength;
+      let hightestIndexByPage;
+
+      if (!isLastPage) {
+        hightestIndexByPage =
+          this.list.length * this.vsb.currentPage - this.list.existingSizeInDOM;
+      } else {
+        const nonLastPagesSize = this.list.length * (this.vsb.totalPages - 1);
+        let lastPageSize =
+          this.list.lastPageLength - this.list.existingSizeInDOM;
+        if (lastPageSize < 0) lastPageSize = 0;
+        hightestIndexByPage = nonLastPagesSize + lastPageSize;
+      }
+
+      console.log({ isFetchToReset, hightestIndexByPage, isLastPage });
       sequenceStart =
         tempStartIndex > lowestIndexByPage ? tempStartIndex : lowestIndexByPage;
 
