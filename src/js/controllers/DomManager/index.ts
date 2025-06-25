@@ -90,7 +90,7 @@ export class DomManager {
       vsb.currentPage === vsb.totalPages &&
       startOffsetIndex > list.lastPageStartIndexOfLastPart
     ) {
-      console.log('last page');
+      // console.log('last page');
       startOffsetIndex = list.lastPageStartIndexOfLastPart;
     } else if (startOffsetIndex > list.startIndexOfLastPart) {
       startOffsetIndex = list.startIndexOfLastPart;
@@ -120,13 +120,13 @@ export class DomManager {
     // this.targetElem.style.transform = `translate(0,${offset}px)`;
 
     // if (startRenderIndex > 60) {
-    console.log('startOffsetIndex', startOffsetIndex);
-    // 98 - 78
-    // 100 - 76
-    console.log('startRenderIndex', startRenderIndex);
-    // 98 - 84
-    // 100 - 84
-    console.log('offset', offset);
+    // console.log('startOffsetIndex', startOffsetIndex);
+    // // 98 - 78
+    // // 100 - 76
+    // console.log('startRenderIndex', startRenderIndex);
+    // // 98 - 84
+    // // 100 - 84
+    // console.log('offset', offset);
     // 98 - offset 8658
     // 100 - offset 8436
     // }
@@ -270,7 +270,7 @@ export class DomManager {
     let isReachBottomLimit = false;
 
     if (direction === 'down' && i + sequenceNumber >= list.length) {
-      console.log(i + sequenceNumber); // проблема не тут
+      // console.log(i + sequenceNumber); // проблема не тут
       isReachBottomLimit = true;
     }
 
