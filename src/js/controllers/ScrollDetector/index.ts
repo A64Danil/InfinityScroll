@@ -7,6 +7,8 @@ export class ScrollDetector {
 
   public maxScroll = 0;
 
+  public lastPageMaxScroll = 0;
+
   // Предыдущая позиция скролла (нужна чтобы сравнивать с новой)
   public prevScroll = 0;
 
@@ -14,16 +16,27 @@ export class ScrollDetector {
     console.log('start ScrollDetector');
   }
 
-  setScrollDirection(scroll: number): void {
+  setScrollDirection(
+    scroll: number,
+    isPageChanged: boolean,
+    isLastPage?: boolean
+  ): void {
     if (scroll === this.prevScroll) return;
 
-    if (scroll > this.prevScroll) {
-      this.direction = 'down';
-    } else {
-      this.direction = 'up';
+    if (!isPageChanged) {
+      if (scroll > this.prevScroll) {
+        this.direction = 'down';
+      } else {
+        this.direction = 'up';
+      }
     }
 
     this.prevScroll = scroll;
+
+    if (isLastPage && scroll >= this.lastPageMaxScroll) {
+      console.warn('last page set direction');
+      this.direction = 'down';
+    }
   }
 
   setGoingFromBottom(
