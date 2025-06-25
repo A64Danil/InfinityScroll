@@ -263,6 +263,14 @@ class InfinityScroll {
     this.domMngr.fillList(this.list);
     this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
 
+    this.scroll.maxScroll =
+      this.list.length * this.list.itemHeight -
+      this.middleWrapper?.clientHeight;
+
+    this.scroll.lastPageMaxScroll =
+      this.list.lastPageLength * this.list.itemHeight -
+      this.middleWrapper?.clientHeight;
+
     this.createVirtualScroll();
 
     this.middleWrapper.addEventListener('scroll', (e) => {
