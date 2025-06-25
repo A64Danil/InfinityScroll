@@ -44,7 +44,7 @@ export class RenderController {
     this.tailingElementsAmount = tailingElementsAmount;
   }
 
-  // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям - скорее всего надо писать "больше или равно"
+  // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям - скорее всего надо писать "больше или равно" => да, "больше или равно" работает лучше
   /**
    * Косаемся начала списка двигаясь сверху
    */
@@ -56,7 +56,7 @@ export class RenderController {
    * Косаемся конца списка двигаясь сверху
    */
   isEndOfListFromTop(startRenderIndex: number): boolean {
-    return startRenderIndex > this.lastRenderIndex;
+    return startRenderIndex >= this.lastRenderIndex;
   }
 
   /**
