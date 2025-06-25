@@ -572,7 +572,8 @@ class InfinityScroll {
 
     const [resultIndex, newRenderIndex] = this.calcRenderIndex(scroll);
 
-    const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
+    // const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
+    const renderIndexDiff = this.chunk.getRenderIndexDiff(resultIndex);
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
