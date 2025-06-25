@@ -174,7 +174,11 @@ class InfinityScroll {
 
       setTimeout(() => {
         if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
-          // console.log(this.vsb.scroll, this.vsb.elem.scrollTop);
+          // console.error(
+          //   'не совпадает!',
+          //   this.vsb.scroll,
+          //   this.vsb.elem.scrollTop
+          // );
           this.vsb.handleScroll();
           // this.calcCurrentDOMRender();
         }
@@ -624,10 +628,7 @@ class InfinityScroll {
           }
 
           if (tempDirection && tempDirection !== this.scroll.direction) {
-            // console.warn(
-            //   'Направления не совпадают, стоит исправить? Исправляем =)'
-            // );
-
+            console.warn('================ Направления не совпадают!');
             this.scroll.direction = tempDirection;
           }
         }
@@ -661,15 +662,16 @@ class InfinityScroll {
         // END Fetch new DATA
 
         // TODO: не нужно?
-        const mainListProps = {
-          existingSizeInDOM: this.list.existingSizeInDOM,
-          halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
-          tailingElementsAmount: this.list.tailingElementsAmount,
-          length: this.list.length,
-          data: this.list.data,
-          startIndexOfLastPart: this.list.startIndexOfLastPart,
-          itemHeight: this.list.itemHeight,
-        };
+        // const mainListProps = {
+        //   existingSizeInDOM: this.list.existingSizeInDOM,
+        //   halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
+        //   tailingElementsAmount: this.list.tailingElementsAmount,
+        //   length: this.list.length,
+        //   data: this.list.data,
+        //   startIndexOfLastPart: this.list.startIndexOfLastPart,
+        //   itemHeight: this.list.itemHeight,
+        // };
+
         this.domMngr.modifyCurrentDOM(
           mainChunkProps,
           this.list,
@@ -763,7 +765,6 @@ class InfinityScroll {
       // TODO: проверить с выключенным fixOrdering
       // END Fetch new DATA
 
-      console.log(renderIndex, sequenceStart);
       this.domMngr.resetAllList(
         this.chunk,
         renderIndex,
@@ -778,7 +779,12 @@ class InfinityScroll {
         // console.log('BEFORE checkIndexOrdering (reset list)');
         this.checkIndexOrdering();
         // console.clear();
-        console.log('AFTER checkIndexOrdering  (reset list)');
+        console.log(
+          'AFTER checkIndexOrdering  (reset list)',
+          this.scroll.direction,
+          timerID,
+          `renderIndex: ${renderIndex}`
+        );
       }
     }
   }
