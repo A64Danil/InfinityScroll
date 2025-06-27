@@ -553,11 +553,16 @@ class InfinityScroll {
     const lastOrderNumber = this.vsb.isLastPage
       ? this.chunk.lastPageLastOrderNumber
       : this.chunk.lastOrderNumber;
+    const maxScroll = this.vsb.isLastPage
+      ? this.scroll.lastPageMaxScroll
+      : this.scroll.maxScroll;
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
       this.chunk.firstOrderNumber,
       lastOrderNumber,
-      chunkOrderNumber
+      chunkOrderNumber,
+      scroll,
+      maxScroll
     );
 
     let resultIndex =

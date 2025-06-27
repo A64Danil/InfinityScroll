@@ -42,7 +42,9 @@ export class ScrollDetector {
   setGoingFromBottom(
     firstOrderNumber: number,
     lastOrderNumber: number,
-    chunkOrderNumber: number
+    chunkOrderNumber: number,
+    scroll: number,
+    maxScroll: number
   ): void {
     if (this.direction === 'down' && chunkOrderNumber <= firstOrderNumber) {
       this.isGoingFromBottom = false;
@@ -52,6 +54,16 @@ export class ScrollDetector {
     ) {
       this.isGoingFromBottom = true;
     }
+
+    if (!this.isGoingFromBottom && scroll >= maxScroll) {
+      // Reach bottom of list;
+      this.isGoingFromBottom = true;
+    } else if (this.isGoingFromBottom && scroll <= 0) {
+      // Reach TOP of list
+      this.isGoingFromBottom = false;
+    }
+
+    console.log('this.isGoingFromBottom', this.isGoingFromBottom);
   }
 
   // eslint-disable-next-line class-methods-use-this
