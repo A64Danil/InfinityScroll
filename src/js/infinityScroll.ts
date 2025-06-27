@@ -163,7 +163,7 @@ class InfinityScroll {
       this.isSyncing = true;
 
       this.scroll.setScrollDirection(
-        this.middleWrapper.scrollTop,
+        this.vsb.elem.scrollTop,
         this.vsb.isPageChanged,
         this.vsb.isLastPage
       );
