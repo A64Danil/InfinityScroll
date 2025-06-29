@@ -55,6 +55,7 @@ console.log('Entry point');
   if (remoteList !== null) {
     console.log('Remote list Started');
     const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+    window.iScroll = myLazyScroll;
   }
 
   const remoteListApi = document.getElementById(
@@ -64,6 +65,7 @@ console.log('Entry point');
   if (remoteListApi !== null) {
     console.log('Remote Api_100_items list Started');
     const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
+    window.iScroll = myLazyScroll;
   }
 
   const lazyDummyJsonList = document.getElementById(
