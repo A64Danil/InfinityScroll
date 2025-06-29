@@ -588,8 +588,12 @@ class InfinityScroll {
 
     const [resultIndex, newRenderIndex] = this.calcRenderIndex(scroll);
 
+    const newItemIndex =
+      this.list.length * (this.vsb.currentPage - 1) + resultIndex;
+
     // const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
-    const renderIndexDiff = this.chunk.getRenderIndexDiff(resultIndex);
+    // const renderIndexDiff = this.chunk.getRenderIndexDiff(resultIndex);
+    const renderIndexDiff = this.chunk.getRenderIndexDiff(newItemIndex);
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
@@ -628,10 +632,11 @@ class InfinityScroll {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       // !isAllowRender &&
       console.log(
-        ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}`
+        ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
       );
       if (isAllowRender && this.domMngr) {
         let tempDirection: IScrollDirection;
+        // TODO: false убрать или всё убрать?
         if (!this.timerIdRefreshList) {
           if (this.chunk.startRenderIndex < oldIndex) {
             tempDirection = 'up';
@@ -646,7 +651,7 @@ class InfinityScroll {
         }
 
         console.log(
-          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isLastPage: ${this.vsb.isLastPage} ======`
+          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isGoingFromBottom: ${this.scroll.isGoingFromBottom}, ${renderIndexDiff} ======`
         );
 
         const mainChunkProps = {
