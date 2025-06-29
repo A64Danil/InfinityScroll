@@ -458,8 +458,11 @@ class InfinityScroll {
       this.list.lastPageLength = this.list.length;
     }
 
+    // this.chunk.lastRenderIndex = this.list.length - this.list.halfOfExistingSizeInDOM;
     this.chunk.lastRenderIndex =
-      this.list.length - this.list.halfOfExistingSizeInDOM;
+      this.list.length -
+      this.list.halfOfExistingSizeInDOM -
+      this.list.tailingElementsAmount;
 
     this.list.startIndexOfLastPart =
       this.list.length - this.list.existingSizeInDOM;
