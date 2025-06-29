@@ -36,8 +36,10 @@ export class ChunkController {
     return chunkOrderNumber;
   }
 
-  getRenderIndexDiff(newRenderIndex: number): number {
-    return Math.abs(this.startRenderIndex - newRenderIndex);
+  // getRenderIndexDiff(newRenderIndex: number): number {
+  getRenderIndexDiff(newItemIndex: number): number {
+    // return Math.abs(this.startRenderIndex - newRenderIndex);
+    return Math.abs(this.itemIndex - newItemIndex);
   }
 
   calcRenderIndex(chunkOrderNumber: number): number {
