@@ -4,7 +4,8 @@ export const REMOTE_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   data: 'https://jsonplaceholder.typicode.com/comments',
   selectorId: 'REMOTE_SIMPLE_500ITEM',
   listType: 'list',
-  forcedListLength: 460,
+  // forcedListLength: 100,
+  forcedListLength: 470,
   listWrapperHeight: '590px',
   templateString: ({ item, listLength, idx }) => `<li 
         class="REMOTE_SIMPLE_500ITEM_List__listItem" 

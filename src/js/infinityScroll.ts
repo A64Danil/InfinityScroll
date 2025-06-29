@@ -296,7 +296,11 @@ class InfinityScroll {
           this.list.length,
           this.vsb.isLastPage
         );
-        console.log('isLastPage', this.vsb.isLastPage, this.vsb.currentPage);
+        console.log(
+          'Before refreshList (main scroll listener), isLastPage',
+          this.vsb.isLastPage,
+          this.vsb.currentPage
+        );
         this.refreshList();
 
         // TODO: кажется это не нужно
@@ -572,7 +576,7 @@ class InfinityScroll {
     let resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
-    // console.log('resultIndex', resultIndex);
+    console.log('resultIndex', resultIndex, this.scroll.isGoingFromBottom);
     // console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (
@@ -603,11 +607,11 @@ class InfinityScroll {
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff || this.vsb.isPageChanged) {
       clearTimeout(this.timerIdRefreshList);
-      console.log(
-        'this.vsb.isLastPage',
-        this.vsb.isLastPage,
-        this.vsb.currentPage
-      );
+      // console.log(
+      //   'this.vsb.isLastPage',
+      //   this.vsb.isLastPage,
+      //   this.vsb.currentPage
+      // );
       this.setTimerToRefreshList();
     }
 
@@ -702,14 +706,25 @@ class InfinityScroll {
         );
 
         // TODO: нужна только 1 из 2?
-        // if (!this.timerIdRefreshList) {
-        //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
-        // }
+        if (!this.timerIdRefreshList) {
+          this.fixElemsOrdering(this.scroll.direction, isEndOfList);
+        }
 
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
           if (!isBigDiff) {
-            this.checkIndexOrdering();
+            // this.checkIndexOrdering();
+            if (!this.checkIndexOrdering()) {
+              console.warn('stop scroll!');
+              this.middleWrapper.style.overflow = 'hidden';
+              this.vsb.elem.style.overflow = 'hidden';
+              console.log(mainChunkProps);
+
+              setTimeout(() => {
+                this.middleWrapper?.removeAttribute('style');
+                this.vsb.elem.removeAttribute('style');
+              }, 8000);
+            }
           }
         }
       }
@@ -870,6 +885,7 @@ class InfinityScroll {
       // TODO: проверить с выключенным fixOrdering
       // END Fetch new DATA
 
+      console.log(renderIndex);
       this.domMngr.resetAllList(
         this.chunk,
         renderIndex,
@@ -1003,7 +1019,7 @@ class InfinityScroll {
         hightestIndexByPage = nonLastPagesSize + lastPageSize;
       }
 
-      console.log({ isFetchToReset, hightestIndexByPage, isLastPage });
+      // console.log({ isFetchToReset, hightestIndexByPage, isLastPage });
       sequenceStart =
         tempStartIndex > lowestIndexByPage ? tempStartIndex : lowestIndexByPage;
 
@@ -1011,7 +1027,7 @@ class InfinityScroll {
         sequenceStart = hightestIndexByPage;
       }
 
-      console.log('sequenceStart', sequenceStart);
+      // console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
     const lastStartIndex = this.list.fullLength - this.list.existingSizeInDOM;
@@ -1100,6 +1116,8 @@ class InfinityScroll {
     }
 
     let prevIndex: number | null = null;
+
+    let isGoodOrdering = true;
     [...list.children].forEach((elem) => {
       const elemIndex = Number(elem.getAttribute('aria-posinset'));
       if (prevIndex !== null) {
@@ -1109,12 +1127,15 @@ class InfinityScroll {
               prevIndex + 1
             })`
           );
+          isGoodOrdering = false;
         }
         prevIndex = elemIndex;
       } else {
         prevIndex = elemIndex;
       }
     });
+
+    return isGoodOrdering;
   }
 
   async getListDataLazy(start = 0, end = 1) {

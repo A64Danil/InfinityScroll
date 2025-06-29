@@ -7,6 +7,7 @@ export const LOCAL_BASIC_10000ITEMS_PROPS: InfinityScrollPropTypes = {
   data: BigJson1,
   selectorId: 'LOCAL_BASIC_10000ITEMS',
   listWrapperHeight: '350px',
+  // forcedListLength: 1200,
   templateString: ({ item, listLength, idx }) => `<li>
             ${item.name} ${item.number} - ${idx}
     </li>`,

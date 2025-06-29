@@ -45,6 +45,7 @@ console.log('Entry point');
   if (instantList !== null) {
     console.log('Instant list Started');
     const myInstantScroll = new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+    window.iScroll = myInstantScroll;
   }
 
   const remoteList = document.getElementById(
