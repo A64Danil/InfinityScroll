@@ -766,8 +766,30 @@ class InfinityScroll {
         setTimeout(() => resolve(), finishTime);
       });
 
+    const scrollToNow = (offset: number) =>
+      new Promise((resolve) => {
+        scrollElem.scrollTop = offset;
+        resolve();
+      });
+
+    const scrollTo = (offset: number) =>
+      new Promise((resolve) => {
+        scrollToNow(offset);
+        setTimeout(() => resolve(), 0);
+      });
+
+    const scrollToTop = () => scrollTo(0);
+    const scrollToBottom = () => scrollTo(fillerHeight);
+
+    const scrollToTopNow = () => scrollToNow(0);
+    const scrollToBottomNow = () => scrollToNow(fillerHeight);
+
     console.clear();
     console.log('start iScroll testing!');
+
+    // scrollDown().then(scrollUp)
+
+    // scrollToBottom().
 
     // setTimeout(() => {
     //     console.log('before go bottom');
