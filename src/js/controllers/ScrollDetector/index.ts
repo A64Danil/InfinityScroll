@@ -33,10 +33,10 @@ export class ScrollDetector {
 
     this.prevScroll = scroll;
 
-    if (isLastPage && scroll >= this.lastPageMaxScroll) {
-      console.warn('last page set direction');
-      this.direction = 'down';
-    }
+    // if (isLastPage && scroll >= this.lastPageMaxScroll) {
+    //   console.warn('last page set direction');
+    //   this.direction = 'down';
+    // }
   }
 
   setGoingFromBottom(
@@ -49,8 +49,9 @@ export class ScrollDetector {
     if (this.direction === 'down' && chunkOrderNumber <= firstOrderNumber) {
       this.isGoingFromBottom = false;
     } else if (
-      this.direction === 'up' &&
-      chunkOrderNumber >= lastOrderNumber - 1
+      // this.direction === 'up' &&
+      chunkOrderNumber >=
+      lastOrderNumber - 3
     ) {
       this.isGoingFromBottom = true;
     }
@@ -58,12 +59,13 @@ export class ScrollDetector {
     if (!this.isGoingFromBottom && scroll >= maxScroll) {
       // Reach bottom of list;
       this.isGoingFromBottom = true;
-    } else if (this.isGoingFromBottom && scroll <= 0) {
-      // Reach TOP of list
-      this.isGoingFromBottom = false;
     }
+    // if (this.isGoingFromBottom && scroll <= 0) {
+    //   // Reach TOP of list
+    //   this.isGoingFromBottom = false;
+    // }
 
-    console.log('this.isGoingFromBottom', this.isGoingFromBottom);
+    // console.log('this.isGoingFromBottom', this.isGoingFromBottom);
   }
 
   // eslint-disable-next-line class-methods-use-this
