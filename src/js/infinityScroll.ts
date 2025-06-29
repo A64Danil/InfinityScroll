@@ -738,13 +738,18 @@ class InfinityScroll {
   }
 
   test() {
+    const { fillerHeight, elem: scrollElem } = this.vsb;
+
+    const repeats = 33;
+    const scrollStepSize = Math.ceil(fillerHeight / repeats);
+    const chunkHeight = this.chunk.htmlHeight;
+
     const scrollUp = () =>
       new Promise((resolve) => {
-        const repeats = 33;
         const finishTime = repeats * 10 + 30;
         for (let i = 0; i < repeats; i++) {
           setTimeout(() => {
-            this.middleWrapper.scrollTop -= 120;
+            this.vsb.elem.scrollTop -= scrollStepSize;
           }, 10 * i);
         }
         setTimeout(() => resolve(), finishTime);
@@ -752,11 +757,10 @@ class InfinityScroll {
 
     const scrollDown = () =>
       new Promise((resolve) => {
-        const repeats = 33;
         const finishTime = repeats * 10 + 30;
         for (let i = 0; i < repeats; i++) {
           setTimeout(() => {
-            this.middleWrapper.scrollTop += 120;
+            this.vsb.elem.scrollTop += scrollStepSize;
           }, 10 * i);
         }
         setTimeout(() => resolve(), finishTime);
@@ -764,13 +768,28 @@ class InfinityScroll {
 
     console.clear();
     console.log('start iScroll testing!');
-    this.middleWrapper.scrollTop = 3050;
-    // this.middleWrapper.scrollTop = 1050;
+
+    // setTimeout(() => {
+    //     console.log('before go bottom');
+    //     scrollDown()
+    //         .then(scrollUp)
+    //     // scrollUp()
+    //         .then(scrollDown)
+    //         .then(scrollUp)
+    //         .then(scrollDown)
+    //         .then(scrollUp)
+    //         .then(scrollDown)
+    //         .then(scrollUp)
+    //
+    // }, 0);
+
+    this.vsb.elem.scrollTop = 3050;
+    // this.vsb.elem.scrollTop = 1050;
 
     // this.scroll.isGoingFromBottom = true;
-    // setTimeout(() => this.middleWrapper.scrollTop = 50, 1000)
+    // setTimeout(() => this.vsb.elem.scrollTop = 50, 1000)
     // eslint-disable-next-line no-return-assign
-    setTimeout(() => (this.middleWrapper.scrollTop = 2750), 200);
+    setTimeout(() => (this.vsb.elem.scrollTop = 2750), 200);
 
     setTimeout(() => {
       // goTop();
@@ -778,25 +797,27 @@ class InfinityScroll {
     }, 500);
     //
     setTimeout(() => {
-      // this.middleWrapper.scrollTop = 2250;
+      // this.vsb.elem.scrollTop = 2250;
     }, 1000);
 
     setTimeout(() => {
-      // this.middleWrapper.scrollTop = 3250;
+      // this.vsb.elem.scrollTop = 3250;
     }, 1200);
 
     setTimeout(() => {
-      this.middleWrapper.scrollTop = 0;
+      this.vsb.elem.scrollTop = 0;
+      // this.scroll.isGoingFromBottom = false;
     }, 1500);
 
     setTimeout(() => {
-      this.middleWrapper.scrollTop = 450;
+      this.vsb.elem.scrollTop = chunkHeight * 1.5;
     }, 1700);
 
     // setTimeout(() => {
     //   console.log('before go bottom');
-    //   scrollDown()
-    //       .then(scrollUp)
+    //   // scrollDown()
+    //   //     .then(scrollUp)
+    // scrollUp()
     //       .then(scrollDown)
     //       .then(scrollUp)
     //       .then(scrollDown)
