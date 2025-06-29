@@ -316,6 +316,7 @@ class InfinityScroll {
       }, 0);
     });
     //
+    this.test();
   }
 
   setDefaultStyles() {
@@ -713,9 +714,93 @@ class InfinityScroll {
 
     // TODO: не нужно?
 
-    if (!this.timerIdRefreshList && isEndOfList) {
+    if (!this.timerIdRefreshList) {
       this.fixElemsOrdering(this.scroll.direction, isEndOfList);
     }
+  }
+
+  test() {
+    const scrollUp = () =>
+      new Promise((resolve) => {
+        const repeats = 33;
+        const finishTime = repeats * 10 + 30;
+        for (let i = 0; i < repeats; i++) {
+          setTimeout(() => {
+            this.middleWrapper.scrollTop -= 120;
+          }, 10 * i);
+        }
+        setTimeout(() => resolve(), finishTime);
+      });
+
+    const scrollDown = () =>
+      new Promise((resolve) => {
+        const repeats = 33;
+        const finishTime = repeats * 10 + 30;
+        for (let i = 0; i < repeats; i++) {
+          setTimeout(() => {
+            this.middleWrapper.scrollTop += 120;
+          }, 10 * i);
+        }
+        setTimeout(() => resolve(), finishTime);
+      });
+
+    console.clear();
+    console.log('start iScroll testing!');
+    this.middleWrapper.scrollTop = 3050;
+    // this.middleWrapper.scrollTop = 1050;
+
+    // this.scroll.isGoingFromBottom = true;
+    // setTimeout(() => this.middleWrapper.scrollTop = 50, 1000)
+    // eslint-disable-next-line no-return-assign
+    setTimeout(() => (this.middleWrapper.scrollTop = 2750), 200);
+
+    setTimeout(() => {
+      // goTop();
+      // scrollUp();
+    }, 500);
+    //
+    setTimeout(() => {
+      // this.middleWrapper.scrollTop = 2250;
+    }, 1000);
+
+    setTimeout(() => {
+      // this.middleWrapper.scrollTop = 3250;
+    }, 1200);
+
+    setTimeout(() => {
+      this.middleWrapper.scrollTop = 0;
+    }, 1500);
+
+    setTimeout(() => {
+      this.middleWrapper.scrollTop = 450;
+    }, 1700);
+
+    // setTimeout(() => {
+    //   console.log('before go bottom');
+    //   scrollDown()
+    //       .then(scrollUp)
+    //       .then(scrollDown)
+    //       .then(scrollUp)
+    //       .then(scrollDown)
+    //       .then(scrollUp)
+    //       .then(scrollDown)
+    //       .then(scrollUp)
+    //   // goBottom();
+    //   // .then(goTop)
+    //   // .then(goBottom)
+    //   // .then(goTop)
+    //   // .then(goBottom)
+    //   // .then(goTop)
+    //   // .then(goBottom)
+    //   // .then(goTop)
+    //
+    //   // goTop()
+    //   //   .then(goBottom)
+    //   //   .then(goTop)
+    //   //   .then(goBottom)
+    //   //   .then(goTop)
+    //   //   .then(goBottom);
+    // }, 3000);
   }
 
   checkBigDiff(scrollDiff: number): boolean {
