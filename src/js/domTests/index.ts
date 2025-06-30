@@ -220,9 +220,43 @@ export function iScrollTester() {
     }
   );
 
+  const asyncChaoticScrollDomTest = createAsyncTestFunction(
+    'asyncChaoticScrollDomTest',
+    async () => {
+      await scrollToNow(900);
+      await scrollToBottomNow();
+      await scrollTo(0, 300);
+      scrollUp();
+      await scrollTo(chunkHeight * 1.5, 300);
+      await scrollTo(fillerHeight - chunkHeight * 1.5, 300);
+      await scrollDown().then(async () => {
+        scrollTo(chunkHeight * 3, 400);
+        scrollTo(chunkHeight * 5, 800);
+        scrollTo(chunkHeight, 1200);
+        scrollToNow(chunkHeight / 2);
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+      });
+      await scrollDown();
+      scrollToNow(fillerHeight / 2);
+      scrollTo(fillerHeight / 2, 1200);
+      await scrollDown();
+      scrollToNow(fillerHeight / 2);
+      await scrollUp();
+    }
+  );
+
   (async () => {
     // await fastUpDownScrollDomTest(1, false);
     await chaoticScrollDomTest(1, false);
+    await asyncChaoticScrollDomTest(1, false);
     // await smoothUpDownScrollDomTest(1, false);
     // await testLocalSimple100item(1, false);
     // console.log('after func');
