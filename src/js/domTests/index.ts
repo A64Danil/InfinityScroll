@@ -253,14 +253,16 @@ export function iScrollTester() {
     }
   );
 
+  const needToReset = false;
+
   (async () => {
-    // await fastUpDownScrollDomTest(1, false);
-    await chaoticScrollDomTest(1, false);
-    await asyncChaoticScrollDomTest(1, false);
-    // await smoothUpDownScrollDomTest(1, false);
-    // await testLocalSimple100item(1, false);
-    // console.log('after func');
-    // await testRemoteSimple500item(1);
+    await fastUpDownScrollDomTest(1, needToReset);
+    await chaoticScrollDomTest(1, needToReset);
+    await asyncChaoticScrollDomTest(1, needToReset);
+    await smoothUpDownScrollDomTest(1, needToReset);
+    await testLocalSimple100item(1, needToReset);
+    console.log('after func');
+    await testRemoteSimple500item(1);
 
     showErrors.call(this);
   })();
