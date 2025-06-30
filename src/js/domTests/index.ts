@@ -1,3 +1,6 @@
+const logStyle =
+  'background-color: lightgreen; color: white; font-weight: bold;';
+
 export function iScrollTester() {
   console.log('iScrollTester log msg');
 
@@ -6,6 +9,11 @@ export function iScrollTester() {
   const repeats = 33;
   const scrollStepSize = Math.ceil(fillerHeight / repeats);
   const chunkHeight = this.chunk.htmlHeight;
+
+  const wait = (time: number) =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(), time);
+    });
 
   const scrollUp = () =>
     new Promise((resolve) => {
@@ -53,16 +61,32 @@ export function iScrollTester() {
   console.log('start iScroll testing!');
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  function test__demoList_local_simple_100item() {
-    scrollToNow(3050);
-    scrollTo(2750, 200)
-      .then(() => scrollToTop(50))
-      .then(() => scrollTo(chunkHeight * 1.5, 500));
+  async function test__demoList_local_simple_100item() {
+    console.log('%c --- start demoList_local_simple_100item --- ', logStyle);
+    await scrollTo(3050, 1000);
+    await scrollTo(2750, 200);
+    await scrollToTop(50);
+    await scrollTo(chunkHeight * 1.5, 500);
+    // console.log('before return')
+    return Promise.resolve();
   }
 
-  test__demoList_local_simple_100item();
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  async function test__demoList_remote_simple_500item() {
+    console.log('%c --- start demoList_remote_simple_500item --- ', logStyle);
+    await scrollDown();
+    await scrollUp();
+  }
 
-  // scrollDown().then(scrollUp)
+  (async function () {
+    await wait(3000);
+    await test__demoList_local_simple_100item();
+    await wait(3000);
+    console.log('before second test');
+    await test__demoList_remote_simple_500item();
+  })();
+
+  //
 
   // scrollToBottom().
 
