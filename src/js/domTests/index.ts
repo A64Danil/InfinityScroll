@@ -13,6 +13,11 @@ const yellowLogStyle =
   'background-color: yellow; color: #333; font-weight: bold;';
 
 export function iScrollTester() {
+  const globalErrorCounter = 0;
+
+  this.tests.name = '';
+  this.tests.errors.clear();
+
   console.log('iScrollTester log msg');
 
   const { fillerHeight, elem: scrollElem } = this.vsb;
@@ -91,22 +96,52 @@ export function iScrollTester() {
     return Promise.resolve();
   }
 
-  function createAsyncTestFunction(name, fn) {
-    async function newFn(delay = 3) {
+  function showErrors() {
+    console.log(this.tests.errors);
+    console.log(this.tests.errors.size);
+
+    if (this.tests.errors.size !== 0) {
+      console.log(
+        `%c Обнаружено ошибок: ${this.tests.errors.size}`,
+        yellowLogStyle
+      );
+
+      this.tests.errors.forEach((value, key) => {
+        const allErrors = value;
+        const errorName = key;
+        console.log(`%c Тест: ${errorName}`, redLogStyle);
+        allErrors.forEach((errorTxt, i) => {
+          console.log(i + 1, errorTxt);
+        });
+      });
+    } else {
+      console.log('%c Ошибки не обнаружены! Поздравляю!', greenLogStyle);
+    }
+  }
+
+  const createAsyncTestFunction = function fnWrapper(name, fn) {
+    console.log(this);
+
+    const newFn = async (delay = 3, needToResetState = true) => {
+      this.tests.name = name;
       await testStartSignal(delay);
       console.log(`%c --- start  fn: ${name}  --- `, greenLogStyle);
       await fn();
       console.log(`%c --- end  fn: ${name}  --- `, greenLogStyle);
       await wait(200);
-      await resetState();
+      if (needToResetState) {
+        await resetState();
+      }
 
+      this.tests.name = '';
       console.log(`%c --- END TEST: ${name}  --- `, darkGreenLogStyle);
-    }
+    };
+
     return newFn;
-  }
+  }.bind(this);
 
   const testLocalSimple100item = createAsyncTestFunction(
-    'test__demoList_local_simple_100item',
+    'LocalSimple100item',
     async () => {
       await scrollTo(3050, 1000);
       await scrollTo(2750, 200);
@@ -116,7 +151,7 @@ export function iScrollTester() {
   );
 
   const testRemoteSimple500item = createAsyncTestFunction(
-    'demoList_remote_simple_500item',
+    'RemoteSimple500item',
     async () => {
       await scrollDown();
       await scrollUp();
@@ -124,9 +159,11 @@ export function iScrollTester() {
   );
 
   (async () => {
-    await testLocalSimple100item();
+    await testLocalSimple100item(2, false);
     console.log('after func');
     await testRemoteSimple500item();
+
+    showErrors.call(this);
   })();
 
   //
