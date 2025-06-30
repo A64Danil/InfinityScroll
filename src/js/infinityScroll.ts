@@ -772,14 +772,16 @@ class InfinityScroll {
         resolve();
       });
 
-    const scrollTo = (offset: number) =>
+    const scrollTo = (offset: number, delay = 0) =>
       new Promise((resolve) => {
-        scrollToNow(offset);
-        setTimeout(() => resolve(), 0);
+        setTimeout(() => {
+          scrollToNow(offset);
+          resolve();
+        }, delay);
       });
 
-    const scrollToTop = () => scrollTo(0);
-    const scrollToBottom = () => scrollTo(fillerHeight);
+    const scrollToTop = (delay = 0) => scrollTo(0, delay);
+    const scrollToBottom = (delay = 0) => scrollTo(fillerHeight, delay);
 
     const scrollToTopNow = () => scrollToNow(0);
     const scrollToBottomNow = () => scrollToNow(fillerHeight);
@@ -805,13 +807,17 @@ class InfinityScroll {
     //
     // }, 0);
 
-    this.vsb.elem.scrollTop = 3050;
-    // this.vsb.elem.scrollTop = 1050;
+    // this.vsb.elem.scrollTop = 3050;
 
-    // this.scroll.isGoingFromBottom = true;
-    // setTimeout(() => this.vsb.elem.scrollTop = 50, 1000)
-    // eslint-disable-next-line no-return-assign
-    setTimeout(() => (this.vsb.elem.scrollTop = 2750), 200);
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    function test__demoList_local_simple_100item() {
+      scrollToNow(3050);
+      scrollTo(2750, 200)
+        .then(() => scrollToTop(50))
+        .then(() => scrollTo(chunkHeight * 1.5, 500));
+    }
+
+    test__demoList_local_simple_100item();
 
     setTimeout(() => {
       // goTop();
@@ -825,16 +831,6 @@ class InfinityScroll {
     setTimeout(() => {
       // this.vsb.elem.scrollTop = 3250;
     }, 1200);
-
-    setTimeout(() => {
-      this.vsb.elem.scrollTop = 0;
-      // this.scroll.isGoingFromBottom = false;
-    }, 1500);
-
-    setTimeout(() => {
-      this.vsb.elem.scrollTop = chunkHeight * 1.5;
-    }, 1700);
-
     // setTimeout(() => {
     //   console.log('before go bottom');
     //   // scrollDown()
