@@ -1,5 +1,16 @@
-const logStyle =
+const greenLogStyle =
   'background-color: lightgreen; color: white; font-weight: bold;';
+
+const darkGreenLogStyle =
+  'background-color: darkgreen; color: white; font-weight: bold;';
+
+const grayLogStyle = 'background-color: gray; color: white; font-weight: bold;';
+
+const redLogStyle =
+  'background-color: tomato; color: white; font-weight: bold;';
+
+const yellowLogStyle =
+  'background-color: yellow; color: #333; font-weight: bold;';
 
 export function iScrollTester() {
   console.log('iScrollTester log msg');
@@ -10,7 +21,7 @@ export function iScrollTester() {
   const scrollStepSize = Math.ceil(fillerHeight / repeats);
   const chunkHeight = this.chunk.htmlHeight;
 
-  const wait = (time: number) =>
+  const wait = (time = 0) =>
     new Promise((resolve) => {
       setTimeout(() => resolve(), time);
     });
@@ -40,13 +51,13 @@ export function iScrollTester() {
   const scrollToNow = (offset: number) =>
     new Promise((resolve) => {
       scrollElem.scrollTop = offset;
-      resolve();
+      setTimeout(resolve, 0);
     });
 
   const scrollTo = (offset: number, delay = 0) =>
-    new Promise((resolve) => {
-      setTimeout(() => {
-        scrollToNow(offset);
+    new Promise<void>((resolve) => {
+      setTimeout(async () => {
+        await scrollToNow(offset);
         resolve();
       }, delay);
     });
@@ -63,39 +74,59 @@ export function iScrollTester() {
   async function testStartSignal(counterValue = 3) {
     for (let i = counterValue; i > 0; i--) {
       setTimeout(() => {
-        console.log(`%c ${i}! `, logStyle);
+        console.log(`%c ${i}! `, greenLogStyle);
       }, 1000 * (counterValue - i));
     }
 
     return new Promise((resolve) => {
       setTimeout(resolve, counterValue * 1000);
     });
-    // console.log('%c 3! ', logStyle);
-    // await wait(1000);
   }
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  async function test__demoList_local_simple_100item() {
-    console.log('%c --- start demoList_local_simple_100item --- ', logStyle);
-    await scrollTo(3050, 1000);
-    await scrollTo(2750, 200);
-    await scrollToTop(50);
-    await scrollTo(chunkHeight * 1.5, 500);
-    // console.log('before return')
+
+  async function resetState() {
+    console.log('%c || Reset iScoll State ||', grayLogStyle);
+    await scrollToTopNow();
+    await scrollDown();
+    await scrollUp();
     return Promise.resolve();
   }
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  async function test__demoList_remote_simple_500item() {
-    console.log('%c --- start demoList_remote_simple_500item --- ', logStyle);
-    await scrollDown();
-    await scrollUp();
+  function createAsyncTestFunction(name, fn) {
+    async function newFn(delay = 3) {
+      await testStartSignal(delay);
+      console.log(`%c --- start  fn: ${name}  --- `, greenLogStyle);
+      await fn();
+      console.log(`%c --- end  fn: ${name}  --- `, greenLogStyle);
+      await wait(200);
+      await resetState();
+
+      console.log(`%c --- END TEST: ${name}  --- `, darkGreenLogStyle);
+    }
+    return newFn;
   }
 
-  (async function () {
-    await testStartSignal();
-    // await test__demoList_local_simple_100item();
-    // await testStartSignal();
-    await test__demoList_remote_simple_500item();
+  const testLocalSimple100item = createAsyncTestFunction(
+    'test__demoList_local_simple_100item',
+    async () => {
+      await scrollTo(3050, 1000);
+      await scrollTo(2750, 200);
+      await scrollToTop(50);
+      await scrollTo(chunkHeight * 1.5, 500);
+    }
+  );
+
+  const testRemoteSimple500item = createAsyncTestFunction(
+    'demoList_remote_simple_500item',
+    async () => {
+      await scrollDown();
+      await scrollUp();
+    }
+  );
+
+  (async () => {
+    await testLocalSimple100item();
+    console.log('after func');
+    await testRemoteSimple500item();
   })();
 
   //
