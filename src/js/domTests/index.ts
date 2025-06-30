@@ -13,8 +13,6 @@ const yellowLogStyle =
   'background-color: yellow; color: #333; font-weight: bold;';
 
 export function iScrollTester() {
-  const globalErrorCounter = 0;
-
   this.tests.name = '';
   this.tests.errors.clear();
 
@@ -97,13 +95,20 @@ export function iScrollTester() {
   }
 
   function showErrors() {
-    console.log('%c Тест завершен!', grayLogStyle);
+    console.log('%c Тест завершен! ', grayLogStyle);
+
+    const errorCounter = Array.from(this.tests.errors).reduce((acc, item) => {
+      const errorsSize = item[1].length;
+      return acc + errorsSize;
+    }, 0);
 
     if (this.tests.errors.size !== 0) {
       console.log(
-        `%c Обнаружено ошибок: ${this.tests.errors.size}`,
+        `%c Тестов не пройдено: ${this.tests.errors.size} <----`,
         yellowLogStyle
       );
+
+      console.log(`%c Ошибок обнаружено: ${errorCounter} <----`, redLogStyle);
 
       this.tests.errors.forEach((value, key) => {
         const allErrors = value;
@@ -114,7 +119,10 @@ export function iScrollTester() {
         });
       });
     } else {
-      console.log('%c Ошибки не обнаружены! Поздравляю!', greenLogStyle);
+      console.log(
+        '%c ☆☆☆ Все тесты завершены без ошибок! Поздравляю! ☆☆☆',
+        greenLogStyle
+      );
     }
   }
 
@@ -157,8 +165,8 @@ export function iScrollTester() {
     }
   );
 
-  const fullDomSimpleScrollTest = createAsyncTestFunction(
-    'fullDomSimpleScrollTest',
+  const smoothUpDownScrollDomTest = createAsyncTestFunction(
+    'smoothUpDownScrollDomTest',
     async () => {
       await scrollDown();
       await scrollUp();
@@ -173,34 +181,55 @@ export function iScrollTester() {
     }
   );
 
+  const fastUpDownScrollDomTest = createAsyncTestFunction(
+    'chaoticScrollDomTest',
+    async () => {
+      ///
+      await scrollToBottom();
+      await scrollToTop(150);
+      await scrollToBottom(150);
+      await scrollToTop(150);
+      await scrollToBottom(150);
+      await scrollToTop(150);
+      await scrollToBottom(150);
+      await scrollToTop(150);
+      await scrollToBottom(150);
+      await scrollToTop(150);
+      await scrollToBottom(150);
+      await scrollToTop(150);
+    }
+  );
+
+  const chaoticScrollDomTest = createAsyncTestFunction(
+    'chaoticScrollDomTest',
+    async () => {
+      ///
+      await scrollToNow(900);
+      await scrollToBottomNow();
+      await scrollTo(0, 300);
+      await scrollTo(chunkHeight * 1.5, 300);
+      await scrollTo(fillerHeight - chunkHeight * 1.5, 300);
+      await scrollTo(chunkHeight * 3, 300);
+      await scrollToNow(chunkHeight / 2);
+      await scrollDown();
+      await scrollToTopNow();
+      await scrollToNow(fillerHeight / 2);
+      await scrollDown();
+      await scrollToNow(fillerHeight / 2);
+      await scrollUp();
+    }
+  );
+
   (async () => {
-    await fullDomSimpleScrollTest(1, false);
-    await testLocalSimple100item(2, false);
-    console.log('after func');
-    await testRemoteSimple500item();
+    // await fastUpDownScrollDomTest(1, false);
+    await chaoticScrollDomTest(1, false);
+    // await smoothUpDownScrollDomTest(1, false);
+    // await testLocalSimple100item(1, false);
+    // console.log('after func');
+    // await testRemoteSimple500item(1);
 
     showErrors.call(this);
   })();
-
-  //
-
-  // scrollToBottom().
-
-  // setTimeout(() => {
-  //     console.log('before go bottom');
-  //     scrollDown()
-  //         .then(scrollUp)
-  //     // scrollUp()
-  //         .then(scrollDown)
-  //         .then(scrollUp)
-  //         .then(scrollDown)
-  //         .then(scrollUp)
-  //         .then(scrollDown)
-  //         .then(scrollUp)
-  //
-  // }, 0);
-
-  // this.vsb.elem.scrollTop = 3050;
 
   setTimeout(() => {
     // goTop();
@@ -214,31 +243,4 @@ export function iScrollTester() {
   setTimeout(() => {
     // this.vsb.elem.scrollTop = 3250;
   }, 1200);
-  // setTimeout(() => {
-  //   console.log('before go bottom');
-  //   // scrollDown()
-  //   //     .then(scrollUp)
-  // scrollUp()
-  //       .then(scrollDown)
-  //       .then(scrollUp)
-  //       .then(scrollDown)
-  //       .then(scrollUp)
-  //       .then(scrollDown)
-  //       .then(scrollUp)
-  //   // goBottom();
-  //   // .then(goTop)
-  //   // .then(goBottom)
-  //   // .then(goTop)
-  //   // .then(goBottom)
-  //   // .then(goTop)
-  //   // .then(goBottom)
-  //   // .then(goTop)
-  //
-  //   // goTop()
-  //   //   .then(goBottom)
-  //   //   .then(goTop)
-  //   //   .then(goBottom)
-  //   //   .then(goTop)
-  //   //   .then(goBottom);
-  // }, 3000);
 }
