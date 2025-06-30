@@ -157,7 +157,24 @@ export function iScrollTester() {
     }
   );
 
+  const fullDomSimpleScrollTest = createAsyncTestFunction(
+    'fullDomSimpleScrollTest',
+    async () => {
+      await scrollDown();
+      await scrollUp();
+      await scrollDown();
+      await scrollUp();
+      await scrollDown();
+      await scrollUp();
+      await scrollDown();
+      await scrollUp();
+      await scrollDown();
+      await scrollUp();
+    }
+  );
+
   (async () => {
+    await fullDomSimpleScrollTest(1, false);
     await testLocalSimple100item(2, false);
     console.log('after func');
     await testRemoteSimple500item();
