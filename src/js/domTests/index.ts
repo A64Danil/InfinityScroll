@@ -60,6 +60,19 @@ export function iScrollTester() {
   console.clear();
   console.log('start iScroll testing!');
 
+  async function testStartSignal(counterValue = 3) {
+    for (let i = counterValue; i > 0; i--) {
+      setTimeout(() => {
+        console.log(`%c ${i}! `, logStyle);
+      }, 1000 * (counterValue - i));
+    }
+
+    return new Promise((resolve) => {
+      setTimeout(resolve, counterValue * 1000);
+    });
+    // console.log('%c 3! ', logStyle);
+    // await wait(1000);
+  }
   // eslint-disable-next-line @typescript-eslint/naming-convention
   async function test__demoList_local_simple_100item() {
     console.log('%c --- start demoList_local_simple_100item --- ', logStyle);
@@ -79,10 +92,9 @@ export function iScrollTester() {
   }
 
   (async function () {
-    await wait(3000);
-    await test__demoList_local_simple_100item();
-    await wait(3000);
-    console.log('before second test');
+    await testStartSignal();
+    // await test__demoList_local_simple_100item();
+    // await testStartSignal();
     await test__demoList_remote_simple_500item();
   })();
 
