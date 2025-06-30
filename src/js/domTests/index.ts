@@ -97,8 +97,7 @@ export function iScrollTester() {
   }
 
   function showErrors() {
-    console.log(this.tests.errors);
-    console.log(this.tests.errors.size);
+    console.log('%c Тест завершен!', grayLogStyle);
 
     if (this.tests.errors.size !== 0) {
       console.log(

@@ -131,6 +131,11 @@ class InfinityScroll {
 
   private readonly test: () => void;
 
+  private tests: {
+    name: string;
+    errors: Map<string, string[]>;
+  };
+
   constructor(props: InfinityScrollPropTypes) {
     this.selectorId = props.selectorId;
 
@@ -217,6 +222,11 @@ class InfinityScroll {
     console.log(props.data);
 
     this.test = iScrollTester;
+
+    this.tests = {
+      name: '',
+      errors: new Map(),
+    };
 
     if (this.dataLoadPlace === 'remote') {
       this.dataUrl = props.data as DataURLType;
@@ -1031,11 +1041,15 @@ class InfinityScroll {
       const elemIndex = Number(elem.getAttribute('aria-posinset'));
       if (prevIndex !== null) {
         if (prevIndex + 1 !== elemIndex) {
-          console.error(
-            `Индексы поломались на элементе ${elemIndex} (ожидали ${
-              prevIndex + 1
-            })`
-          );
+          const errorText = `Индексы поломались на элементе ${elemIndex} (ожидали ${
+            prevIndex + 1
+          })`;
+          console.error(`${this.tests.name} -- ${errorText})`);
+
+          if (!Array.isArray(this.tests.errors.get(this.tests.name))) {
+            this.tests.errors.set(this.tests.name, []);
+          }
+          this.tests.errors.get(this.tests.name).push(errorText);
           isGoodOrdering = false;
         }
         prevIndex = elemIndex;
