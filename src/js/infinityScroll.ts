@@ -582,7 +582,7 @@ class InfinityScroll {
     let resultIndex =
       newRenderIndex +
       (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
-    console.log('resultIndex', resultIndex, this.scroll.isGoingFromBottom);
+    // console.log('resultIndex', resultIndex, this.scroll.isGoingFromBottom);
     // console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
     if (
@@ -643,11 +643,10 @@ class InfinityScroll {
         this.chunk.startRenderIndex,
         this.vsb.currentPage !== 1 && this.vsb.isLastPage
       );
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      // !isAllowRender &&
-      console.log(
-        ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
-      );
+
+      // console.log(
+      //   ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
+      // );
       if (isAllowRender && this.domMngr) {
         let tempDirection: IScrollDirection;
         // TODO: false убрать или всё убрать?
@@ -692,17 +691,6 @@ class InfinityScroll {
         }
         // END Fetch new DATA
 
-        // TODO: не нужно?
-        // const mainListProps = {
-        //   existingSizeInDOM: this.list.existingSizeInDOM,
-        //   halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
-        //   tailingElementsAmount: this.list.tailingElementsAmount,
-        //   length: this.list.length,
-        //   data: this.list.data,
-        //   startIndexOfLastPart: this.list.startIndexOfLastPart,
-        //   itemHeight: this.list.itemHeight,
-        // };
-
         this.domMngr.modifyCurrentDOM(
           mainChunkProps,
           this.list,
@@ -712,9 +700,9 @@ class InfinityScroll {
         );
 
         // TODO: нужна только 1 из 2?
-        if (!this.timerIdRefreshList) {
-          this.fixElemsOrdering(this.scroll.direction, isEndOfList);
-        }
+        // if (!this.timerIdRefreshList) {
+        //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
+        // }
 
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
@@ -737,10 +725,9 @@ class InfinityScroll {
     }
 
     // TODO: не нужно?
-
-    if (!this.timerIdRefreshList) {
-      this.fixElemsOrdering(this.scroll.direction, isEndOfList);
-    }
+    // if (!this.timerIdRefreshList) {
+    //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
+    // }
   }
 
   checkBigDiff(scrollDiff: number): boolean {
