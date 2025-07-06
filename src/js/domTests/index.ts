@@ -163,6 +163,53 @@ export function iScrollTester() {
     }
   );
 
+  const testRemoteLazyDummyjsonAPI = createAsyncTestFunction(
+    'testRemoteLazyDummyjsonAPI',
+    async () => {
+      await scrollToNow(900);
+      await scrollToBottomNow();
+      await scrollTo(0, 300);
+      await scrollTo(chunkHeight * 1.5, 300);
+      await scrollTo(fillerHeight - chunkHeight * 1.5, 300);
+      await scrollTo(chunkHeight * 3, 300);
+      await scrollToNow(chunkHeight / 2);
+      await scrollDown();
+      await scrollToTopNow();
+      await scrollToNow(fillerHeight / 2);
+      await scrollDown();
+      await scrollToNow(fillerHeight / 2);
+      await scrollUp();
+      console.warn('-------------------');
+      await scrollToNow(900);
+      await scrollToBottomNow();
+      await scrollTo(0, 300);
+      scrollUp();
+      await scrollTo(chunkHeight * 1.5, 300);
+      await scrollTo(fillerHeight - chunkHeight * 1.5, 300);
+      await scrollDown().then(async () => {
+        scrollTo(chunkHeight * 3, 400);
+        scrollTo(chunkHeight * 5, 800);
+        scrollTo(chunkHeight, 1200);
+        scrollToNow(chunkHeight / 2);
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+        await scrollDown();
+        await scrollUp();
+      });
+      await scrollDown();
+      scrollToNow(fillerHeight / 2);
+      scrollTo(fillerHeight / 2, 1200);
+      await scrollDown();
+      scrollToNow(fillerHeight / 2);
+      await scrollUp();
+    }
+  );
+
   const smoothUpDownScrollDomTest = createAsyncTestFunction(
     'smoothUpDownScrollDomTest',
     async () => {
@@ -252,13 +299,15 @@ export function iScrollTester() {
   );
 
   const needToReset = false;
+  // const needToReset = true;
 
   (async () => {
     // await fastUpDownScrollDomTest(1, needToReset);
     // await chaoticScrollDomTest(1, needToReset);
-    await asyncChaoticScrollDomTest(1, needToReset);
+    // await asyncChaoticScrollDomTest(1, needToReset);
     // await smoothUpDownScrollDomTest(1, needToReset);
     // await testLocalSimple100item(1, needToReset);
+    await testRemoteLazyDummyjsonAPI(1, needToReset);
     console.log('after func');
     // await testRemoteSimple500item(1);
 
