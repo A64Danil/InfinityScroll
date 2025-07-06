@@ -46,9 +46,7 @@ export class ScrollDetector {
     scroll: number,
     maxScroll: number
   ): void {
-    console.log(this.direction, chunkOrderNumber, firstOrderNumber);
-    // TODO: this with zero have promles
-    // if (this.direction === 'down' && chunkOrderNumber <= 0) {
+    // console.log(this.direction, chunkOrderNumber, firstOrderNumber);
     if (this.direction === 'down' && chunkOrderNumber <= 1) {
       this.isGoingFromBottom = false;
     } else if (
