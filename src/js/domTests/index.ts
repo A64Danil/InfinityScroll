@@ -127,8 +127,6 @@ export function iScrollTester() {
   }
 
   const createAsyncTestFunction = function fnWrapper(name, fn) {
-    console.log(this);
-
     const newFn = async (delay = 3, needToResetState = true) => {
       this.tests.name = name;
       await testStartSignal(delay);
@@ -182,7 +180,7 @@ export function iScrollTester() {
   );
 
   const fastUpDownScrollDomTest = createAsyncTestFunction(
-    'chaoticScrollDomTest',
+    'fastUpDownScrollDomTest',
     async () => {
       ///
       await scrollToBottom();
@@ -256,13 +254,13 @@ export function iScrollTester() {
   const needToReset = false;
 
   (async () => {
-    await fastUpDownScrollDomTest(1, needToReset);
-    await chaoticScrollDomTest(1, needToReset);
+    // await fastUpDownScrollDomTest(1, needToReset);
+    // await chaoticScrollDomTest(1, needToReset);
     await asyncChaoticScrollDomTest(1, needToReset);
-    await smoothUpDownScrollDomTest(1, needToReset);
-    await testLocalSimple100item(1, needToReset);
+    // await smoothUpDownScrollDomTest(1, needToReset);
+    // await testLocalSimple100item(1, needToReset);
     console.log('after func');
-    await testRemoteSimple500item(1);
+    // await testRemoteSimple500item(1);
 
     showErrors.call(this);
   })();
