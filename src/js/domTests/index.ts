@@ -302,14 +302,14 @@ export function iScrollTester() {
   // const needToReset = true;
 
   (async () => {
-    // await fastUpDownScrollDomTest(1, needToReset);
-    // await chaoticScrollDomTest(1, needToReset);
-    // await asyncChaoticScrollDomTest(1, needToReset);
-    // await smoothUpDownScrollDomTest(1, needToReset);
-    // await testLocalSimple100item(1, needToReset);
+    await fastUpDownScrollDomTest(1, needToReset);
+    await chaoticScrollDomTest(1, needToReset);
+    await asyncChaoticScrollDomTest(1, needToReset);
+    await smoothUpDownScrollDomTest(1, needToReset);
+    await testLocalSimple100item(1, needToReset);
     await testRemoteLazyDummyjsonAPI(1, needToReset);
     console.log('after func');
-    // await testRemoteSimple500item(1);
+    await testRemoteSimple500item(1);
 
     showErrors.call(this);
   })();

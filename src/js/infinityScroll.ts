@@ -336,7 +336,7 @@ class InfinityScroll {
       }, 0);
     });
     //
-    this.test();
+    // this.test();
   }
 
   setDefaultStyles() {
