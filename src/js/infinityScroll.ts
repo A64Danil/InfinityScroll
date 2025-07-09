@@ -975,6 +975,7 @@ class InfinityScroll {
         startFetchIndex,
         endFetchIndex
       ).then((data): void => {
+        if (data.length === 0) return;
         const extractedData = this.extractResponse(data);
         this.addNewItemsToDataList(sequenceStart, extractedData);
         this.updateSkeletonItems(sequenceStart, extractedData);
