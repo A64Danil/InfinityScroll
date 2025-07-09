@@ -75,6 +75,7 @@ console.log('Entry point');
   if (lazyDummyJsonList !== null) {
     console.log('Lazy DummyJson list Started');
     const myLazyScroll = new InfinityScroll(REMOTE_LAZY_DUMMYJSON_API_PROPS);
+    window.iScroll = myLazyScroll;
   }
 
   const lazyAPIList = document.getElementById(REMOTE_LAZY_API_PROPS.selectorId);
