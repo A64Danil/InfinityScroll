@@ -16,7 +16,7 @@ export function elemFromString(itemLikeStr: string) {
 export function setPlaceholder(item: HTMLElement): void {
   item.classList.add('loading');
   // eslint-disable-next-line no-param-reassign
-  item.innerHTML = 'Loading<span class="dots">...</span>';
+  // item.innerHTML = 'Loading<span class="dots">...</span>';
 }
 
 export function setTdPlaceholder(item: HTMLElement): void {

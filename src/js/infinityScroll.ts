@@ -453,6 +453,14 @@ class InfinityScroll {
 
     this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
+    const styleELemLoading = document.createElement('style');
+    styleELemLoading.appendChild(
+      document.createTextNode(`.${this.selectorId}_List li.loading { 
+      min-height: ${this.list.itemHeight}px;
+    }`)
+    );
+    styleELem.after(styleELemLoading);
+
     this.chunk.amount = Math.ceil(
       this.list.wrapperHeight / this.list.itemHeight
     );
