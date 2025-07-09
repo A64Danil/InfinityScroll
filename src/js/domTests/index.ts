@@ -310,6 +310,10 @@ export function iScrollTester() {
     await testRemoteLazyDummyjsonAPI(1, needToReset);
     console.log('after func');
     await testRemoteSimple500item(1);
+    // await testRemoteSimple500item(1);
+    // await testRemoteSimple500item(1);
+    // await testRemoteSimple500item(1);
+    // await testRemoteSimple500item(1);
 
     showErrors.call(this);
   })();
