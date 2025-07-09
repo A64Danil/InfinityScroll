@@ -454,11 +454,29 @@ class InfinityScroll {
     this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
     const styleELemLoading = document.createElement('style');
-    styleELemLoading.appendChild(
-      document.createTextNode(`.${this.selectorId}_List li.loading { 
+
+    const cssTextLoading = `.${this.selectorId}_List li.loading { 
       min-height: ${this.list.itemHeight}px;
-    }`)
-    );
+    }
+    
+.${this.selectorId}_List li.loading img { 
+      width: 100%;
+      aspect-ratio: 1;
+      background: #ccc;
+      animation: opacityLoader 3s ease-in-out infinite alternate;
+      border-radius: 10px;
+    }
+    
+@keyframes opacityLoader {
+    from {
+        opacity: 1;
+    }
+    to   {
+        opacity: 0.1;
+    }
+}
+    `;
+    styleELemLoading.appendChild(document.createTextNode(cssTextLoading));
     styleELem.after(styleELemLoading);
 
     this.chunk.amount = Math.ceil(
