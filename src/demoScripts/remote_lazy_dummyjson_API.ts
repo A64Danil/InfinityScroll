@@ -9,14 +9,7 @@ export const REMOTE_LAZY_DUMMYJSON_API_PROPS: InfinityScrollPropTypes = {
   // forcedListLength: 15, // TODO: temportary
   // forcedListLength: 194, // TODO: temportary
   templateString: ({ item, templateCb }) => {
-    const {
-      thumbnail = '',
-      title = '',
-      brand = '',
-      website = '',
-      industry = '',
-      reviews = [],
-    } = item;
+    const { thumbnail, title, brand, website, industry, reviews } = item;
 
     return `<li 
         class="REMOTE_LAZY_DUMMYJSON_API__listItem" 
@@ -41,7 +34,7 @@ export const REMOTE_LAZY_DUMMYJSON_API_PROPS: InfinityScrollPropTypes = {
     </li>`;
   },
   templateCb: {
-    reviewShower(reviewsAray: []) {
+    reviewShower(reviewsAray = [{}]) {
       return reviewsAray
         ?.map(
           (el: Record<string, unknown>, i) => `<div class="review">
