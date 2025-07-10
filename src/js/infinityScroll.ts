@@ -269,9 +269,8 @@ class InfinityScroll {
 
       await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
         (data): void => {
-          // TODO: have bug -
-          this.setListData(this.list.data?.concat(data));
-          // this.list.data = this.list.data?.concat(data);
+          const shiftedArr = new Array(1).concat(data);
+          this.setListData(shiftedArr);
         }
       );
     }
