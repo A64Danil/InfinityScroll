@@ -237,6 +237,8 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
     }
 
+    this.getSavedListData().then(console.log);
+
     this.setInitialListData(props.data).then(() => {
       this.start();
     });
@@ -897,11 +899,16 @@ class InfinityScroll {
     this.dbmanager.write(this.selectorId, index, dataObj);
   }
 
+  async getSavedListData() {
+    const listData = await this.dbmanager.readAll(this.selectorId);
+    return listData;
+  }
+
   async setInitialListData(data: object[] | DataURLType) {
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
-      // this.list.data = data as [];
-      this.setListData(data as []);
+      this.list.data = data as [];
+      // this.setListData(data as []);
       newLength = this.forcedListLength || (data && data.length);
     } else {
       const dataUrl = data as DataURLType;
@@ -1231,8 +1238,10 @@ class InfinityScroll {
     const storeName = this.selectorId;
     // const storeName = 'test2';
     // TODO:
+
     // Установка TTL на сутки
-    await this.dbmanager.setTTL(storeName, 24 * 60 * 60 * 1000);
+    // await this.dbmanager.setTTL(storeName, 24 * 60 * 60 * 1000);
+    await this.dbmanager.setTTL(storeName, 60 * 1000);
 
     // // Пример объектов с id
     // await this.dbmanager.writeMany(storeName, [

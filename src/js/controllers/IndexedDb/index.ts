@@ -100,6 +100,8 @@ export class IndexedTTLStoreManager {
     const expired = await this.isExpired(storeName);
     if (!expired) return;
 
+    console.warn(`Your data in store '${storeName}' is expired!`);
+
     const db = await this.openDatabase(storeName);
     const tx = db.transaction(storeName, 'readwrite');
     tx.objectStore(storeName).clear();
@@ -172,13 +174,23 @@ export class IndexedTTLStoreManager {
     const db = await this.openDatabase(storeName);
     const tx = db.transaction(storeName, 'readonly');
     const store = tx.objectStore(storeName);
-    const request = store.getAll();
+    const result: Record<string, unknown>[] = [];
 
     return new Promise((resolve, reject) => {
+      const request = store.openCursor();
+
       request.onsuccess = () => {
-        db.close();
-        resolve(request.result as Record<string, unknown>[]);
+        const cursor = request.result;
+        if (cursor) {
+          const key = cursor.key as number;
+          result[key] = cursor.value;
+          cursor.continue();
+        } else {
+          db.close();
+          resolve(result);
+        }
       };
+
       request.onerror = () => {
         db.close();
         reject(request.error);
