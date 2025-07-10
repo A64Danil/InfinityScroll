@@ -24,7 +24,7 @@ export class IndexedTTLStoreManager {
         }
 
         if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { keyPath: 'id' }); // ✅ теперь используется `id` как ключ
+          db.createObjectStore(storeName); // ✅ теперь используется `id` как ключ
         }
       };
 
@@ -40,7 +40,7 @@ export class IndexedTTLStoreManager {
 
           upgradeRequest.onupgradeneeded = () => {
             const upgradeDb = upgradeRequest.result;
-            upgradeDb.createObjectStore(storeName, { keyPath: 'id' });
+            upgradeDb.createObjectStore(storeName);
           };
 
           upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
@@ -113,8 +113,32 @@ export class IndexedTTLStoreManager {
     });
   }
 
+  public async write(
+    storeName: string,
+    index: number | string,
+    value: Record<string, unknown>
+  ): Promise<void> {
+    const db = await this.openDatabase(storeName);
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+
+    store.put(value, index);
+
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      tx.onerror = () => {
+        db.close();
+        reject(tx.error);
+      };
+    });
+  }
+
   public async writeMany(
     storeName: string,
+    index: IDBValidKey,
     entries: Record<string, unknown>[]
   ): Promise<void> {
     const db = await this.openDatabase(storeName);
@@ -128,7 +152,7 @@ export class IndexedTTLStoreManager {
           'All objects must contain an "id" property to be used as the key.'
         );
       }
-      store.put(value);
+      store.put(value, index);
     }
 
     return new Promise((resolve, reject) => {

@@ -1020,7 +1020,10 @@ class InfinityScroll {
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
       this.list.data[currentIndex] = data[i];
+      this.dbmanager.write('test2', currentIndex, data[i]);
     }
+
+    console.log(this.list.data);
   }
 
   updateSkeletonItems(sequenceStart: number, data: Rec[]) {
