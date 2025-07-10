@@ -237,7 +237,7 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
     }
 
-    this.setListData(props.data).then(() => {
+    this.setInitialListData(props.data).then(() => {
       this.start();
     });
   }
@@ -258,7 +258,8 @@ class InfinityScroll {
 
       await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
         (data): void => {
-          this.list.data = this.list.data?.concat(data);
+          this.setListData(this.list.data?.concat(data));
+          // this.list.data = this.list.data?.concat(data);
         }
       );
     }
@@ -881,10 +882,26 @@ class InfinityScroll {
     );
   }
 
-  async setListData(data: object[] | DataURLType) {
+  setListData(data: ListController['data']) {
+    this.list.data = data;
+
+    const indexedDBentries = this.list.data.map((value, index) => ({
+      index,
+      value,
+    }));
+    this.dbmanager.writeMany('test2', indexedDBentries);
+  }
+
+  setListDataByIndex(dataObj: ListController['data'][number], index: number) {
+    this.list.data[index] = dataObj;
+    this.dbmanager.write('test2', index, dataObj);
+  }
+
+  async setInitialListData(data: object[] | DataURLType) {
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
-      this.list.data = data as [];
+      // this.list.data = data as [];
+      this.setListData(data as []);
       newLength = this.forcedListLength || (data && data.length);
     } else {
       const dataUrl = data as DataURLType;
@@ -897,7 +914,8 @@ class InfinityScroll {
       if (!isDataUrlReturnString) {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
           const extractedData = this.extractResponse(fetchedData);
-          this.list.data = extractedData;
+          // this.list.data = extractedData;
+          this.setListData(extractedData);
           newLength =
             this.forcedListLength || (extractedData && extractedData.length);
         });
@@ -910,7 +928,8 @@ class InfinityScroll {
         const endIdx = this.basedIndex + Number(!this.includeEnd);
         const fetchedData = await this.getListDataLazy(startIdx, endIdx);
         console.log(fetchedData);
-        this.list.data = fetchedData;
+        // this.list.data = fetchedData;
+        this.setListData(fetchedData);
 
         if (this.forcedListLength) {
           newLength = this.forcedListLength;
@@ -1019,8 +1038,9 @@ class InfinityScroll {
     const loopLength = data.length;
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
-      this.list.data[currentIndex] = data[i];
-      this.dbmanager.write('test2', currentIndex, data[i]);
+      this.setListDataByIndex(data[i], currentIndex);
+      // this.list.data[currentIndex] = data[i];
+      // this.dbmanager.write('test2', currentIndex, data[i]);
     }
 
     console.log(this.list.data);

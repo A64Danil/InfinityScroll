@@ -138,15 +138,14 @@ export class IndexedTTLStoreManager {
 
   public async writeMany(
     storeName: string,
-    index: IDBValidKey,
-    entries: Record<string, unknown>[]
+    entries: { index: number; value: Record<string, unknown> }[]
   ): Promise<void> {
     const db = await this.openDatabase(storeName);
     const tx = db.transaction(storeName, 'readwrite');
     const store = tx.objectStore(storeName);
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const value of entries) {
+    for (const { value, index } of entries) {
       if (!('id' in value)) {
         throw new Error(
           'All objects must contain an "id" property to be used as the key.'
