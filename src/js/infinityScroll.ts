@@ -198,7 +198,7 @@ class InfinityScroll {
       }, 0);
     });
 
-    this.dbmanager = new IndexedTTLStoreManager();
+    this.dbmanager = new IndexedTTLStoreManager(this.selectorId);
 
     this.skeleton = new Skeleton({
       template: props.templateString,
@@ -237,7 +237,16 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
     }
 
-    this.getSavedListData().then(console.log);
+    // TODO: проблема в том что мы "перекрываем" кешированные данные свежими
+    this.getSavedListData().then((data) => {
+      if (data.length) {
+        this.list.data = data;
+        console.log(data);
+        console.log(this);
+      }
+    });
+
+    // return
 
     this.setInitialListData(props.data).then(() => {
       this.start();
@@ -891,16 +900,27 @@ class InfinityScroll {
       index,
       value,
     }));
-    this.dbmanager.writeMany(this.selectorId, indexedDBentries);
+    this.dbmanager.writeMany(indexedDBentries);
   }
 
   setListDataByIndex(dataObj: ListController['data'][number], index: number) {
     this.list.data[index] = dataObj;
-    this.dbmanager.write(this.selectorId, index, dataObj);
+    this.dbmanager.write(index, dataObj);
   }
 
   async getSavedListData() {
-    const listData = await this.dbmanager.readAll(this.selectorId);
+    const size = await this.dbmanager.getStoreSize();
+
+    const safeDataSize = 100000;
+    console.log(size);
+    let listData;
+    if (size < safeDataSize) {
+      listData = await this.dbmanager.readAll();
+    } else {
+      console.warn('Объем закешированных данных слишком большой');
+      listData = await this.dbmanager.readRange(0, safeDataSize - 1);
+    }
+
     return listData;
   }
 
@@ -1235,29 +1255,12 @@ class InfinityScroll {
   async setIndexedDb() {
     console.log('setIndexedDb');
 
-    const storeName = this.selectorId;
-    // const storeName = 'test2';
-    // TODO:
-
     // Установка TTL на сутки
-    // await this.dbmanager.setTTL(storeName, 24 * 60 * 60 * 1000);
-    await this.dbmanager.setTTL(storeName, 60 * 1000);
+    // await this.dbmanager.setTTL(24 * 60 * 60 * 1000);
+    await this.dbmanager.setTTL(60 * 1000);
 
-    // // Пример объектов с id
-    // await this.dbmanager.writeMany(storeName, [
-    //   { id: 293, name: 'Mars', industry: 'research' },
-    //   { id: 297, name: 'M&M', industry: 'research' },
-    //   { id: 4995, name: 'AArl', industry: 'research' },
-    //   { id: 4996, name: 'Bbarry', industry: 'research' },
-    //   { id: 4997, name: 'Ccarl', industry: 'research' },
-    // ]);
-    //
-    // // Получение диапазона по ID
-    // const range = await this.dbmanager.readRange(storeName, 4000, 5000);
-    // console.log('📦 Range:', range);
-    //
     // // Получение всех данных
-    // const all = await this.dbmanager.readAll(storeName);
+    // const all = await this.dbmanager.readAll();
     // console.log('🧾 All companies:', all);
   }
 }

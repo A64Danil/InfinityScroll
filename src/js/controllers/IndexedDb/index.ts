@@ -9,6 +9,12 @@ export class IndexedTTLStoreManager {
 
   private static TTL_STORE = '__ttl__';
 
+  private readonly storeName: string;
+
+  constructor(storeName: string) {
+    this.storeName = storeName;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   private async openDatabase(storeName: string): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -54,13 +60,13 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  public async setTTL(storeName: string, ttlMs: number): Promise<void> {
+  public async setTTL(ttlMs: number): Promise<void> {
     const db = await this.openDatabase(IndexedTTLStoreManager.TTL_STORE);
     const tx = db.transaction(IndexedTTLStoreManager.TTL_STORE, 'readwrite');
     const store = tx.objectStore(IndexedTTLStoreManager.TTL_STORE);
 
     const meta: TTLMeta = {
-      storeName,
+      storeName: this.storeName,
       createdAt: Date.now(),
       ttlMs,
     };
@@ -75,11 +81,11 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  private async isExpired(storeName: string): Promise<boolean> {
+  private async isExpired(): Promise<boolean> {
     const db = await this.openDatabase(IndexedTTLStoreManager.TTL_STORE);
     const tx = db.transaction(IndexedTTLStoreManager.TTL_STORE, 'readonly');
     const store = tx.objectStore(IndexedTTLStoreManager.TTL_STORE);
-    const request = store.get(storeName);
+    const request = store.get(this.storeName);
 
     return new Promise((resolve) => {
       // eslint-disable-next-line consistent-return
@@ -96,15 +102,15 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  public async clearIfExpired(storeName: string): Promise<void> {
-    const expired = await this.isExpired(storeName);
+  public async clearIfExpired(): Promise<void> {
+    const expired = await this.isExpired();
     if (!expired) return;
 
-    console.warn(`Your data in store '${storeName}' is expired!`);
+    console.warn(`Your data in store '${this.storeName}' is expired!`);
 
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readwrite');
-    tx.objectStore(storeName).clear();
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readwrite');
+    tx.objectStore(this.storeName).clear();
 
     // eslint-disable-next-line consistent-return
     return new Promise((resolve) => {
@@ -116,13 +122,12 @@ export class IndexedTTLStoreManager {
   }
 
   public async write(
-    storeName: string,
     index: number | string,
     value: Record<string, unknown>
   ): Promise<void> {
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readwrite');
+    const store = tx.objectStore(this.storeName);
 
     store.put(value, index);
 
@@ -139,12 +144,11 @@ export class IndexedTTLStoreManager {
   }
 
   public async writeMany(
-    storeName: string,
     entries: { index: number; value: Record<string, unknown> }[]
   ): Promise<void> {
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readwrite');
+    const store = tx.objectStore(this.storeName);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { value, index } of entries) {
@@ -168,12 +172,12 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  public async readAll(storeName: string): Promise<Record<string, unknown>[]> {
-    await this.clearIfExpired(storeName);
+  public async readAll(): Promise<Record<string, unknown>[]> {
+    await this.clearIfExpired();
 
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
     const result: Record<string, unknown>[] = [];
 
     return new Promise((resolve, reject) => {
@@ -199,15 +203,14 @@ export class IndexedTTLStoreManager {
   }
 
   public async readRange(
-    storeName: string,
     fromId: number | string,
     toId: number | string
   ): Promise<Record<string, unknown>[]> {
-    await this.clearIfExpired(storeName);
+    await this.clearIfExpired();
 
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
 
     const range = IDBKeyRange.bound(fromId, toId);
     const result: Record<string, unknown>[] = [];
@@ -231,10 +234,10 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  public async has(storeName: string, id: IDBValidKey): Promise<boolean> {
-    const db = await this.openDatabase(storeName);
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
+  public async has(id: IDBValidKey): Promise<boolean> {
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
 
     return new Promise((resolve) => {
       const request = store.count(id);
@@ -245,6 +248,26 @@ export class IndexedTTLStoreManager {
       request.onerror = () => {
         db.close();
         resolve(false);
+      };
+    });
+  }
+
+  public async getStoreSize(): Promise<number> {
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
+
+    return new Promise((resolve, reject) => {
+      const request = store.count();
+
+      request.onsuccess = () => {
+        db.close();
+        resolve(request.result);
+      };
+
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
       };
     });
   }
