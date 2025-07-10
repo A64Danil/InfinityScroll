@@ -6,6 +6,7 @@ import {
   DomManager,
   Skeleton,
   Vsb,
+  IndexedTTLStoreManager,
 } from './controllers';
 
 import {
@@ -127,7 +128,9 @@ class InfinityScroll {
 
   private readonly skeleton: Skeleton;
 
-  private vsb: Vsb;
+  private readonly vsb: Vsb;
+
+  private readonly dbmanager: IndexedTTLStoreManager;
 
   private readonly test: () => void;
 
@@ -194,6 +197,8 @@ class InfinityScroll {
         this.isSyncing = false;
       }, 0);
     });
+
+    this.dbmanager = new IndexedTTLStoreManager();
 
     this.skeleton = new Skeleton({
       template: props.templateString,

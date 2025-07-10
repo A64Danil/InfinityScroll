@@ -5,6 +5,7 @@ import { ListController } from './List';
 import { DomManager } from './DomManager';
 import { Skeleton } from './Skeleton';
 import { Vsb } from './VirtualScrollbar';
+import { IndexedTTLStoreManager } from './IndexedDb';
 
 export {
   RenderController,
@@ -14,4 +15,5 @@ export {
   DomManager,
   Skeleton,
   Vsb,
+  IndexedTTLStoreManager,
 };
