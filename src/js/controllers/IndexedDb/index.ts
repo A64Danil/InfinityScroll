@@ -195,4 +195,22 @@ export class IndexedTTLStoreManager {
       };
     });
   }
+
+  public async has(storeName: string, id: IDBValidKey): Promise<boolean> {
+    const db = await this.openDatabase(storeName);
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+
+    return new Promise((resolve) => {
+      const request = store.count(id);
+      request.onsuccess = () => {
+        db.close();
+        resolve(request.result > 0);
+      };
+      request.onerror = () => {
+        db.close();
+        resolve(false);
+      };
+    });
+  }
 }

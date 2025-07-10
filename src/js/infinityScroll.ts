@@ -342,6 +342,7 @@ class InfinityScroll {
     });
     //
     // this.test();
+    this.setIndexedDb();
   }
 
   setDefaultStyles() {
@@ -1118,6 +1119,7 @@ class InfinityScroll {
     return res;
   }
 
+  // TODO: useless??
   fixElemsOrdering(direction: IScrollDirection, isEndOfList?: boolean) {
     const firstElemPosition = Number(this.listEl.firstChild.ariaPosInSet);
     const lastElemPosition = Number(this.listEl.lastChild.ariaPosInSet);
@@ -1202,6 +1204,33 @@ class InfinityScroll {
       //   this.vsb
       // );
     }
+  }
+
+  async setIndexedDb() {
+    console.log('setIndexedDb');
+
+    // const storeName = this.selectorId;
+    const storeName = 'test2';
+    // TODO:
+    // Установка TTL на сутки
+    await this.dbmanager.setTTL(storeName, 24 * 60 * 60 * 1000);
+
+    // // Пример объектов с id
+    // await this.dbmanager.writeMany(storeName, [
+    //   { id: 293, name: 'Mars', industry: 'research' },
+    //   { id: 297, name: 'M&M', industry: 'research' },
+    //   { id: 4995, name: 'AArl', industry: 'research' },
+    //   { id: 4996, name: 'Bbarry', industry: 'research' },
+    //   { id: 4997, name: 'Ccarl', industry: 'research' },
+    // ]);
+    //
+    // // Получение диапазона по ID
+    // const range = await this.dbmanager.readRange(storeName, 4000, 5000);
+    // console.log('📦 Range:', range);
+    //
+    // // Получение всех данных
+    // const all = await this.dbmanager.readAll(storeName);
+    // console.log('🧾 All companies:', all);
   }
 }
 
