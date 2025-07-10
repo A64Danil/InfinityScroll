@@ -150,15 +150,14 @@ export class IndexedTTLStoreManager {
     const tx = db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const { value, index } of entries) {
+    entries.forEach(({ value, index }) => {
       if (!('id' in value)) {
         throw new Error(
           'All objects must contain an "id" property to be used as the key.'
         );
       }
       store.put(value, index);
-    }
+    });
 
     return new Promise((resolve, reject) => {
       tx.oncomplete = () => {
