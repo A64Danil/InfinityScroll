@@ -269,6 +269,7 @@ class InfinityScroll {
 
       await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
         (data): void => {
+          // TODO: have bug -
           this.setListData(this.list.data?.concat(data));
           // this.list.data = this.list.data?.concat(data);
         }
@@ -894,8 +895,11 @@ class InfinityScroll {
   }
 
   setListData(data: ListController['data']) {
-    this.list.data = data;
+    data.forEach((obj, i) => this.setListDataByIndex(obj, i));
+    this.saveListData(data);
+  }
 
+  saveListData(data: ListController['data']) {
     const indexedDBentries = this.list.data.map((value, index) => ({
       index,
       value,
@@ -905,6 +909,9 @@ class InfinityScroll {
 
   setListDataByIndex(dataObj: ListController['data'][number], index: number) {
     this.list.data[index] = dataObj;
+  }
+
+  saveListDataByIndex(dataObj: ListController['data'][number], index: number) {
     this.dbmanager.write(index, dataObj);
   }
 
@@ -928,7 +935,6 @@ class InfinityScroll {
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
       this.list.data = data as [];
-      // this.setListData(data as []);
       newLength = this.forcedListLength || (data && data.length);
     } else {
       const dataUrl = data as DataURLType;
@@ -1066,6 +1072,7 @@ class InfinityScroll {
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
       this.setListDataByIndex(data[i], currentIndex);
+      this.saveListDataByIndex(data[i], currentIndex);
     }
   }
 
