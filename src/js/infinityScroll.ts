@@ -889,12 +889,12 @@ class InfinityScroll {
       index,
       value,
     }));
-    this.dbmanager.writeMany('test2', indexedDBentries);
+    this.dbmanager.writeMany(this.selectorId, indexedDBentries);
   }
 
   setListDataByIndex(dataObj: ListController['data'][number], index: number) {
     this.list.data[index] = dataObj;
-    this.dbmanager.write('test2', index, dataObj);
+    this.dbmanager.write(this.selectorId, index, dataObj);
   }
 
   async setInitialListData(data: object[] | DataURLType) {
@@ -1039,11 +1039,7 @@ class InfinityScroll {
     for (let i = 0; i < loopLength; i++) {
       const currentIndex = sequenceStart + i;
       this.setListDataByIndex(data[i], currentIndex);
-      // this.list.data[currentIndex] = data[i];
-      // this.dbmanager.write('test2', currentIndex, data[i]);
     }
-
-    console.log(this.list.data);
   }
 
   updateSkeletonItems(sequenceStart: number, data: Rec[]) {
@@ -1232,8 +1228,8 @@ class InfinityScroll {
   async setIndexedDb() {
     console.log('setIndexedDb');
 
-    // const storeName = this.selectorId;
-    const storeName = 'test2';
+    const storeName = this.selectorId;
+    // const storeName = 'test2';
     // TODO:
     // Установка TTL на сутки
     await this.dbmanager.setTTL(storeName, 24 * 60 * 60 * 1000);
