@@ -1263,7 +1263,12 @@ class InfinityScroll {
 
     // Установка TTL на сутки
     // await this.dbmanager.setTTL(24 * 60 * 60 * 1000);
-    await this.dbmanager.setTTL(60 * 1000);
+
+    const oneDayTimeMS = 24 * 60 * 60 * 1000;
+    const days = 7;
+
+    const totalDaysTTL = days * oneDayTimeMS;
+    await this.dbmanager.setTTL(totalDaysTTL);
 
     // // Получение всех данных
     // const all = await this.dbmanager.readAll();
