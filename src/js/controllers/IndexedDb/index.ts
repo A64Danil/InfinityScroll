@@ -202,8 +202,8 @@ export class IndexedTTLStoreManager {
   }
 
   public async readRange(
-    fromId: number | string,
-    toId: number | string
+    fromId: number,
+    toId: number
   ): Promise<Record<string, unknown>[]> {
     await this.clearIfExpired();
 
@@ -212,19 +212,45 @@ export class IndexedTTLStoreManager {
     const store = tx.objectStore(this.storeName);
 
     const range = IDBKeyRange.bound(fromId, toId);
-    const result: Record<string, unknown>[] = [];
+    const result: Record<string, unknown>[] = new Array(toId - fromId + 1);
+
+    console.log(result);
 
     return new Promise((resolve, reject) => {
       const request = store.openCursor(range);
       request.onsuccess = () => {
         const cursor = request.result;
         if (cursor) {
-          result.push(cursor.value);
+          const key = cursor.key as number;
+          const index = key - fromId;
+          result[index] = cursor.value;
           cursor.continue();
         } else {
           db.close();
           resolve(result);
         }
+      };
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+    });
+  }
+
+  public async get(
+    index: number | string
+  ): Promise<Record<string, unknown> | undefined> {
+    await this.clearIfExpired(this.storeName);
+
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
+
+    return new Promise((resolve, reject) => {
+      const request = store.get(index);
+      request.onsuccess = () => {
+        db.close();
+        resolve(request.result as Record<string, unknown> | undefined);
       };
       request.onerror = () => {
         db.close();
