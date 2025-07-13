@@ -83,6 +83,7 @@ console.log('Entry point');
   if (lazyAPIList !== null) {
     console.log('Lazy API list Started');
     const myLazyAPIScroll = new InfinityScroll(REMOTE_LAZY_API_PROPS);
+    window.iScroll = myLazyAPIScroll;
   }
 
   const lazyAPIList100 = document.getElementById(
@@ -94,6 +95,7 @@ console.log('Entry point');
     const myLazyAPIScroll100 = new InfinityScroll(
         REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS
     );
+    window.iScroll = myLazyAPIScroll100;
   }
 
   const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
