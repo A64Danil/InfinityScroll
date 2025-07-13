@@ -475,6 +475,7 @@ class InfinityScroll {
 
     const cssTextLoading = `.${this.selectorId}_List li.loading { 
       min-height: ${this.list.itemHeight}px;
+      box-sizing: border-box;
     }
     
 .${this.selectorId}_List li.loading img { 
@@ -733,6 +734,9 @@ class InfinityScroll {
           const [sequenceStart, sequenceEnd] = this.getSequence(
             this.chunk.itemIndex
           );
+
+          await this.getItemsFromDB(sequenceStart, sequenceEnd);
+
           const unfoundedRanges = this.checkItemForLoad(
             sequenceStart,
             sequenceEnd
@@ -762,17 +766,17 @@ class InfinityScroll {
           // For tests - 1
           if (!isBigDiff) {
             // this.checkIndexOrdering();
-            if (!this.checkIndexOrdering()) {
-              console.warn('stop scroll!');
-              this.middleWrapper.style.overflow = 'hidden';
-              this.vsb.elem.style.overflow = 'hidden';
-              console.log(mainChunkProps);
-
-              setTimeout(() => {
-                this.middleWrapper?.removeAttribute('style');
-                this.vsb.elem.removeAttribute('style');
-              }, 8000);
-            }
+            // if (!this.checkIndexOrdering()) {
+            //   console.warn('stop scroll!');
+            //   this.middleWrapper.style.overflow = 'hidden';
+            //   this.vsb.elem.style.overflow = 'hidden';
+            //   console.log(mainChunkProps);
+            //
+            //   setTimeout(() => {
+            //     this.middleWrapper?.removeAttribute('style');
+            //     this.vsb.elem.removeAttribute('style');
+            //   }, 8000);
+            // }
           }
         }
       }
@@ -917,7 +921,9 @@ class InfinityScroll {
   async getSavedListData() {
     const size = await this.dbmanager.getStoreSize();
 
-    const safeDataSize = 100000;
+    // TODO: change this
+    // const safeDataSize = 100000;
+    const safeDataSize = 10;
     console.log(size);
     let listData;
     if (size < safeDataSize) {
@@ -1086,6 +1092,33 @@ class InfinityScroll {
       ) as HTMLElement;
       if (element) this.skeleton.updateElement(element, data[i], dataIndex);
     }
+  }
+
+  // TODO: useless?
+  async getListItem(index): Promise<Rec | undefined> {
+    let elem;
+    if (this.list.data[index] !== undefined) {
+      elem = this.list.data[index];
+    } else {
+      console.log('Элемента в быстром доступе нет. Будем искать в БД', index);
+      if (await this.dbmanager.has(index)) {
+        console.log('Нашли его в БД');
+        elem = await this.dbmanager.get(index);
+        console.log(elem);
+      } else {
+        console.log('Элемента в БД нет, вот что отдаёт БД');
+        console.log(await this.dbmanager.get(index));
+      }
+    }
+    return elem;
+  }
+
+  async getItemsFromDB(sequenceStart: number, sequenceEnd: number) {
+    const result = await this.dbmanager.readRange(
+      sequenceStart,
+      sequenceEnd - 1
+    );
+    this.list.data.splice(sequenceStart, this.chunk.amount, ...result);
   }
 
   checkItemForLoad(sequenceStart: number, sequenceEnd: number): unknown[] {
