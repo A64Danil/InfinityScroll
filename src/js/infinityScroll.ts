@@ -1000,6 +1000,16 @@ class InfinityScroll {
   ): number[] {
     let sequenceStart;
     let sequenceEnd;
+
+    let hightestEndIndexByPage;
+
+    if (!isLastPage) {
+      hightestEndIndexByPage = this.list.length * this.vsb.currentPage;
+    } else {
+      const nonLastPagesSize = this.list.length * (this.vsb.totalPages - 1);
+      hightestEndIndexByPage = nonLastPagesSize + this.list.lastPageLength;
+    }
+
     if (!isFetchToReset) {
       sequenceStart = calcSequenceByDirection(
         this.scroll.direction,
@@ -1008,6 +1018,11 @@ class InfinityScroll {
         this.chunk.amount
       );
       sequenceEnd = sequenceStart + this.chunk.amount;
+
+      if (sequenceEnd > hightestEndIndexByPage) {
+        console.log('fix sequenceEnd');
+        sequenceEnd = hightestEndIndexByPage;
+      }
     } else {
       const tempStartIndex = renderIndex - this.chunk.amount;
 
