@@ -77,11 +77,11 @@ export class ScrollDetector {
   ): boolean {
     // 69 - 80
     // 11
-    // const isBigDiff =
-    //   (this.isGoingFromBottom &&
-    //     renderIndexDiff > chunkAmount + tailingElementsAmount) ||
-    //   (!this.isGoingFromBottom && renderIndexDiff > chunkAmount);
-    const isBigDiff = renderIndexDiff > chunkAmount;
+    const isBigDiff =
+      (this.isGoingFromBottom &&
+        renderIndexDiff > chunkAmount + tailingElementsAmount) ||
+      (!this.isGoingFromBottom && renderIndexDiff > chunkAmount);
+    // const isBigDiff = renderIndexDiff > chunkAmount;
     return isBigDiff;
   }
 }

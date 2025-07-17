@@ -823,10 +823,14 @@ class InfinityScroll {
   }
 
   checkBigDiff(scrollDiff: number): boolean {
+    const tailingElementsAmount = !this.vsb.isLastPage
+      ? this.list.pageTailingElementsAmount
+      : this.list.lastPageTailingElementsAmount;
+
     return this.scroll.isBigDiff(
       scrollDiff,
       this.chunk.amount,
-      this.list.tailingElementsAmount
+      tailingElementsAmount
     );
   }
 
