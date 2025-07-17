@@ -139,6 +139,8 @@ class InfinityScroll {
     errors: Map<string, string[]>;
   };
 
+  private isDebugMode = false;
+
   constructor(props: InfinityScrollPropTypes) {
     this.selectorId = props.selectorId;
 
@@ -158,6 +160,8 @@ class InfinityScroll {
 
     this.listWrapperHeight = props.listWrapperHeight;
 
+    this.isDebugMode = props.isDebugMode || false;
+
     this.listEl = this.createInnerList();
 
     this.scroll = new ScrollDetector();
@@ -166,7 +170,7 @@ class InfinityScroll {
 
     this.list = new ListController();
 
-    this.vsb = new Vsb(() => {
+    this.vsb = new Vsb(this.isDebugMode, () => {
       if (this.isSyncing) {
         // console.log('Внещний скролл, поэтому не тригерим handleScroll');
         return;

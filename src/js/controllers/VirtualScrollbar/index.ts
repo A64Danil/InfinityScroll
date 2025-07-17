@@ -51,7 +51,7 @@ export class Vsb {
   // Callback to set height to offsetElement
   setHeight: (() => void) | undefined;
 
-  constructor(scrollTrigger: (e: Event) => void) {
+  constructor(isDebugMode: boolean, scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
     this.currentPage = 1;
@@ -78,6 +78,7 @@ export class Vsb {
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
+    if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
     this.elem.addEventListener('scroll', scrollTrigger);
 
