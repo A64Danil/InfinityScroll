@@ -1,5 +1,11 @@
 import { Rec } from '../../types/utils';
 
+type ListState = {
+  name?: string;
+  tailingElementsAmount: number;
+  length: number;
+};
+
 export class ListController {
   // Массив данных для превращения в хтмл-ссписок
   public data: Rec[];
@@ -28,6 +34,27 @@ export class ListController {
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
 
+  // Количество элементов в крайнем чанке любой не последней страницы
+  pageTailingElementsAmount = 0;
+
+  // Количество элементов в крайнем чанке на последней странице
+  lastPageTailingElementsAmount = 0;
+
+  // НА БУДУЩЕЕ
+  // State for usual pages
+  // 0: ListState = {
+  //   name: "page",
+  //   tailingElementsAmount: 0,
+  //   length: 0,
+  // };
+  //
+  // // State only for last page
+  // 1: ListState = {
+  //   name: "lastPage",
+  //   tailingElementsAmount: 0,
+  //   length: 0,
+  // };
+
   // Стартовый индекс последней части списка
   public startIndexOfLastPart = 0;
 
@@ -42,5 +69,13 @@ export class ListController {
   getTotalListHeight(): number {
     const totalListHeight = this.itemHeight * this.fullLength;
     return totalListHeight;
+  }
+
+  setState(isLastPage: boolean) {
+    if (!isLastPage) {
+      this.tailingElementsAmount = this.pageTailingElementsAmount;
+    } else {
+      this.tailingElementsAmount = this.lastPageTailingElementsAmount;
+    }
   }
 }
