@@ -12,6 +12,7 @@ export type InfinityScrollPropTypes = {
   tHeadNames?: string[];
   subDir?: string;
   templateCb?: Record<string, (arg: any) => any>;
+  isDebugMode?: boolean;
 };
 
 // type DataLikeArr = {
