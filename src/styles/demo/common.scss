@@ -41,11 +41,20 @@ html {
   background-color: transparent;
 }
 
+.vSrcollbar_debugMode {
+  width: 400px;
+  transform: translate(-16px, 0px);
+  background-color: #5c637033;
+}
+
 .vScrollbarFiller {
   width: 1px;
   //height: 10000000px;
   //background-color: red;
+}
 
+.vScrollbarFiller_debugMode {
+  width: 10px;
 }
 
 section {
