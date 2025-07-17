@@ -531,13 +531,15 @@ class InfinityScroll {
 
     this.list.startIndexOfLastPart =
       this.list.length - this.list.existingSizeInDOM;
+    // this.list.startIndexOfLastPart = this.list.length - this.chunk.amount * 3;
+
     this.chunk.lastOrderNumber = Math.floor(
       this.list.length / this.chunk.amount
     );
 
     this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
 
-    this.list.tailingElementsAmount = this.list.length % this.chunk.amount; // TODO: возможно уже не нужно после включения VSB
+    // this.list.tailingElementsAmount = this.list.length % this.chunk.amount; // TODO: возможно уже не нужно после включения VSB
 
     if (listItem) {
       this.domMngr.removeItem('firstChild');
@@ -546,6 +548,16 @@ class InfinityScroll {
 
   createVirtualScroll() {
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
+    this.list.pageTailingElementsAmount = this.list.length % this.chunk.amount;
+    this.list.lastPageTailingElementsAmount =
+      this.list.lastPageLength % this.chunk.amount;
+    // this.list.setState(this.vsb.isLastPage);
+
+    //
+    //
+    // this.list[0].tailingElementsAmount = this.list[0].length % this.chunk.amount;
+    // this.list[1].tailingElementsAmount = this.list[1].length % this.chunk.amount;
+
     console.log(
       'this.list.tailingElementsAmount',
       this.list.tailingElementsAmount
@@ -571,8 +583,8 @@ class InfinityScroll {
     this.skeleton.setListHeight(this.list.fullLength);
 
     // Не нужно?
-    this.list.startIndexOfLastPart =
-      this.list.length - this.list.existingSizeInDOM;
+    // this.list.startIndexOfLastPart =
+    //   this.list.length - this.list.existingSizeInDOM;
 
     this.list.lastPageStartIndexOfLastPart =
       this.list.lastPageLength - this.list.existingSizeInDOM;
@@ -622,9 +634,15 @@ class InfinityScroll {
     const lastOrderNumber = this.vsb.isLastPage
       ? this.chunk.lastPageLastOrderNumber
       : this.chunk.lastOrderNumber;
+
     const maxScroll = this.vsb.isLastPage
       ? this.scroll.lastPageMaxScroll
       : this.scroll.maxScroll;
+
+    // FUTURE?
+    // const lastOrderNumberNEW = this.chunk[this.vsb.isLastPage].lastOrderNumber
+    // const maxScrollNEW = this.scroll[this.vsb.isLastPage].maxScroll
+
     // Устанавливаем буль, если мы движемся вверх от самого низа списка (это важно)
     this.scroll.setGoingFromBottom(
       this.chunk.firstOrderNumber,
@@ -634,9 +652,18 @@ class InfinityScroll {
       maxScroll
     );
 
+    const tailingElementsAmount = !this.vsb.isLastPage
+      ? this.list.pageTailingElementsAmount
+      : this.list.lastPageTailingElementsAmount;
+
+    // const tailingElementsAmount = this.list.tailingElementsAmount;
+    // const tailingElementsAmount = this.list.lastPageTailingElementsAmount;
+
+    // console.log('tailingElementsAmount', tailingElementsAmount, this.vsb.currentPage, this.vsb.isLastPage);
+
     let resultIndex =
       newRenderIndex +
-      (this.scroll.isGoingFromBottom ? this.list.tailingElementsAmount : 0);
+      (this.scroll.isGoingFromBottom ? tailingElementsAmount : 0);
     // console.log('resultIndex', resultIndex, this.scroll.isGoingFromBottom);
     // console.log('this.chunk.startRenderIndex', this.chunk.startRenderIndex);
 
@@ -667,6 +694,7 @@ class InfinityScroll {
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff || this.vsb.isPageChanged) {
+      console.log('isBigDiff', isBigDiff, renderIndexDiff);
       clearTimeout(this.timerIdRefreshList);
       // console.log(
       //   'this.vsb.isLastPage',
@@ -734,14 +762,16 @@ class InfinityScroll {
           const [sequenceStart, sequenceEnd] = this.getSequence(
             this.chunk.itemIndex
           );
-
-          await this.getItemsFromDB(sequenceStart, sequenceEnd);
+          // TODO: check 1th time to load from IndexedDB
+          console.log(sequenceStart, sequenceEnd);
+          // await this.getItemsFromDB(sequenceStart, sequenceEnd);
 
           const unfoundedRanges = this.checkItemForLoad(
             sequenceStart,
             sequenceEnd
           );
 
+          // TODO: check 2nd time to load from SERVER
           if (unfoundedRanges.length) {
             console.log('Unfounded', unfoundedRanges);
             this.fetchUnfoundedRanges(unfoundedRanges as NumRange[]);
@@ -765,7 +795,7 @@ class InfinityScroll {
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
           if (!isBigDiff) {
-            // this.checkIndexOrdering();
+            this.checkIndexOrdering();
             // if (!this.checkIndexOrdering()) {
             //   console.warn('stop scroll!');
             //   this.middleWrapper.style.overflow = 'hidden';
@@ -1133,6 +1163,7 @@ class InfinityScroll {
       sequenceStart,
       sequenceEnd - 1
     );
+    console.log(result);
     this.list.data.splice(sequenceStart, this.chunk.amount, ...result);
   }
 
