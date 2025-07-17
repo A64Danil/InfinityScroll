@@ -261,11 +261,15 @@ export class DomManager {
   ): boolean {
     const isStartOfList = direction === 'up' && sequenceNumber === 0;
 
+    const tailingElementsAmount = !vsb.isLastPage
+      ? list.pageTailingElementsAmount
+      : list.lastPageTailingElementsAmount;
+
     const isReachTopLimit =
       isGoingFromBottom &&
       isStartOfList &&
-      list.tailingElementsAmount !== 0 &&
-      i + sequenceNumber >= list.tailingElementsAmount;
+      tailingElementsAmount !== 0 &&
+      i + sequenceNumber >= tailingElementsAmount;
 
     let isReachBottomLimit = false;
 
