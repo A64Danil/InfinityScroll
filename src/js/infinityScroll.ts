@@ -357,7 +357,7 @@ class InfinityScroll {
       }, 0);
     });
     //
-    // this.test();
+    this.test();
     this.setIndexedDb();
   }
 
@@ -799,7 +799,7 @@ class InfinityScroll {
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
           if (!isBigDiff) {
-            this.checkIndexOrdering();
+            this.checkIndexOrdering(this.scroll.isGoingFromBottom);
             // if (!this.checkIndexOrdering()) {
             //   console.warn('stop scroll!');
             //   this.middleWrapper.style.overflow = 'hidden';
@@ -1199,7 +1199,7 @@ class InfinityScroll {
     return unfoundedItems;
   }
 
-  checkIndexOrdering() {
+  checkIndexOrdering(isGoingFromBottom: boolean) {
     const list = this.domMngr?.targetElem;
 
     if (!list) {
@@ -1215,7 +1215,7 @@ class InfinityScroll {
         if (prevIndex + 1 !== elemIndex) {
           const errorText = `Индексы поломались на элементе ${elemIndex} (ожидали ${
             prevIndex + 1
-          })`;
+          }), isGoingFromBottom - ${isGoingFromBottom}`;
           console.error(`${this.tests.name} -- ${errorText})`);
 
           if (!Array.isArray(this.tests.errors.get(this.tests.name))) {
