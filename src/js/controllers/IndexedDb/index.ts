@@ -214,8 +214,6 @@ export class IndexedTTLStoreManager {
     const range = IDBKeyRange.bound(fromId, toId);
     const result: Record<string, unknown>[] = new Array(toId - fromId + 1);
 
-    console.log(result);
-
     return new Promise((resolve, reject) => {
       const request = store.openCursor(range);
       request.onsuccess = () => {
