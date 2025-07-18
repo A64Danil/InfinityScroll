@@ -357,7 +357,7 @@ class InfinityScroll {
       }, 0);
     });
     //
-    this.test();
+    // this.test();
     this.setIndexedDb();
   }
 
@@ -768,16 +768,22 @@ class InfinityScroll {
           );
           // TODO: check 1th time to load from IndexedDB
           console.log(sequenceStart, sequenceEnd);
-          // await this.getItemsFromDB(sequenceStart, sequenceEnd);
-
-          const unfoundedRanges = this.checkItemForLoad(
+          let unfoundedRanges = this.checkItemForLoad(
             sequenceStart,
             sequenceEnd
           );
 
+          if (unfoundedRanges.length) {
+            console.log('Unfounded (for DB)', unfoundedRanges);
+            // TODO: может убрать эвэйт?
+            await this.getItemsFromDB(sequenceStart, sequenceEnd);
+          }
+
+          unfoundedRanges = this.checkItemForLoad(sequenceStart, sequenceEnd);
+
           // TODO: check 2nd time to load from SERVER
           if (unfoundedRanges.length) {
-            console.log('Unfounded', unfoundedRanges);
+            console.log('Unfounded (for fetch)', unfoundedRanges);
             this.fetchUnfoundedRanges(unfoundedRanges as NumRange[]);
           }
         }
