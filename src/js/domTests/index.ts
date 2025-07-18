@@ -298,8 +298,8 @@ export function iScrollTester() {
     }
   );
 
-  const needToReset = false;
-  // const needToReset = true;
+  // const needToReset = false;
+  const needToReset = true;
 
   (async () => {
     await fastUpDownScrollDomTest(1, needToReset);

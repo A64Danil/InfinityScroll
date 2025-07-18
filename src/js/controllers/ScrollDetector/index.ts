@@ -52,7 +52,8 @@ export class ScrollDetector {
     } else if (
       // this.direction === 'up' &&
       chunkOrderNumber >=
-      lastOrderNumber - 3
+      // lastOrderNumber - 3
+      lastOrderNumber - 1
     ) {
       this.isGoingFromBottom = true;
     }
