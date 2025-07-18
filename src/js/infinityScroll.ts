@@ -761,33 +761,15 @@ class InfinityScroll {
           htmlHeight: this.chunk.htmlHeight,
         };
 
-        // Fetch new DATA
+        // Read from indexedDB or Fetch new DATA
         if (this.isLazy && !isBigDiff) {
           const [sequenceStart, sequenceEnd] = this.getSequence(
             this.chunk.itemIndex
           );
-          // TODO: check 1th time to load from IndexedDB
-          console.log(sequenceStart, sequenceEnd);
-          let unfoundedRanges = this.checkItemForLoad(
-            sequenceStart,
-            sequenceEnd
-          );
 
-          if (unfoundedRanges.length) {
-            console.log('Unfounded (for DB)', unfoundedRanges);
-            // TODO: может убрать эвэйт?
-            await this.getItemsFromDB(sequenceStart, sequenceEnd);
-          }
-
-          unfoundedRanges = this.checkItemForLoad(sequenceStart, sequenceEnd);
-
-          // TODO: check 2nd time to load from SERVER
-          if (unfoundedRanges.length) {
-            console.log('Unfounded (for fetch)', unfoundedRanges);
-            this.fetchUnfoundedRanges(unfoundedRanges as NumRange[]);
-          }
+          await this.loadDataFromSources(sequenceStart, sequenceEnd);
         }
-        // END Fetch new DATA
+        // END  Read from indexedDB or Fetch new DATA
 
         this.domMngr.modifyCurrentDOM(
           mainChunkProps,
@@ -838,6 +820,39 @@ class InfinityScroll {
       this.chunk.amount,
       tailingElementsAmount
     );
+  }
+
+  async loadDataFromSources(sequenceStart: number, sequenceEnd: number) {
+    const sources = [
+      {
+        name: 'DB',
+        loader: async () => {
+          await this.getItemsFromDB(sequenceStart, sequenceEnd);
+          return this.checkItemForLoad(sequenceStart, sequenceEnd);
+        },
+      },
+      {
+        name: 'fetch',
+        loader: async (ranges: NumRange[]) => {
+          this.fetchUnfoundedRanges(ranges);
+          return [];
+        },
+      },
+    ];
+
+    let unfoundedRanges = this.checkItemForLoad(sequenceStart, sequenceEnd);
+
+    await sources.reduce(async (promise, source) => {
+      await promise;
+      if (unfoundedRanges.length === 0) {
+        return Promise.resolve();
+      }
+
+      console.log(`Unfounded (for ${source.name})`, unfoundedRanges);
+      unfoundedRanges = await source.loader(unfoundedRanges);
+
+      return Promise.resolve();
+    }, Promise.resolve());
   }
 
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
