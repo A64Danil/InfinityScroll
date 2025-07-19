@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env mode=development webpack serve --config config/webpack.dev.js",
-    "build": "cross-env mode=production webpack --config config/webpack.prod.js",
-    "buildLib": "webpack --config config/webpack.libraryBuild.js",
+    "build": "cross-env mode=production VERSION=$npm_package_version webpack --config config/webpack.prod.js",
+    "buildLib": "cross-env VERSION=$npm_package_version webpack --config config/webpack.libraryBuild.js",
     "datagen": "node mocks/dataGenerator.js",
     "lint": "eslint ./src --format table",
     "lint:fix": "eslint ./src --fix --format table --color",
