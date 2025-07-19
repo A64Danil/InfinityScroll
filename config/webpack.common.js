@@ -30,6 +30,7 @@ function generateHtmlPlugins(templateDir) {
         return new HtmlWebpackPlugin({
             title: namedTitle,
             origName: name.replace('demoList_', ''),
+            libVersion: process.env.VERSION,
             filename: `${name}.html`,
             template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`),
             mode: process.env.mode,
