@@ -84,8 +84,8 @@ const mainProdConfig = merge(common, {
     },
     optimization: {
         // TODO: Не забыть включить минимизацию!!!
-        // minimize: true,
-        minimize: false,
+        minimize: true,
+        // minimize: false,
         minimizer: [
             (compiler) => {
                 const TerserPlugin = require('terser-webpack-plugin');
