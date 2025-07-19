@@ -60,7 +60,7 @@ module.exports = {
         extensions: ['.js', '.ts'],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         // Copies files from target to destination folder
         new CopyWebpackPlugin({
             patterns: [
