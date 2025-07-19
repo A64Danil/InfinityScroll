@@ -19,7 +19,7 @@ module.exports = {
     output: {
         path: paths.lib,
         // filename: 'InfinityScroll.bundle.[contenthash].js',
-        filename: 'infinityScroll.bundle.js',
+        filename: `infinityScroll-${process.env.VERSION}.js`,
         // publicPath: '/', // добавлено
         library: 'InfinityScroll', // Имя, под которым будет доступен класс
         libraryTarget: 'global', // Указываем, что класс добавляется в глобальный объект (window)
