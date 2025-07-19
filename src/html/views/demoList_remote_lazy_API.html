@@ -1,6 +1,6 @@
 <% var data = { title: htmlWebpackPlugin.options.title, origName:
 htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
-author: "Danil X" }; %>
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,10 +47,19 @@ author: "Danil X" }; %>
     `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
   selectorId: 'REMOTE_LAZY_API',
   forcedListLength: 17154017,
-  templateString: (element, listLength) => `&lt;li
+  templateString: ({ item, listLength, idx }) =&gt; `&lt;li
               class="REMOTE_LAZY_API__listItem" &gt;
-           ${element?.name}
-    &lt;/li&gt;`,
+            &lt;div class="contentWrapper"&gt;
+              &lt;p class="title"&gt;
+                &lt;em&gt;Company:&lt;/em&gt; ${item?.name} 
+                &lt;span&gt;(${idx})&lt;/span&gt;
+                &lt;/p&gt;
+              &lt;p class="desc"&gt;
+                &lt;em&gt;website:&lt;/em&gt; ${item?.website}  &lt;em&gt;(industry: ${item?.industry})&lt;/em&gt; 
+              &lt;/p&gt;
+              
+            &lt;/div&gt;
+&lt;/li&gt;`,
 };
 
 
@@ -99,10 +108,19 @@ author: "Danil X" }; %>
         selectorId: 'REMOTE_LAZY_API',
         forcedListLength: 17154017,
         // listType: 'list',
-        templateString: (element, listLength) => `<li
+          templateString: ({ item, listLength, idx }) => `<li
         class="REMOTE_LAZY_API__listItem" >
-           ${element?.name}
-    </li>`,
+            <div class="contentWrapper">
+              <p class="title">
+                <em>Company:</em> ${item?.name}
+                <span>(${idx})</span>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${item?.website}  <em>(industry: ${item?.industry})</em>
+              </p>
+
+            </div>
+</li>`,
       };
 
       new InfinityScroll(REMOTE_LAZY_API_PROPS);
