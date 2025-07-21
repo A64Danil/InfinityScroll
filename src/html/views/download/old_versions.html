@@ -1,0 +1,27 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+    <section class="container">
+      <h2>Old versions</h2>
+    </section>
+
+    <section class="container">
+      <ul class="listOfOldVersions">
+        <li><a href="/js/infinityScroll-1.9.1.js">1.9.1</a></li>
+        <li><a href="/js/infinityScroll-1.9.0.js">1.9.0</a></li>
+      </ul>
+    </section>
+
+  </body>
+</html>
