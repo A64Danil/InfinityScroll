@@ -156,3 +156,21 @@ pre {
     display: block;
   }
 }
+
+.demoLinkItem {
+  margin-bottom: 16px;
+}
+
+.demoLink {
+  display: inline-block;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px 24px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #eee;
+  }
+}
+
