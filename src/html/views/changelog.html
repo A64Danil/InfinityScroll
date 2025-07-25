@@ -5,6 +5,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta http-equiv="refresh" content="0; url=/download/old_versions.html" />
     <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
@@ -17,17 +18,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     </section>
 
     <section class="container">
-      <h3>1.9.1</h3>
-      <p class="codeDescription">Build-related changes</p>
-      <ul>
-        <li>Add version to name of filelibrary </li>
-        <li>Change webpack settings</li>
-      </ul>
-    </section>
-
-    <section class="container">
-      <h3>1.9.0</h3>
-      <p class="codeDescription">First test version</p>
+      <p><a href="/download/old_versions.html">Redirect to changelog page</a></p>
     </section>
   </body>
 </html>
