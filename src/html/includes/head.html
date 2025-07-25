@@ -12,18 +12,18 @@
 <script src="/js/infinityScroll-<%= libVersion %>.js"></script>
 <link rel="stylesheet" href="/styles/common.css" />
 <link rel="stylesheet" href="/styles/<%= origName %>.css" />
+<% } %>
 
 <link rel="stylesheet" href="/assets/styles/hl/atom-one-dark.min.css" />
 <link rel="stylesheet" href="/assets/styles/hl/nnfx-dark.min.css" />
 <link rel="stylesheet" href="/assets/styles/hl/agate.min.css" />
 <script src="/assets/js/hl/highlight.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', (event) => {
-    document.querySelectorAll('pre code').forEach((el) => {
-      hljs.highlightElement(el);
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.querySelectorAll('pre code').forEach((el) => {
+            hljs.highlightElement(el);
+        });
     });
-  });
 </script>
-<% } %>
 
 <title>Infinity Scroll - <%=title%></title>
