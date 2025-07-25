@@ -17,55 +17,94 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     <section class="container">
       <h2>Demo list</h2>
 
-      <h3>Local lists <small>(only full load available)</small></h3>
-      <p>Local - data saved in your JS file (just in array or imported from JSON, etc)</p>
+      <h3>Local data <small class="titleDescr">(in memory)</small></h3>
 
       <ul class="listOfDemoLink">
         <li class="demoLinkItem">
-          <a href="/demoList_local_basic_10000items.html" class="demoLink"
-          >Basic demo without styles (10 000 items)
+          <a href="/demoList_local_basic_10000items.html" class="demoLink">
+            <span class="demoIcon demoIcon_list demoIcon_noStyle"></span>
+            No styles
+            <span class="demoLinkAmount">10 000 items</span>
           </a>
         </li>
         <li class="demoLinkItem">
           <a href="/demoList_local_simple_100item.html" class="demoLink"
-          >Simple demo with styles (100 items)</a
+          >
+            <span class="demoIcon demoIcon_list"></span>
+            Simple demo
+            <span class="demoLinkAmount">100 items</span>
+          </a
           >
         </li>
       </ul>
 
 
-      <h3>Remote lists  <small>(full load)</small></h3>
+      <h3>Remote data <small class="titleDescr">(full load)</small></h3>
       <ul class="listOfDemoLink">
+
         <li class="demoLinkItem">
-          <a href="/demoList_remote_simple_500item.html" class="demoLink"
-          >List, JsonPlaceholder API (500 items)</a
+          <a href="/demoList_remote_simple_500item.html" class="demoLink" title="
+            JsonPlaceholder API"
           >
+            <span class="demoIcon demoIcon_list">
+              <span class="remoteIcon">⬇</span>
+            </span>
+            <span class="demoLinkAmount">500 items</span>
+          </a>
         </li>
 
         <li class="demoLinkItem">
-          <a href="/demoList_remote_simple_API_100items.html" class="demoLink"
-          >List, iScroll Api (100 items)</a
+          <a href="/demoList_remote_simple_API_100items.html" class="demoLink" title="
+            iScroll API"
+          >
+            <span class="demoIcon demoIcon_list">
+              <span class="remoteIcon">⬇</span>
+            </span>
+            <span class="demoLinkAmount">100 items</span>
+          </a
           >
         </li>
       </ul>
 
-      <h3>Remote lists  <small>(lazy load)</small></h3>
+      <h3>Remote data <small class="titleDescr">(lazy load)</small></h3>
       <ul class="listOfDemoLink">
         <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_API.html" class="demoLink"
-          >List, iScroll Api (17 000 000+ items)</a
+          <a href="/demoList_remote_simple_500item.html" class="demoLink" title="
+            iScroll Api"
+          >
+            <span class="demoIcon demoIcon_list demoIcon_lazy">
+               <span class="remoteIcon">⬇</span>
+            </span>
+            Big data
+            <span class="demoLinkAmount">17 000 000+ items</span></a
           >
         </li>
 
         <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_100items_table_iscrollAPI.html" class="demoLink"
-          >Table, iSrcoll Api (100 items)</a
+          <a href="/demoList_remote_lazy_100items_table_iscrollAPI.html" class="demoLink" title="
+            iScroll Api"
+          >
+            <span class="demoIcon demoIcon_table demoIcon_lazy">
+               <span class="remoteIcon">⬇</span>
+            </span>
+
+            Table
+            <span class="demoLinkAmount">100 items</span>
+          </a
           >
         </li>
 
         <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_dummyjson_API.html" class="demoLink"
-          >List with subdir, DummyJSON Api (~200 items)</a
+          <a href="/demoList_remote_lazy_dummyjson_API.html" class="demoLink" title="
+            DummyJSON Api"
+          >
+             <span class="demoIcon demoIcon_list demoIcon_lazy">
+               <span class="remoteIcon">⬇</span>
+            </span>
+
+              With subdir
+            <span class="demoLinkAmount">~200 items</span>
+          </a
           >
         </li>
       </ul>
