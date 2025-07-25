@@ -1,0 +1,34 @@
+
+// TODO: это надо перенести в js
+.middleWrapper {
+  position: relative;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.vSrcollbar {
+  position: absolute;
+  //left: 50px;
+  top: 0;
+  right: 0px;
+  //right: -10px;
+  //transform: translate(-16px, 0px);
+  //transform: translate(-100%, 0px);
+  //transform: translate(100%, 0px);
+  //width: 400px;
+  height: 100%;
+  overflow-y: scroll;
+  background-color: transparent;
+}
+
+.vSrcollbar_debugMode {
+  width: 400px;
+  transform: translate(-16px, 0px);
+  background-color: #5c637033;
+}
+
+.vScrollbarFiller {
+  width: 100px;
+  //height: 10000000px;
+  background-color: red;
+}
