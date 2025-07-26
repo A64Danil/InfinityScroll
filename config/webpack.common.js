@@ -54,6 +54,7 @@ function generateHtmlPlugins(templateDir) {
 
         return new HtmlWebpackPlugin({
             title: namedTitle,
+            // TODO: уже не надо - убрать
             origName: name.replace('demoList_', ''),
             libVersion: process.env.VERSION,
             filename: outputPath, // Теперь включает путь с папками

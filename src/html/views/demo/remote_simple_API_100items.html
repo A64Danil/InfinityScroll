@@ -5,16 +5,16 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
   </head>
   <body>
     <section class="container">
-      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
     </section>
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../includes/demoLists/remote_simple_api_100items.html'))(data)
+      _.template(require('html-loader!./../../includes/demoLists/remote_simple_api_100items.html'))(data)
       %>
     </section>
 
@@ -22,18 +22,18 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       <h2>How to use it:</h2>
       <p class="codeDescription">
         <%=
-        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
         %>
       </p>
       <p class="codeDescription">2. Put script to the head tag:</p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/remote_simple_api_100items.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/remote_simple_api_100items.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
@@ -77,7 +77,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../includes/demoDescriptions/listSetupShort.html'))(data)
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupShort.html'))(data)
       %>
     </section>
     <% if (data.mode === 'production') {%>
