@@ -172,24 +172,10 @@ const TABLE_CONFIG = {
 new InfinityScroll(TABLE_CONFIG);
 ```
 
-xplorer 11+
-
 ## Demo
 
 Visit the [demo page](https://iscroll.qoobeo.ru/demo/index.html) to see InfinityScroll in action.
 
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/A64Danil/InfinityScroll.git
-
-# Navigate to project directory
-cd InfinityScroll
-
-# Open examples in browser
-# Open any HTML file from the examples/ folder
-```
 
 ## Contributing
 
