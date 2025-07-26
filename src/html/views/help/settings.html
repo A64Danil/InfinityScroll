@@ -5,11 +5,11 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
   </head>
   <body>
     <section class="container">
-      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
     </section>
 
     <section class="container">
@@ -42,7 +42,7 @@ new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../includes/demoDescriptions/listSetupFull.html'))(data)
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupFull.html'))(data)
       %>
     </section>
   </body>

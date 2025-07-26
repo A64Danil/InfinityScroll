@@ -5,25 +5,25 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
   </head>
   <body>
     <section class="container">
-      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
     </section>
     
     <section class="container">
       <h2>Getting Started:</h2>
       <p class="codeDescription">
         <%=
-        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
         %>
       </p>
       <p class="codeDescription">
         2. Put script to the head tag or before your closing body tag:
       </p>
       <pre class="code">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
@@ -61,7 +61,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       <h2>Config's property description</h2>
       <p>
         Here you can see
-        <a href="/settings.html">full instruction to setup</a> your list!
+        <a href="/help/settings.html">full instruction to setup</a> your list!
       </p>
     </section>
   </body>
