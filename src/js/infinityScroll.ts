@@ -242,6 +242,22 @@ class InfinityScroll {
     }
 
     // TODO: проблема в том что мы "перекрываем" кешированные данные свежими
+    // Решение будет после того как функция setInitialListData будет разбита на несколько функций
+
+    // 1. получаем данные из IndexedDB
+    // 2. если есть, устанавливаем их в список
+    // 3. получаем параметры АПИ и начальные данные для отрисовки
+    // 4. Стартуем список
+
+    // проблема - пункты 1 и 3 - асинхронные
+
+    // 2 всегда идёт после 1
+    // 1 и 3 могут (и должны) выполняться параллельно
+    // 4 идёт всегда последним
+
+    // Если в кэше ничего нет, то ничего и не делаем
+    // Если интернет не работате, то запускаем start без ожидания
+
     this.getSavedListData().then((data) => {
       if (data.length) {
         this.list.data = data;
@@ -984,6 +1000,8 @@ class InfinityScroll {
     // TODO: change this
     // const safeDataSize = 100000;
     const safeDataSize = 10;
+    // const dataSizeLimit = this.isLazy ? safeDataSize : size;
+    const dataSizeLimit = 10;
     console.log(size);
     let listData;
     if (size < safeDataSize) {
@@ -996,7 +1014,14 @@ class InfinityScroll {
     return listData;
   }
 
+  /*
+   * Define length of list and length of last page;
+   * Also define apiSettings, html-height and fetch initial data
+   * */
+
+  // TODO: кажеься надо разбить на несколько отдельных функций
   async setInitialListData(data: object[] | DataURLType) {
+    console.log('---- setInitialListData ----');
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
       this.list.data = data as [];
@@ -1013,6 +1038,7 @@ class InfinityScroll {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
           const extractedData = this.extractResponse(fetchedData);
           // this.list.data = extractedData;
+          console.log('after get remote data');
           this.setListData(extractedData);
           newLength =
             this.forcedListLength || (extractedData && extractedData.length);
