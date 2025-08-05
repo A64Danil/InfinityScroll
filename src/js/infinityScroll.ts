@@ -1000,11 +1000,11 @@ class InfinityScroll {
     // TODO: change this
     // const safeDataSize = 100000;
     const safeDataSize = 10;
-    // const dataSizeLimit = this.isLazy ? safeDataSize : size;
-    const dataSizeLimit = 10;
+    const dataSizeLimit = this.isLazy ? safeDataSize : size;
+    // const dataSizeLimit = 10; // for tests
     console.log(size);
     let listData;
-    if (size < safeDataSize) {
+    if (size <= dataSizeLimit) {
       listData = await this.dbmanager.readAll();
     } else {
       console.warn('Объем закешированных данных слишком большой');
