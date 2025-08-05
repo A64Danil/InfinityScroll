@@ -49,10 +49,10 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   const LOCAL_BASIC_10000ITEMS_PROPS = {
       data: BigJson1, // Any array
       selectorId: 'LOCAL_BASIC_10000ITEMS', // Container's ID
-      listWrapperHeight: '350px', // Your list's height
-      templateString: (element, listLength, number) => `&lt;li&gt;
-        ${element.name} ${element.number} - ${number}
-&lt;/li&gt;`, // template of list items
+      listWrapperHeight: '350px', // Because this list hasn't css-styles
+      templateString: ({ item, idx }) => `&lt;li&gt;
+            ${item.name} ${item.number} - ${idx}
+    &lt;/li&gt;`, // template of list items
   };
 
   new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
@@ -74,12 +74,12 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
       const BigJson1 = BigDataList10000.data;
 
-      const LOCAL_BASIC_10000ITEMS_PROPS = {
-        data: BigJson1,
-        selectorId: 'LOCAL_BASIC_10000ITEMS',
-        listWrapperHeight: '350px',
-        templateString: (element, listLength, number) => `<li>
-            ${element.name} ${element.number} - ${number}
+      const LOCAL_BASIC_10000ITEMS_PROPS =  {
+          data: BigJson1,
+          selectorId: 'LOCAL_BASIC_10000ITEMS',
+          listWrapperHeight: '350px',
+          templateString: ({ item, idx }) => `<li>
+            ${item.name} ${item.number} - ${idx}
     </li>`,
       };
 

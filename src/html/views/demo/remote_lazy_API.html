@@ -69,26 +69,53 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
 .REMOTE_LAZY_API {
-  color: #333;
-  height: 260px;
+    color: #333;
+    height: 600px;
+    background-color: #fff;
+    outline: 3px solid #a9a9a9
 }
+
+.REMOTE_LAZY_API_List {
+    padding: 0;
+    margin: 0
+}
+
 .REMOTE_LAZY_API__listItem {
-  padding: 8px 10px;
-  font-weight: normal;
-  border-radius: 4px;
-  font-size: 18px;
-  max-height: 72px;
-  overflow: hidden;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 12px 10px 20px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden
 }
+
+.REMOTE_LAZY_API__listItem:nth-child(2n) {
+    background-color: #f7f7f7
+}
+
 .REMOTE_LAZY_API__listItem:hover {
-  background: #eee;
+    background: #eee
 }
+
 .REMOTE_LAZY_API__listItem:before {
-  content: attr(aria-posinset) ')';
+    content: attr(aria-posinset) ")";
+    font-size: 24px;
+    padding-right: 5px
 }
-.REMOTE_LAZY_API__listItem.big {
-  padding: 15px 10px;
-  font-size: 36px;
+
+.REMOTE_LAZY_API__listItem .contentWrapper .title {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.REMOTE_LAZY_API__listItem .contentWrapper .title span {
+    color: gray;
+    font-size: 14px
+}
+
+.REMOTE_LAZY_API__listItem .contentWrapper em {
+    color: gray
 }
       </code></pre>
     </section>

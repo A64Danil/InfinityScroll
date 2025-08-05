@@ -51,10 +51,45 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   }) => `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
   selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
   subDir: 'products',
-  templateString: (element, listLength) => `&lt;li
-              class="REMOTE_LAZY_DUMMYJSON_API_List__listItem big" &gt;
-            ${element?.id} ${element?.title}
-    &lt;/li&gt;`,
+  templateString: ({ item, templateCb }) => {
+    const { thumbnail, title, brand, website, industry, reviews } = item;
+
+    return `&lt;li
+              class="REMOTE_LAZY_DUMMYJSON_API__listItem"
+      &gt;
+            &lt;div class="imgWrapper"&gt;
+                &lt;img src="${thumbnail}" alt=""&gt;
+            &lt;/div&gt;
+            &lt;div class="contentWrapper"&gt;
+        
+              &lt;p class="title"&gt;
+                ${title} &lt;em&gt;(${brand})&lt;/em&gt;
+                &lt;/p&gt;
+              &lt;p class="desc"&gt;
+                &lt;em&gt;website:&lt;/em&gt; ${website}  &lt;em&gt;(industry: ${industry})&lt;/em&gt; 
+              &lt;/p&gt;
+              
+              &lt;div class="reviewList"&gt;
+              ${templateCb.reviewShower(reviews)}
+              &lt;/div&gt;
+              
+            &lt;/div&gt;
+    &lt;/li&gt;`;
+  },
+  templateCb: {
+    reviewShower(reviewsAray = [{}]) {
+      return reviewsAray
+        ?.map(
+          (el: Record&lt;string, unknown&gt;, i) => `&lt;div class="review"&gt;
+        &lt;p&gt;${el.reviewerName} &lt;em&gt;${el.reviewerEmail}&lt;/em&gt; &lt;strong&gt;${el.rating} / 5&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;${el.comment}&lt;/p&gt;
+        &lt;p&gt;&lt;em&gt;${el.date}&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;`
+        )
+        .join('');
+    },
+    anyOtherFunc() {},
+  },
 };
 
 
@@ -63,24 +98,77 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       </code></pre>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
+.REMOTE_LAZY_DUMMYJSON_API {
+    color: #333;
+    height: 610px
+}
+
 .REMOTE_LAZY_DUMMYJSON_API_List {
-  color: #333;
+    padding: 0;
+    margin: 0
 }
-.REMOTE_LAZY_DUMMYJSON_API_List__listItem {
-  padding: 5px 10px;
-  font-size: 18px;
-  font-weight: normal;
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 12px 10px 20px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden
 }
-.REMOTE_LAZY_DUMMYJSON_API_List__listItem:hover {
-  background: #eee;
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem:nth-child(2n) {
+    background-color: #f7f7f7
 }
-.REMOTE_LAZY_DUMMYJSON_API_List__listItem:before {
-  content: attr(aria-posinset) ')';
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem:hover {
+    background: #eee
 }
-.REMOTE_LAZY_DUMMYJSON_API_List__listItem.big {
-  padding: 15px 10px;
-  font-size: 36px;
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem:before {
+    content: attr(aria-posinset) ")";
+    font-size: 24px;
+    padding-right: 5px
 }
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .imgWrapper {
+    width: 120px
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .imgWrapper img {
+    max-width: 100%;
+    height: auto
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper .title {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper .title span {
+    color: gray;
+    font-size: 14px
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper .desc {
+    margin-bottom: 20px
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper em {
+    color: gray
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper .reviewList {
+    background-color: #f7f7f7;
+    border-left: 10px solid #ccc;
+    padding: 20px
+}
+
+.REMOTE_LAZY_DUMMYJSON_API__listItem .contentWrapper .reviewList .review {
+    margin-bottom: 10px
+}
+
       </code></pre>
     </section>
 
@@ -98,11 +186,45 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
           `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
         selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
         subDir: 'products',
-        templateString: (element, listLength) => `<li
-           class="REMOTE_LAZY_DUMMYJSON_API_List__listItem big"
+        templateString: ({ item, templateCb }) => {
+              const { thumbnail, title, brand, website, industry, reviews } = item;
+
+              return `<li
+        class="REMOTE_LAZY_DUMMYJSON_API__listItem"
         >
-            ${element?.id} ${element?.title}
-    </li>`,
+            <div class="imgWrapper">
+                <img src="${thumbnail}" alt="">
+            </div>
+            <div class="contentWrapper">
+
+              <p class="title">
+                ${title} <em>(${brand})</em>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${website}  <em>(industry: ${industry})</em>
+              </p>
+
+              <div class="reviewList">
+              ${templateCb.reviewShower(reviews)}
+              </div>
+
+            </div>
+    </li>`;
+          },
+        templateCb: {
+              reviewShower(reviewsAray = [{}]) {
+                  return reviewsAray
+                      ?.map(
+                          (el, i) => `<div class="review">
+        <p>${el.reviewerName} <em>${el.reviewerEmail}</em> <strong>${el.rating} / 5</strong></p>
+        <p>${el.comment}</p>
+        <p><em>${el.date}</em></p>
+</div>`
+                      )
+                      .join('');
+              },
+              anyOtherFunc() {},
+          },
       };
 
       new InfinityScroll(REMOTE_LAZY_DUMMYJSON_API_PROPS);

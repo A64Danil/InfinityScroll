@@ -49,10 +49,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   const LOCAL_SIMPLE_100ITEMS_PROPS = {
       data: BigJson1,
       selectorId: 'LOCAL_SIMPLE_100ITEMS',
-      listWrapperHeight: '270px',
-      templateString: (element, listLength, number) => `&lt;li
+      templateString: ({ item, listLength, idx }) =&gt; `&lt;li
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" &gt;
-            ${element.name} ${element.number} - ${number}
+            ${item.name} ${item.number} &lt;span&gt;(order number ${idx} of ${listLength})&lt;/span&gt;
     &lt;/li&gt;`,
   };
 
@@ -62,28 +61,49 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
 .LOCAL_SIMPLE_100ITEMS_Border {
-  position: relative;
-  padding: 10px 0;
-  border: 2px solid #444;
-  border-radius: 8px;
-  margin-bottom: 20px;
+    position: relative;
+    border: 2px solid #777;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden
 }
+
+#LOCAL_SIMPLE_100ITEMS {
+    height: 300px
+}
+
 .LOCAL_SIMPLE_100ITEMS_List {
-  color: #555;
-  margin: 0;
+    color: #444;
+    margin: 0;
+    padding-left: 0;
+    background-color: #f7f7f7
 }
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem {
-  padding: 8px 10px;
-  font-weight: normal;
-  border-radius: 4px;
-  font-size: 18px;
+    padding: 8px 10px;
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px
 }
+
+.LOCAL_SIMPLE_100ITEMS_List__listItem:nth-child(2n) {
+    background-color: #fefefe
+}
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem:hover {
-  background: #efefef;
+    background: #efefef
 }
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem:before {
-  content: attr(aria-posinset) ')';
+    content: attr(aria-posinset) ")";
+    color: #555
 }
+
+.LOCAL_SIMPLE_100ITEMS_List__listItem span {
+    font-size: 14px;
+    color: #888
+}
+
       </code></pre>
     </section>
 
@@ -103,9 +123,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       const LOCAL_SIMPLE_100ITEMS_PROPS = {
         data: BigJson1,
         selectorId: 'LOCAL_SIMPLE_100ITEMS',
-        templateString: (element, listLength, number) => `<li
-        class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
-            ${element.name} ${element.number} - ${number}
+        templateString: ({ item, listLength, idx }) => `<li
+          class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+            ${item.name} ${item.number} <span>(order number ${idx} of ${listLength})</span>
     </li>`,
       };
 

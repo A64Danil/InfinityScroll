@@ -43,13 +43,23 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   console.log('start: <%= data.title %> ');
 
   const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
-      data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`, // link to json (response from API)
+      data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`, // link to json (response from API)
       selectorId: 'REMOTE_SIMPLE_API_100ITEMS', // Container's ID
-      // listType: 'list',
-      templateString: (element, listLength, elemNum) => `&lt;li
-        class="REMOTE_simple_API_100ITEMS__listItem"&gt;
-               ${element?.name} (elemNum - ${elemNum})
-        &lt;/li&gt;`,
+      listWrapperHeight: '490px',
+      templateString: ({ item, listLength, idx }) => `&lt;li
+              class="REMOTE_SIMPLE_API_100ITEMS__listItem"
+      &gt;
+            &lt;div class="contentWrapper"&gt;
+              &lt;p class="title"&gt;
+                &lt;em&gt;Company:&lt;/em&gt; ${item?.name} 
+                &lt;span&gt;(${idx})&lt;/span&gt;
+                &lt;/p&gt;
+              &lt;p class="desc"&gt;
+                &lt;em&gt;website:&lt;/em&gt; ${item?.website}  &lt;em&gt;(industry: ${item?.industry})&lt;/em&gt; 
+              &lt;/p&gt;
+              
+            &lt;/div&gt;
+    &lt;/li&gt;`,
     };
 
   new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
@@ -57,21 +67,59 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       </code></pre>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
-.REMOTE_simple_API_100ITEMS {
-  color: #333;
+#REMOTE_SIMPLE_API_100ITEMS {
+    height: 290px;
+    background-color: #fff;
+    outline: 1px solid #a9a9a9
 }
-.REMOTE_simple_API_100ITEMS__listItem {
-  padding: 5px 10px;
-  font-weight: normal;
-  white-space: nowrap;
-  overflow: hidden;
+
+.REMOTE_SIMPLE_API_100ITEMS {
+    color: #333
 }
-.REMOTE_simple_API_100ITEMS__listItem:hover {
-  background: #eee;
+
+.REMOTE_SIMPLE_API_100ITEMS_List {
+    padding: 0;
+    margin: 0
 }
-.REMOTE_simple_API_100ITEMS__listItem:before {
-  content: attr(aria-posinset) ')';
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 12px 10px 20px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden
 }
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem:nth-child(2n) {
+    background-color: #f7f7f7
+}
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem:hover {
+    background: #eee
+}
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem:before {
+    content: attr(aria-posinset) ")";
+    font-size: 24px;
+    padding-right: 5px
+}
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem .contentWrapper .title {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem .contentWrapper .title span {
+    color: gray;
+    font-size: 14px
+}
+
+.REMOTE_SIMPLE_API_100ITEMS__listItem .contentWrapper em {
+    color: gray
+}
+
       </code></pre>
     </section>
 
@@ -85,13 +133,23 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       console.log('start: <%= data.title %> ');
 
       const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
-        data: `https://restapi.qoobeo.ru/api/v1/companys?start=1&end=100`,
+        data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`,
         selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
-        templateString: (element, listLength, elemNum) => `<li
-        class="REMOTE_simple_API_100ITEMS__listItem"
-        >
-           ${element?.name} (elemNum - ${elemNum})
-    </li>`,
+        listWrapperHeight: '490px',
+        templateString: ({ item, listLength, idx }) => `<li
+          class="REMOTE_SIMPLE_API_100ITEMS__listItem"
+          >
+              <div class="contentWrapper">
+                <p class="title">
+                  <em>Company:</em> ${item?.name}
+                  <span>(${idx})</span>
+                  </p>
+                <p class="desc">
+                  <em>website:</em> ${item?.website}  <em>(industry: ${item?.industry})</em>
+                </p>
+
+              </div>
+      </li>`,
       };
 
       new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
