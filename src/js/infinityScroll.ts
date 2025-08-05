@@ -506,6 +506,7 @@ class InfinityScroll {
       this.list.wrapperHeight / this.list.itemHeight
     );
 
+    // TODO: сделать несколько проверок на случай если всего 1 страница и айтемов меньше чем амаунт * 4
     this.list.existingSizeInDOM = this.chunk.amount * 4; // TODO: может быть ситуация, когда деток меньше чем (чанк * 4) - сделать сеттер или проверку (лучше сеттер)
     this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
 
