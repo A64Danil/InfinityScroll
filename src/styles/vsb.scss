@@ -4,6 +4,12 @@
   position: relative;
   overflow-y: scroll;
   height: 100%;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.middleWrapper::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari */
 }
 
 .vSrcollbar {
@@ -16,6 +22,7 @@
   //transform: translate(-100%, 0px);
   //transform: translate(100%, 0px);
   //width: 400px;
+  width: 400px;
   height: 100%;
   overflow-y: scroll;
   background-color: transparent;
@@ -50,26 +57,26 @@
   background-color: #5c637033;
 }
 
-/* Базовые стили */
-.persistent-scrollbar {
+/* Новый вариант - Базовые стили */
+.vSrcollbar {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 /* Для всех webkit браузеров (включая iOS Safari) */
-.persistent-scrollbar::-webkit-scrollbar {
+.vSrcollbar::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   -webkit-appearance: none;
   appearance: none;
 }
 
-.persistent-scrollbar::-webkit-scrollbar-track {
+.vSrcollbar::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
 
-.persistent-scrollbar::-webkit-scrollbar-thumb {
+.vSrcollbar::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 4px;
   /* Ключевое свойство для постоянной видимости */
@@ -78,7 +85,7 @@
 
 /* Firefox */
 @-moz-document url-prefix() {
-  .persistent-scrollbar {
+  .vSrcollbar {
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
   }
@@ -86,12 +93,12 @@
 
 /* Специально для touch устройств */
 @media (pointer: coarse) {
-  .persistent-scrollbar::-webkit-scrollbar {
+  .vSrcollbar::-webkit-scrollbar {
     width: 12px;
     height: 12px;
   }
 
-  .persistent-scrollbar::-webkit-scrollbar-thumb {
+  .vSrcollbar::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.4);
     min-height: 30px;
   }

@@ -65,6 +65,7 @@ export class Vsb {
     // this.safeLimit = 10000000;
     // this.safeLimit = 8000000;
     this.safeLimit = 111000;
+    // this.safeLimit = 51000;
     // this.safeLimit = 11100;
     // this.safeLimit = 10;
 
