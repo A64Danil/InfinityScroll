@@ -1,5 +1,7 @@
 import { IScrollDirection } from '../../types/IScrollDirection';
 
+import { getBrowserName } from '../../helpers/detectClient';
+
 // Virtual Scroll Bar
 export class Vsb {
   // Ссылка на html элемент со скроллом (виртуал скролл)
@@ -81,6 +83,8 @@ export class Vsb {
 
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
+    const browserName = getBrowserName();
+    this.elem.classList.add(`vSrcollbar_${browserName}`);
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
     this.elem.addEventListener('scroll', scrollTrigger);

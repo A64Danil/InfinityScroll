@@ -14,8 +14,8 @@
 .vSrcollbar {
   position: absolute;
   top: 0;
-  right: 0px;
-  width: 18px;
+  right: 0;
+  width: 12px;
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -34,15 +34,15 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+    //background: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
+    border-radius: 6px;
     /* Ключевое свойство для постоянной видимости */
-    //min-height: 20px;
+    min-height: 20px;
     width: 11px;
   }
 
@@ -66,16 +66,47 @@
     }
   }
 
-  &_chrome {
-    .vSrcollbar::-webkit-scrollbar-track {
-      background: white;
-      border-radius: 4px;
-      padding: 0 3px;
+  &_googleChrome {
+    &::-webkit-scrollbar {
+      width: 9px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #fcfcfc;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #8b8b8b;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgb(99 99 99);
     }
   }
-}
 
-//#8b8b8b
+  &_safari {
+
+    &::-webkit-scrollbar {
+    }
+
+    &::-webkit-scrollbar:hover {
+    }
+
+    &::-webkit-scrollbar-track {
+    }
+
+    &::-webkit-scrollbar-track:hover {
+      background: white;
+      border-left: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #8b8b8b;
+    }
+
+  }
+}
 
 
 
