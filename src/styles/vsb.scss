@@ -15,59 +15,69 @@
   position: absolute;
   top: 0;
   right: 0px;
-  width: 12px;
+  width: 18px;
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   background-color: transparent;
-}
 
-.vSrcollbar_debugMode {
-  width: 400px;
-  transform: translate(-16px, 0px);
-  background-color: #5c637033;
-}
+  &_debugMode {
+    width: 400px;
+    transform: translate(-16px, 0px);
+    background-color: #5c637033;
+  }
 
-/* Для всех webkit браузеров (включая iOS Safari) */
-.vSrcollbar::-webkit-scrollbar {
-  width: 11px;
-  min-height: 16px;
-  -webkit-appearance: none;
-  appearance: none;
-}
+  &::-webkit-scrollbar {
+    width: 11px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-.vSrcollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-}
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
 
-.vSrcollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  /* Ключевое свойство для постоянной видимости */
-  min-height: 20px;
-}
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    /* Ключевое свойство для постоянной видимости */
+    //min-height: 20px;
+    width: 11px;
+  }
 
-/* Firefox */
-@-moz-document url-prefix() {
-  .vSrcollbar {
+
+  /* Firefox */
+  @-moz-document url-prefix() {
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
   }
-}
 
-/* Специально для touch устройств */
-@media (pointer: coarse) {
-  .vSrcollbar::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+  /* Специально для touch устройств */
+  @media (pointer: coarse) {
+    &::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.4);
+      min-height: 30px;
+    }
   }
 
-  .vSrcollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.4);
-    min-height: 30px;
+  &_chrome {
+    .vSrcollbar::-webkit-scrollbar-track {
+      background: white;
+      border-radius: 4px;
+      padding: 0 3px;
+    }
   }
 }
+
+//#8b8b8b
+
+
 
 .vScrollbarFiller {
   width: 100%;
