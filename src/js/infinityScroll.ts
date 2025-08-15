@@ -172,12 +172,12 @@ class InfinityScroll {
     this.list = new ListController();
 
     this.vsb = new Vsb(this.isDebugMode, () => {
-      if (this.isSyncing) {
-        // console.log('Внещний скролл, поэтому не тригерим handleScroll');
+      if (this.vsb.isSyncing || this.isSyncing) {
+        console.log('Внещний скролл, поэтому не тригерим handleScroll - 2.0');
         return;
       }
-
-      this.isSyncing = true;
+      console.log('VSB scroll listener - 2.1');
+      this.vsb.isSyncing = true;
 
       this.scroll.setScrollDirection(
         this.vsb.elem.scrollTop,
@@ -189,18 +189,23 @@ class InfinityScroll {
 
       // this.isSyncing = false;
 
-      setTimeout(() => {
-        if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
-          // console.error(
-          //   'не совпадает!',
-          //   this.vsb.scroll,
-          //   this.vsb.elem.scrollTop
-          // );
-          this.vsb.handleScroll();
-          // this.calcCurrentDOMRender();
-        }
-        this.isSyncing = false;
-      }, 0);
+      // setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          console.log('Убираем синхронизацию - 2.2');
+          if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
+            // console.error(
+            //   'не совпадает!',
+            //   this.vsb.scroll,
+            //   this.vsb.elem.scrollTop
+            // );
+            this.vsb.handleScroll();
+            // this.calcCurrentDOMRender();
+          }
+          this.vsb.isSyncing = false;
+        });
+      });
+      // }, 16);
     });
 
     this.dbmanager = new IndexedTTLStoreManager(this.selectorId);
@@ -332,9 +337,11 @@ class InfinityScroll {
     this.createVirtualScroll();
 
     this.middleWrapper.addEventListener('scroll', (e) => {
-      if (this.isSyncing) {
+      if (this.vsb.isSyncing || this.isSyncing) {
+        console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
+      console.log('main scroll listener - 1.1');
       this.isSyncing = true;
       this.scroll.setScrollDirection(
         this.middleWrapper.scrollTop,
@@ -368,10 +375,15 @@ class InfinityScroll {
       } else {
         this.calcCurrentDOMRender();
       }
-      setTimeout(() => {
-        this.vsb.isPageChanged = false;
-        this.isSyncing = false;
-      }, 0);
+      // setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          console.log('Убираем синхронизацию - 1.2');
+          this.vsb.isPageChanged = false;
+          this.isSyncing = false;
+        });
+      });
+      // }, 16);
     });
     //
     // this.test();
