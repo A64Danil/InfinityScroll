@@ -51,6 +51,8 @@ export class Vsb {
   // Callback to set height to offsetElement
   setHeight: (() => void) | undefined;
 
+  isSyncing = false;
+
   constructor(isDebugMode: boolean, scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
