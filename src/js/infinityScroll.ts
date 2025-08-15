@@ -172,7 +172,7 @@ class InfinityScroll {
     this.list = new ListController();
 
     this.vsb = new Vsb(this.isDebugMode, () => {
-      if (this.vsb.isSyncing || this.isSyncing) {
+      if (this.isSyncing) {
         console.log('Внещний скролл, поэтому не тригерим handleScroll - 2.0');
         return;
       }
@@ -337,7 +337,7 @@ class InfinityScroll {
     this.createVirtualScroll();
 
     this.middleWrapper.addEventListener('scroll', (e) => {
-      if (this.vsb.isSyncing || this.isSyncing) {
+      if (this.vsb.isSyncing) {
         console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
