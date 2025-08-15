@@ -160,8 +160,8 @@ class InfinityScroll {
 
     this.listWrapperHeight = props.listWrapperHeight;
 
-    // this.isDebugMode = props.isDebugMode || false;
-    this.isDebugMode = props.isDebugMode || true;
+    this.isDebugMode = props.isDebugMode || false;
+    // this.isDebugMode = props.isDebugMode || true;
 
     this.listEl = this.createInnerList();
 

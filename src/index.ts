@@ -37,6 +37,7 @@ console.log('Entry point');
   if (pureList !== null) {
     console.log('Basic list Started');
     const myLazyScroll = new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
+    window.iScroll = myLazyScroll;
   }
 
   const instantList = document.getElementById(
