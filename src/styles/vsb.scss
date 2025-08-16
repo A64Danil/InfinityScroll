@@ -15,7 +15,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 12px;
+  min-width: 12px;
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -27,33 +27,26 @@
     background-color: #5c637033;
   }
 
-  &::-webkit-scrollbar {
-    width: 11px;
-    -webkit-appearance: none;
-    appearance: none;
+  &_googleChrome {
+    min-width: 16px;
   }
 
-  &::-webkit-scrollbar-track {
-    //background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 6px;
-    /* Ключевое свойство для постоянной видимости */
-    min-height: 20px;
-    width: 11px;
+  &_mozillaFirefox {
+    min-width: 18px;
   }
 
 
-  /* Firefox */
-  @-moz-document url-prefix() {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+  &_safari {
+    min-width: 16px;
+
+    &::-webkit-scrollbar {
+      //-webkit-appearance: none;
+      //width: 16px; /* Всегда широкий как при наведении */
+    }
   }
 
-  /* Специально для touch устройств */
+
+  // Специально для touch устройств
   @media (pointer: coarse) {
     &::-webkit-scrollbar {
       width: 12px;
@@ -66,46 +59,6 @@
     }
   }
 
-  &_googleChrome {
-    &::-webkit-scrollbar {
-      width: 9px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #fcfcfc;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #8b8b8b;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: rgb(99 99 99);
-    }
-  }
-
-  &_safari {
-
-    &::-webkit-scrollbar {
-    }
-
-    &::-webkit-scrollbar:hover {
-    }
-
-    &::-webkit-scrollbar-track {
-    }
-
-    &::-webkit-scrollbar-track:hover {
-      background: white;
-      border-left: 1px solid #ccc;
-      border-right: 1px solid #ccc;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #8b8b8b;
-    }
-
-  }
 }
 
 
