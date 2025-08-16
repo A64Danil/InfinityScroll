@@ -219,8 +219,6 @@ class InfinityScroll {
     const domChangerProps = {
       skeleton: this.skeleton,
       targetElem: this.listEl,
-      // TODO: этот пропс тут НЕ НУЖЕН??
-      template: props.templateString,
     };
     this.domMngr = new DomManager(domChangerProps);
 

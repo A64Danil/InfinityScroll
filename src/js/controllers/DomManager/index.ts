@@ -3,7 +3,6 @@ import { ChunkController } from '../Chunk';
 import { Skeleton } from '../Skeleton';
 import { Vsb } from '../VirtualScrollbar';
 import { IScrollDirection } from '../../types/IScrollDirection';
-import { TemplateStringFunction } from '../../types/TemplateStringFunction';
 import {
   ChunkPropsToModifyDom,
   ListPropsToModifyDom,
@@ -14,20 +13,7 @@ import { Rec } from '../../types/utils';
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
-  public isStopRender = false;
-
-  // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
-  private delay = 0;
-
-  // хранит в себе id сетТаймаута
-  private fillListTimerId: number | undefined;
-
   readonly targetElem;
-
-  targetElemSavedOffset = 0;
-
-  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
-  private readonly template;
 
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
@@ -36,15 +22,10 @@ export class DomManager {
 
   offsetElem: HTMLElement | null;
 
-  constructor(props: {
-    skeleton: Skeleton;
-    template: TemplateStringFunction;
-    targetElem: HTMLElement;
-  }) {
+  constructor(props: { skeleton: Skeleton; targetElem: HTMLElement }) {
     // this.data = props.data;
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
-    this.template = props.template;
     this.offsetElem = null;
   }
 
