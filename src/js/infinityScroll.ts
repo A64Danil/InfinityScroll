@@ -310,13 +310,12 @@ class InfinityScroll {
         : 1;
 
     const renderProps = {
-      halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
       lastPageLastRenderIndex: this.chunk.lastPageLastRenderIndex,
       listLength: this.list.length,
       listlastPageLength: this.list.lastPageLength,
       chunkAmount: this.chunk.amount,
-      tailingElementsAmount: this.list.tailingElementsAmount,
+      // tailingElementsAmount: this.list.tailingElementsAmount,
     };
     console.log(renderProps);
     if (isPropsUndefined(renderProps)) {
