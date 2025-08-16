@@ -48,24 +48,6 @@ const errorLang = LANG === 'ru' ? 'ru' : 'en';
 
 const errors = errorMsg[errorLang];
 
-const cssAnimationSkeletonText = `.loading .dots {
-    width: 0.5em;
-    animation: load 3s steps(4, end) infinite;
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: text-bottom;
-}
-
-@keyframes load {
-    from {
-        width: 0em;
-    }
-    to   {
-        width: 2em;
-    }
-}
-`;
-
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 // TODO: начать кэшировать некоторые настройки списка
@@ -467,66 +449,10 @@ class InfinityScroll {
       this.domMngr.targetElem.append(this.domMngr.createItem(elemData, 0));
       listItem = list.firstChild as HTMLElement;
     }
-
-    // TODO: вынести в отдельную функцию?
-    // Set required styles
-    const innerElementClassName = `${this.selectorId}_${this.listType
-      .charAt(0)
-      .toUpperCase()}${this.listType.slice(1)}`;
-
-    const mapOfChildSelector = {
-      list: 'li',
-      table: 'tbody > tr',
-      div: 'div',
-    };
-
-    const childElementTagName = mapOfChildSelector[this.listType];
-
-    const cssText = `.${this.selectorId}_List {
-      overflow: hidden; 
-      margin: 0;
-      }
-      
-.${this.selectorId}_List li { 
-      white-space: nowrap;
-    }
-
-    
-.${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}`;
-
-    const styleELem = document.createElement('style');
-    styleELem.appendChild(document.createTextNode(cssText));
-    this.wrapperEl.prepend(styleELem);
-    // End - Set required styles
-
     this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
-    const styleELemLoading = document.createElement('style');
-
-    const cssTextLoading = `.${this.selectorId}_List li.loading { 
-      min-height: ${this.list.itemHeight}px;
-      box-sizing: border-box;
-    }
-    
-.${this.selectorId}_List li.loading img { 
-      width: 100%;
-      aspect-ratio: 1;
-      background: #ccc;
-      animation: opacityLoader 3s ease-in-out infinite alternate;
-      border-radius: 10px;
-    }
-    
-@keyframes opacityLoader {
-    from {
-        opacity: 1;
-    }
-    to   {
-        opacity: 0.1;
-    }
-}
-    `;
-    styleELemLoading.appendChild(document.createTextNode(cssTextLoading));
-    styleELem.after(styleELemLoading);
+    // Set required styles
+    this.initializeBaseStyles();
 
     this.chunk.amount = Math.ceil(
       this.list.wrapperHeight / this.list.itemHeight
@@ -575,6 +501,71 @@ class InfinityScroll {
     if (listItem) {
       this.domMngr.removeItem('firstChild');
     }
+  }
+
+  initializeBaseStyles() {
+    const cssAnimationSkeletonText = `.loading .dots {
+    width: 0.5em;
+    animation: load 3s steps(4, end) infinite;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: text-bottom;
+}
+
+@keyframes load {
+    from {
+        width: 0em;
+    }
+    to   {
+        width: 2em;
+    }
+}
+`;
+
+    const innerElementClassName = `${this.selectorId}_${this.listType
+      .charAt(0)
+      .toUpperCase()}${this.listType.slice(1)}`;
+
+    const childElementTagName = {
+      list: 'li',
+      table: 'tbody > tr',
+      div: 'div',
+    }[this.listType];
+
+    const allStyles = `
+    .${this.selectorId}_List {
+      overflow: hidden; 
+      margin: 0;
+    }
+    
+    .${this.selectorId}_List li { 
+      white-space: nowrap;
+    }
+    
+    .${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}
+    
+    .${this.selectorId}_List li.loading { 
+      min-height: ${this.list.itemHeight}px;
+      box-sizing: border-box;
+    }
+    
+    .${this.selectorId}_List li.loading img { 
+      width: 100%;
+      aspect-ratio: 1;
+      background: #ccc;
+      animation: opacityLoader 3s ease-in-out infinite alternate;
+      border-radius: 10px;
+    }
+    
+    @keyframes opacityLoader {
+      from { opacity: 1; }
+      to { opacity: 0.1; }
+    }
+  `;
+
+    const styleElement = document.createElement('style');
+    styleElement.textContent = allStyles.trim();
+    this.wrapperEl.prepend(styleElement);
   }
 
   createVirtualScroll() {
