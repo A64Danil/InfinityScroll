@@ -12,8 +12,7 @@ export class Skeleton {
 
   private readonly templateCb: Record<string, (arg: any) => any> | undefined;
 
-  // TODO: 0 instead of undefined
-  private listLength: number | undefined;
+  private listLength = 0;
 
   private readonly makeItemFromString: (itemFromStrTpl: string) => HTMLElement;
 
@@ -33,8 +32,7 @@ export class Skeleton {
       props.listType !== 'table' ? setPlaceholder : setTdPlaceholder;
   }
 
-  // TODO: need to rename?
-  setListHeight(listLength: number) {
+  setListLength(listLength: number) {
     this.listLength = listLength;
   }
 

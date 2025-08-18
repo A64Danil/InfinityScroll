@@ -601,7 +601,7 @@ class InfinityScroll {
     }
 
     this.domMngr.setHeightToList(this.list);
-    this.skeleton.setListHeight(this.list.fullLength);
+    this.skeleton.setListLength(this.list.fullLength);
 
     // Не нужно?
     // this.list.startIndexOfLastPart =
@@ -1075,7 +1075,7 @@ class InfinityScroll {
     console.log('newLength', newLength);
     this.list.fullLength = newLength;
     this.list.length = newLength;
-    this.skeleton.setListHeight(this.list.length);
+    this.skeleton.setListLength(this.list.length);
   }
 
   // TODO: renderIndex or itemIndex ??? -> truly this is itemIndex, but name is no difference?
