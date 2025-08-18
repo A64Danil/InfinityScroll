@@ -29,7 +29,6 @@ export class DomManager {
     this.offsetElem = null;
   }
 
-  // TODO: rename to setHeight
   setHeightToList(list: ListPropsToModifyDom, vsb?: Vsb, offset = 0): void {
     let { length } = list;
 
