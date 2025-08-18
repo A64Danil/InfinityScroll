@@ -30,26 +30,15 @@ export class DomManager {
   }
 
   // TODO: rename to setHeight
-  setPaddingToList(
-    list: ListPropsToModifyDom,
-    chunkHtmlHeight: number,
-    vsb?: Vsb,
-    offset = 0
-  ): void {
+  setHeightToList(list: ListPropsToModifyDom, vsb?: Vsb, offset = 0): void {
     let { length } = list;
 
     if (vsb && vsb.currentPage !== 1 && vsb.currentPage === vsb.totalPages) {
       length = list.lastPageLength;
     }
 
-    // console.log('length', length);
-    // let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
+    console.log(this.targetElem);
     const height = length * list.itemHeight - offset;
-
-    // if (paddingBottom < 0) {
-    //   paddingBottom = 0;
-    // }
-    // this.targetElem.style.paddingBottom = `${paddingBottom}px`;
     this.targetElem.style.height = `${height}px`;
   }
 
@@ -113,7 +102,7 @@ export class DomManager {
     // }
 
     this.offsetElem.style.height = `${offset}px`;
-    this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
+    this.setHeightToList(list, vsb, offset);
   }
 
   createItem(elemData: Rec, elemNum: number): HTMLElement {

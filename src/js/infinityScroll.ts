@@ -281,8 +281,7 @@ class InfinityScroll {
       );
     }
 
-    this.vsb.setHeight = () =>
-      this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    this.vsb.setHeight = () => this.domMngr.setHeightToList(this.list);
 
     this.chunk.lastPageLastRenderIndex =
       this.list.lastPageLength > this.list.halfOfExistingSizeInDOM
@@ -303,7 +302,7 @@ class InfinityScroll {
     }
     this.render = new RenderController(renderProps);
     this.domMngr.fillList(this.list);
-    this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    this.domMngr.setHeightToList(this.list);
 
     this.scroll.maxScroll =
       this.list.length * this.list.itemHeight -
@@ -601,7 +600,7 @@ class InfinityScroll {
       );
     }
 
-    this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    this.domMngr.setHeightToList(this.list);
     this.skeleton.setListHeight(this.list.fullLength);
 
     // Не нужно?
