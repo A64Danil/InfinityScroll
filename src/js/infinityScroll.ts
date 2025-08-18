@@ -169,25 +169,15 @@ class InfinityScroll {
       this.vsb.handleScroll();
       this.calcCurrentDOMRender();
 
-      // this.isSyncing = false;
-
-      // setTimeout(() => {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           console.log('Убираем синхронизацию - 2.2');
           if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
-            // console.error(
-            //   'не совпадает!',
-            //   this.vsb.scroll,
-            //   this.vsb.elem.scrollTop
-            // );
             this.vsb.handleScroll();
-            // this.calcCurrentDOMRender();
           }
           this.vsb.isSyncing = false;
         });
       });
-      // }, 16);
     });
 
     this.dbmanager = new IndexedTTLStoreManager(this.selectorId);
@@ -341,19 +331,10 @@ class InfinityScroll {
           this.vsb.currentPage
         );
         this.refreshList();
-
-        // TODO: кажется это не нужно
-        // if (this.scroll.direction === 'up') {
-        //   this.chunk.setRenderIndex(
-        //     this.chunk.prevPageRenderIndex,
-        //     this.vsb.currentPage,
-        //     this.list.length
-        //   );
-        // }
       } else {
         this.calcCurrentDOMRender();
       }
-      // setTimeout(() => {
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           console.log('Убираем синхронизацию - 1.2');
@@ -361,7 +342,6 @@ class InfinityScroll {
           this.isSyncing = false;
         });
       });
-      // }, 16);
     });
     //
     // this.test();
