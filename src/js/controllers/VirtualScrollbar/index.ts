@@ -3,7 +3,7 @@ import 'simplebar/dist/simplebar.min.css';
 
 import { IScrollDirection } from '../../types/IScrollDirection';
 
-import { getBrowserName } from '../../helpers/detectClient';
+import { getBrowserName, getDeviceType } from '../../helpers/detectClient';
 
 // Virtual Scroll Bar
 export class Vsb {
@@ -90,13 +90,14 @@ export class Vsb {
     this.elem.classList.add(`vSrcollbar_${browserName}`);
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
-    const simpleBar = new SimpleBar(this.elem, {
-      autoHide: false, // Всегда показывать на iOS
-      scrollbarMinSize: 60,
-      // Производительность
-      forceVisible: 'y', // Принудительно показывать вертикальный скроллбар
-      clickOnTrack: true, // Клик по треку для скролла
-    });
+    if (getDeviceType() !== 'desktop') {
+      const simpleBar = new SimpleBar(this.elem, {
+        autoHide: false, // Всегда показывать на iOS
+        scrollbarMinSize: 60,
+        forceVisible: 'y', // Принудительно показывать вертикальный скроллбар
+        clickOnTrack: true, // Клик по треку для скролла
+      });
+    }
 
     this.elem.addEventListener('scroll', scrollTrigger);
 

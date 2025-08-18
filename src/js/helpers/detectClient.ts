@@ -23,3 +23,20 @@ export function getBrowserName():
 
   return undefined;
 }
+
+export function getDeviceType():
+  | 'mobile'
+  | 'tablet'
+  | 'touchDesktop'
+  | 'desktop' {
+  const isTouchDevice =
+    'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const width = window.innerWidth;
+
+  if (isTouchDevice) {
+    if (width <= 767) return 'mobile';
+    if (width <= 1024) return 'tablet';
+    return 'touchDesktop'; // Напр., сенсорный ноутбук или Surface
+  }
+  return 'desktop';
+}
