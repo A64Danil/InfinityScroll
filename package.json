@@ -12,6 +12,7 @@
     "lint:fix": "eslint ./src --fix --format table --color",
     "lintts": "tsc --noEmit",
     "lintall": "eslint ./src --format table && tsc --noEmit",
+    "killLS": "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :8080') do taskkill /F /PID %a",
     "jsonServer": "json-server --watch mocks/bigList10000.json"
   },
   "repository": {
