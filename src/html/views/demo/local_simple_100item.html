@@ -1,20 +1,20 @@
 <% var data = { title: htmlWebpackPlugin.options.title, origName:
 htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
-author: "Danil X" }; %>
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
   </head>
   <body>
     <section class="container">
-      <%= _.template(require('html-loader!./../includes/header.html'))(data) %>
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
     </section>
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../includes/demoLists/local_simple_100item.html'))(data)
+      _.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)
       %>
     </section>
 
@@ -22,18 +22,18 @@ author: "Danil X" }; %>
       <h2>How to use it:</h2>
       <p class="codeDescription">
         <%=
-        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
         %>
       </p>
       <p class="codeDescription">2. Put script to the head tag:</p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoLists/local_simple_100item.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
@@ -49,10 +49,9 @@ author: "Danil X" }; %>
   const LOCAL_SIMPLE_100ITEMS_PROPS = {
       data: BigJson1,
       selectorId: 'LOCAL_SIMPLE_100ITEMS',
-      listWrapperHeight: '270px',
-      templateString: (element, listLength, number) => `&lt;li
+      templateString: ({ item, listLength, idx }) =&gt; `&lt;li
         class="LOCAL_SIMPLE_100ITEMS_List__listItem" &gt;
-            ${element.name} ${element.number} - ${number}
+            ${item.name} ${item.number} &lt;span&gt;(order number ${idx} of ${listLength})&lt;/span&gt;
     &lt;/li&gt;`,
   };
 
@@ -62,34 +61,55 @@ author: "Danil X" }; %>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
 .LOCAL_SIMPLE_100ITEMS_Border {
-  position: relative;
-  padding: 10px 0;
-  border: 2px solid #444;
-  border-radius: 8px;
-  margin-bottom: 20px;
+    position: relative;
+    border: 2px solid #777;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden
 }
+
+#LOCAL_SIMPLE_100ITEMS {
+    height: 300px
+}
+
 .LOCAL_SIMPLE_100ITEMS_List {
-  color: #555;
-  margin: 0;
+    color: #444;
+    margin: 0;
+    padding-left: 0;
+    background-color: #f7f7f7
 }
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem {
-  padding: 8px 10px;
-  font-weight: normal;
-  border-radius: 4px;
-  font-size: 18px;
+    padding: 8px 10px;
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px
 }
+
+.LOCAL_SIMPLE_100ITEMS_List__listItem:nth-child(2n) {
+    background-color: #fefefe
+}
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem:hover {
-  background: #efefef;
+    background: #efefef
 }
+
 .LOCAL_SIMPLE_100ITEMS_List__listItem:before {
-  content: attr(aria-posinset) ')';
+    content: attr(aria-posinset) ")";
+    color: #555
 }
+
+.LOCAL_SIMPLE_100ITEMS_List__listItem span {
+    font-size: 14px;
+    color: #888
+}
+
       </code></pre>
     </section>
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../includes/demoDescriptions/listSetupShort.html'))(data)
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupShort.html'))(data)
       %>
     </section>
     <% if (data.mode === 'production') {%>
@@ -103,9 +123,9 @@ author: "Danil X" }; %>
       const LOCAL_SIMPLE_100ITEMS_PROPS = {
         data: BigJson1,
         selectorId: 'LOCAL_SIMPLE_100ITEMS',
-        templateString: (element, listLength, number) => `<li
-        class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
-            ${element.name} ${element.number} - ${number}
+        templateString: ({ item, listLength, idx }) => `<li
+          class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+            ${item.name} ${item.number} <span>(order number ${idx} of ${listLength})</span>
     </li>`,
       };
 

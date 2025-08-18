@@ -9,7 +9,7 @@ export const REMOTE_LAZY_API_PROPS: InfinityScrollPropTypes = {
   // maximal value is 33554400px
   // forcedListLength: 5000000, //    padding-bottom: 5.6445e+07px; transform: translate(0px, 3.35538e+07px);
   listType: 'list',
-  templateString: ({ item, listLength, idx }) => `<li 
+  templateString: ({ item, idx }) => `<li 
         class="REMOTE_LAZY_API__listItem" >
             <div class="contentWrapper">
               <p class="title">

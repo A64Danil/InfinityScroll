@@ -1,0 +1,73 @@
+// TODO: это надо перенести в js
+.middleWrapper {
+  position: relative;
+  overflow-y: scroll;
+  height: 100%;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.middleWrapper::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari */
+}
+
+.vSrcollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 12px;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background-color: transparent;
+
+  &_debugMode {
+    width: 400px;
+    transform: translate(-16px, 0px);
+    background-color: #5c637033;
+  }
+
+  &_googleChrome {
+    min-width: 16px;
+  }
+
+  &_mozillaFirefox {
+    min-width: 18px;
+  }
+
+
+  &_safari {
+    min-width: 16px;
+
+    &::-webkit-scrollbar {
+      //-webkit-appearance: none;
+      //width: 16px; /* Всегда широкий как при наведении */
+    }
+  }
+
+
+  // Специально для touch устройств
+  @media (pointer: coarse) {
+    width: 30px;
+
+    &::-webkit-scrollbar {
+      width: 16px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.4);
+      min-height: 60px;
+      border-radius: 10px;
+    }
+  }
+
+}
+
+
+
+.vScrollbarFiller {
+  width: 100%;
+  //height: 10000000px;
+  //background-color: red;
+}

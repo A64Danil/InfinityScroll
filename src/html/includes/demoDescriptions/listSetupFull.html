@@ -1,10 +1,18 @@
 <section>
-  <h3>Data</h3>
+  <h3>1) Data<i>: object[] |  string | (obj) => string;</i></h3>
   <p>data - your array with objects. Can be like:</p>
   <ol>
     <li>just array</li>
     <li>URL-string to your array in network</li>
-    <li>Function, that's return URL-string to your array in network</li>
+    <li>
+        Function, that's return URL-string to your array in network <br>
+        <i>(obj: { <br>
+            start?: number;<br>
+            end?: number;<br>
+            page?: number;<br>
+            limit?: number;<br>
+            }) =&gt; string;</i>
+    </li>
   </ol>
   <pre class="code">
 data: BigJson1, // just array
@@ -21,7 +29,7 @@ data: (&#123; start, end &#125;) => `https://restapi.qoobeo.ru/api/v1/companys?s
 </section>
 
 <section>
-  <h3>SelectorId</h3>
+  <h3>2) SelectorId<i>: string</i></h3>
   <p class="codeDescription">ID of your root element</p>
   <pre class="code">
 selectorId: 'myRootID';
@@ -30,10 +38,16 @@ selectorId: 'myRootID';
 </section>
 
 <section>
-  <h3>TemplateString</h3>
+  <h3>3) TemplateString<i>: (obj) => string</i></h3>
+  <h4><i>obj: {<br>
+      item: { [key: string]: unknown }; <br>
+      listLength?: number; <br>
+      idx?: number; <br>
+      templateCb?: Record&lt;string, (arg: any) =&gt; any>; <br>
+      }</i></h4>
   <p class="codeDescription">Template of list items</p>
   <pre class="code">
-templateString: (element, listLength) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;&gt;
+templateString: ({element, listLength}) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;&gt;
             $&#123;element?.number&#125; $&#123;element?.name&#125;
     &lt;/li&gt;`,
       </pre
@@ -41,7 +55,7 @@ templateString: (element, listLength) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM
 </section>
 
 <section>
-  <h3>ListWrapperHeight <i>(optional)</i></h3>
+  <h3>4) ListWrapperHeight<i>: number, (optional)</i></h3>
   <p class="codeDescription">
     Height of your root element. Set in styles or in JS.
   </p>
@@ -52,7 +66,7 @@ listWrapperHeight: '350px',
 </section>
 
 <section>
-  <h3>ForcedListLength <i>(optional)</i></h3>
+  <h3>5) ForcedListLength<i>: number, (optional)</i></h3>
   <p class="codeDescription">
     You can set length of your list manually. To limit very big list or just to
     accelerate initializating of list (to prevent automatical searching of list
@@ -65,7 +79,7 @@ forcedListLength: 100,
 </section>
 
 <section>
-  <h3>ListType <i>(optional)</i></h3>
+  <h3>6) ListType<i>: 'list' | 'table' | 'div', (optional)</i></h3>
   <p class="codeDescription">
     Switch type of your list between LIST (ul), TABLE (table) and just DIV
     (div). Default value is 'list'.
@@ -73,13 +87,24 @@ forcedListLength: 100,
       <strong>Attention:</strong> if you are using a TABLE, we strongly recommend setting the min-height of your TR (table row) based on the size of the maximum content that may be inside the cells.
   </p>
   <pre class="code">
-listType?: 'list' | 'table' | 'div';
+listType?: 'list';
       </pre
   >
 </section>
 
 <section>
-  <h3>SubDir <i>(optional)</i></h3>
+  <h3>7) tHeadNames<i>: string[], (optional)</i></h3>
+  <p class="codeDescription">
+    Title of your colums, while using table-mode intead of list
+  </p>
+  <pre class="code">
+tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
+      </pre
+  >
+</section>
+
+<section>
+  <h3>8) SubDir<i>: string, (optional)</i></h3>
   <p class="codeDescription">
     Set additional directory to parce your API-response. In case, if you have
     response not like array, but like object with array
@@ -97,4 +122,42 @@ const response = &#123;
 subDir: 'products',
       </pre
   >
+</section>
+
+
+<section>
+  <h3>9) TemplateCb<i>: Record&lt;string, (arg: any) =&gt; any>;, (optional)</i></h3>
+  <p class="codeDescription">
+    Set additional directory to parce your API-response. In case, if you have
+    response not like array, but like object with array
+  </p>
+  <pre class="code">
+ templateCb: &lcub;
+    reviewShower(reviewsAray = [&lcub;&rcub;]) &lcub;
+      return reviewsAray
+        ?.map(
+          (el, i) => `&lt;div class=&quot;review&quot;&gt;<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&lt;p&gt;$&lcub;el.reviewerName&rcub; &lt;em&gt;$&lcub;el.reviewerEmail&rcub;&lt;/em&gt; &lt;strong&gt;$&lcub;el.rating&rcub; / 5&lt;/strong&gt;&lt;/p&gt;<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&lt;p&gt;$&lcub;el.comment&rcub;&lt;/p&gt;<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&lt;p&gt;&lt;em&gt;$&lcub;el.date&rcub;&lt;/em&gt;&lt;/p&gt;<br />
+&lt;/div&gt;`
+        )
+        .join('');
+    &rcub;,
+    anyOtherFunc() &lcub;&rcub;,
+  &rcub;
+      </pre>
+
+</section>
+
+
+<section>
+    <h3>10) isDebugMode<i>: boolean;, (optional)</i></h3>
+    <p class="codeDescription">
+       Feature description in progress...
+    </p>
+    <pre class="code">
+isDebugMode: true,
+      </pre>
+
 </section>

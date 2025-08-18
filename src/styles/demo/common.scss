@@ -20,39 +20,6 @@ html {
   //padding-bottom: 400px;
 }
 
-.middleWrapper {
-  position: relative;
-  overflow-y: scroll;
-  height: 100%;
-}
-
-.vSrcollbar {
-  position: absolute;
-  //left: 50px;
-  top: 0;
-  right: 0px;
-  //right: -10px;
-  //transform: translate(-16px, 0px);
-  //transform: translate(-100%, 0px);
-  //transform: translate(100%, 0px);
-  //width: 400px;
-  height: 100%;
-  overflow-y: scroll;
-  background-color: transparent;
-}
-
-.vSrcollbar_debugMode {
-  width: 400px;
-  transform: translate(-16px, 0px);
-  background-color: #5c637033;
-}
-
-.vScrollbarFiller {
-  width: 1px;
-  //height: 10000000px;
-  //background-color: red;
-}
-
 section {
   margin-bottom: 60px;
   padding: 0 15px;
@@ -93,6 +60,10 @@ pre {
 
 .pageTitle {
   text-transform: capitalize;
+}
+
+.titleDescr {
+  font-size: 16px;
 }
 
 .codeDescription {
@@ -147,7 +118,7 @@ pre {
 .mainMenu {
   display: flex;
   flex-wrap: wrap;
-  //justify-content: space-between;
+  justify-content: space-between;
   gap: 40px;
   padding: 0;
 
@@ -155,4 +126,150 @@ pre {
   &__item {
     display: block;
   }
+}
+
+.listOfDemoLink {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0;
+}
+
+.demoLinkItem {
+  //margin-bottom: 16px;
+}
+
+.demoLink {
+  //display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px 24px;
+  text-decoration: none;
+  box-sizing: border-box;
+  height: 100%;
+
+  &:hover {
+    background-color: #eee;
+  }
+}
+
+.demoIcon {
+  display: inline-block;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #222;
+  border-radius: 3px;
+  padding: 2px;
+  margin-bottom: 6px;
+
+  &_list:before {
+    display: block;
+    content: "";
+    height: 100%;
+    background: repeating-linear-gradient(
+                    0deg,
+                    transparent 1px,
+                    transparent 3px,
+                    #777 3px,
+                    #777 5px,
+                    transparent 5px,
+                    transparent 7px,
+                    #777 7px,
+                    #777 9px,
+                    transparent 9px,
+                    transparent 11px,
+                    #777 11px,
+                    #777 13px,
+                    transparent 13px,
+                    transparent 15px,
+                    #777 15px,
+                    #777 17px
+    );
+  }
+
+  &_noStyle {
+    border: none;
+  }
+
+  &_table {
+    background: repeating-linear-gradient(
+                    90deg,
+                    transparent 1px,
+                    transparent 3px,
+                    #777 3px,
+                    #777 5px,
+                    transparent 5px,
+                    transparent 7px,
+                    #777 7px,
+                    #777 9px,
+                    transparent 9px,
+                    transparent 11px,
+                    #777 11px,
+                    #777 13px,
+                    transparent 13px,
+                    transparent 15px,
+                    #777 15px,
+                    #777 17px
+    );
+  }
+
+  &_table:before {
+    display: block;
+    content: "";
+    height: 100%;
+    background: repeating-linear-gradient(
+                    0deg,
+                    transparent 1px,
+                    transparent 3px,
+                    #777 3px,
+                    #777 5px,
+                    transparent 5px,
+                    transparent 7px,
+                    #777 7px,
+                    #777 9px,
+                    transparent 9px,
+                    transparent 11px,
+                    #777 11px,
+                    #777 13px,
+                    transparent 13px,
+                    transparent 15px,
+                    #777 15px,
+                    #777 17px
+    );
+  }
+
+  &_lazy:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) -30%, rgb(255, 255, 255) 70%);
+  }
+
+  .remoteIcon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(11px, 6px);
+    color: #676767;
+    text-shadow: 0px 0px 3px white, 0px 0px 3px white, 0px 0px 4px white, 0px 0px 4px white;
+    font-size: 36px;
+    line-height: 28px;
+    border-bottom: 2px solid #676767;
+    z-index: 2;
+  }
+}
+
+.demoLinkAmount {
+  display: block;
 }

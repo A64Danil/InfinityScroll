@@ -1,10 +1,11 @@
 <% var data = { title: htmlWebpackPlugin.options.title, origName:
 htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
-author: "Danil X" }; %>
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta http-equiv="refresh" content="0; url=/download/old_versions.html" />
     <%= _.template(require('html-loader!./../includes/head.html'))(data) %>
   </head>
   <body>
@@ -13,17 +14,11 @@ author: "Danil X" }; %>
     </section>
 
     <section class="container">
-      <h2>Download:</h2>
-      <p>
-        <%=
-        _.template(require('html-loader!./../includes/demoDescriptions/whereDownLoadScript.html'))(data)
-        %>
-      </p>
-      <p>2. Or just connect it to your project like romete link</p>
+      <h2>Changelog</h2>
+    </section>
 
-      <pre class="code">
-<%= escapeHtml(_.template(require('html-loader!./../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
-      </pre>
+    <section class="container">
+      <p><a href="/download/old_versions.html">Redirect to changelog page</a></p>
     </section>
   </body>
 </html>

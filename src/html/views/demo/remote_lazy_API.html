@@ -1,0 +1,157 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+    <section class="container">
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_api.html'))(data)
+      %>
+    </section>
+
+    <section class="container">
+      <h2>How to use it:</h2>
+      <p class="codeDescription">
+        <%=
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p class="codeDescription">2. Put script to the head tag:</p>
+      <pre class="code"><code class="language-html">
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+      </code></pre>
+      <p class="codeDescription">
+        3. Place any tag with your unique ID into your html-code:
+      </p>
+      <pre class="code"><code class="language-html">
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/remote_lazy_api.html'))(data)) %>
+      </code></pre>
+      <p class="codeDescription">
+        4. Configure list and start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code"><code class="language-javascript">
+&lt;script type="module"&gt;
+  console.log('start: <%= data.title %> ');
+
+  const REMOTE_LAZY_API_PROPS = {
+  data: ({ start, end }) =>
+    `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
+  selectorId: 'REMOTE_LAZY_API',
+  forcedListLength: 17154017,
+  templateString: ({ item, listLength, idx }) =&gt; `&lt;li
+              class="REMOTE_LAZY_API__listItem" &gt;
+            &lt;div class="contentWrapper"&gt;
+              &lt;p class="title"&gt;
+                &lt;em&gt;Company:&lt;/em&gt; ${item?.name} 
+                &lt;span&gt;(${idx})&lt;/span&gt;
+                &lt;/p&gt;
+              &lt;p class="desc"&gt;
+                &lt;em&gt;website:&lt;/em&gt; ${item?.website}  &lt;em&gt;(industry: ${item?.industry})&lt;/em&gt; 
+              &lt;/p&gt;
+              
+            &lt;/div&gt;
+&lt;/li&gt;`,
+};
+
+
+  new InfinityScroll(REMOTE_LAZY_API_PROPS);
+&lt;/script&gt;
+      </code></pre>
+      <p class="codeDescription">5. Add your styles:</p>
+      <pre class="code"><code class="language-css">
+.REMOTE_LAZY_API {
+    color: #333;
+    height: 600px;
+    background-color: #fff;
+    outline: 3px solid #a9a9a9
+}
+
+.REMOTE_LAZY_API_List {
+    padding: 0;
+    margin: 0
+}
+
+.REMOTE_LAZY_API__listItem {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 12px 10px 20px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden
+}
+
+.REMOTE_LAZY_API__listItem:nth-child(2n) {
+    background-color: #f7f7f7
+}
+
+.REMOTE_LAZY_API__listItem:hover {
+    background: #eee
+}
+
+.REMOTE_LAZY_API__listItem:before {
+    content: attr(aria-posinset) ")";
+    font-size: 24px;
+    padding-right: 5px
+}
+
+.REMOTE_LAZY_API__listItem .contentWrapper .title {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.REMOTE_LAZY_API__listItem .contentWrapper .title span {
+    color: gray;
+    font-size: 14px
+}
+
+.REMOTE_LAZY_API__listItem .contentWrapper em {
+    color: gray
+}
+      </code></pre>
+    </section>
+
+    <section class="container">
+      <%=
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupShort.html'))(data)
+      %>
+    </section>
+    <% if (data.mode === 'production') {%>
+    <script>
+      console.log('start: <%= data.title %> ');
+
+      const REMOTE_LAZY_API_PROPS = {
+        data: ({ start, end }) =>
+          `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
+        selectorId: 'REMOTE_LAZY_API',
+        forcedListLength: 17154017,
+        // listType: 'list',
+          templateString: ({ item, listLength, idx }) => `<li
+        class="REMOTE_LAZY_API__listItem" >
+            <div class="contentWrapper">
+              <p class="title">
+                <em>Company:</em> ${item?.name}
+                <span>(${idx})</span>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${item?.website}  <em>(industry: ${item?.industry})</em>
+              </p>
+
+            </div>
+</li>`,
+      };
+
+      new InfinityScroll(REMOTE_LAZY_API_PROPS);
+    </script>
+    <% } %>
+  </body>
+</html>

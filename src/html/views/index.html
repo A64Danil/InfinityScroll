@@ -1,6 +1,6 @@
 <% var data = { title: htmlWebpackPlugin.options.title, origName:
 htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
-author: "Danil X" }; %>
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,111 +15,67 @@ author: "Danil X" }; %>
     <section class="container">
       <h2>What is it?</h2>
 
-      <p class="codeDescription">
-        This is a script to create truly infinity scroll list (or any other
-        scrollable entity). Unfortunately, web-browsers have limitation to show
-        list of any height, so we have a limited presentation of list. This
-        limit is 33554400px in height. However, working in progress and in version
-        2.0 we will solve this problem!
-      </p>
+      <div class="description">
+        <p><strong>Infinity Scroll</strong> is a JavaScript library for creating truly infinite scroll lists of any size without browser limitations. While web browsers typically have a container height limit of <b>33,554,400px</b> that restricts scrollable list sizes, Infinity Scroll solves this problem and enables working with lists containing millions of elements.</p>
+      </div>
+
+      <div class="features">
+        <h2>Key Features:</h2>
+        <ul>
+          <li><strong>Truly infinite scroll</strong> — no limitations on the number of elements</li>
+          <li><strong>Efficient DOM rendering</strong> — keeps only minimum necessary elements in DOM for optimal performance</li>
+          <li><strong>Lazy data loading</strong> — fetches data from network only when needed, not all at once</li>
+          <li><strong>Smart caching</strong> — saves loaded data in browser, eliminating repeated requests</li>
+          <li><strong>Flexible data sources</strong> — works with local arrays and remote databases</li>
+          <li><strong>Customizable templates</strong> — supports lists, tables, and custom div containers</li>
+          <li><strong>Simple integration</strong> — minimal setup, maximum results</li>
+        </ul>
+      </div>
+
+      <div class="use-cases">
+        <h3>Perfect for:</h3>
+        <p>• Large product catalogs<br>
+          • News feeds and social media streams<br>
+          • Search results with thousands of records<br>
+          • Any interfaces with large datasets</p>
+      </div>
     </section>
 
+
     <section class="container">
-      <h2>Demo list</h2>
+      <h2>Demo example:</h2>
 
-      <p>
-        Legend: <br />
-        - Local/Remote - place of data (local data or remote DB)<br />
-        - Instant/Lazy - type of load data. Instant load all db to memory. Lazy
-        laod only visible parts.
-      </p>
+      <p class="codeDescription">Minimal setup:</p>
+      <pre class="code"><code class="language-javascript">
+// define config of your list
+const MY_LIST_PROPS = {
+  data: (start, end) => `http://jsonplaceholder.typicode.com/comments?_start=${start}&_end=${end}`,
+  selectorId: 'MY_LIST',
+  templateString: ({ item }) => `&lt;li class=&quot;MY_LIST_Item&quot; &gt;
+            ${item?.number} ${item?.name}
+    &lt;/li&gt;`,
+};
 
-      <ul class="listOfDemoLink">
-        <li class="demoLinkItem">
-          <a href="/demoList_local_basic_10000items.html" class="demoLink"
-            >Basic demo - Local Instant List (10 000 items) without styles
-          </a>
-        </li>
-        <li class="demoLinkItem">
-          <a href="/demoList_local_simple_100item.html" class="demoLink"
-            >Simple demo - Local Instant List (100 items) with styles</a
-          >
-        </li>
-        <li class="demoLinkItem">
-          <a href="/demoList_remote_simple_500item.html" class="demoLink"
-            >Remote Instant List (500 items)</a
-          >
-        </li>
+// start it by call like new InfinityScroll(config)
+new InfinityScroll(MY_LIST_PROPS);
+      </code></pre>
 
-        <li class="demoLinkItem">
-          <a href="/demoList_remote_simple_API_100items.html" class="demoLink"
-            >Remote Instant Api List (100 items)</a
-          >
-        </li>
-
-        <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_API.html" class="demoLink"
-            >Remote Lazy List, iscrollApi (17 000 000+ items)</a
-          >
-        </li>
-
-        <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_100items_table_iscrollAPI.html" class="demoLink"
-            >Remote Lazy Table, isrcollApi (100 items)</a
-          >
-        </li>
-
-        <li class="demoLinkItem">
-          <a href="/demoList_remote_lazy_dummyjson_API.html" class="demoLink"
-            >Remote Lazy List with subdir, DummyJSON Api (~200 items)</a
-          >
-        </li>
-      </ul>
+      <p class="codeDescription">Full setup you can find <a href="/help/settings.html">here</a></p>
     </section>
 
     <section class="container">
       <h2>How to use it:</h2>
 
-      <p class="codeDescription">Types of config:</p>
-      <pre class="code"><code class="language-typescript">
-const REMOTE_LAZY_000ITEMS_PROPS = {
-  data: object[] | DataURLType;
-  selectorId: string;
-  templateString: (
-      element: { [key: string]: unknown },
-      listLength?: number,
-      elemNum?: number
-    ) => string;
-  listWrapperHeight?: string;
-  forcedListLength?: number;
-  listType?: 'list' | 'table' | 'div';
-  subDir?: string;
-
-};
-
-new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
-      </code></pre>
+      <p class="codeDescription">
+        1. Download InfinityScroll or copy remote link<br>
+        2. Put script to the head tag or before your closing body tag<br>
+        3. Place any tag with your unique ID into your html-code<br>
+        4. Configure list in script tag. And then, start it by call new InfinityScroll(config)<br>
+      </p>
+      <p class="codeDescription">
+        More details you can find <a href="/help/getting-started.html">here</a>
+      </p>
     </section>
 
-    <section class="container">
-      <h2>Demo example:</h2>
-
-      <p class="codeDescription">Description in progress:</p>
-      <pre class="code"><code class="language-javascript">
-const REMOTE_LAZY_000ITEMS_PROPS = {
-  data: (start, end) =>
-    `http://localhost:3000/data?_start=${start}&_end=${end}`,
-  selectorId: 'REMOTE_LAZY_000ITEM',
-  forcedListLength: 500,
-  listType: 'list',
-  listWrapperHeight: '290px',
-  templateString: (element: object, listLength?: number): string => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot; &gt;
-            ${element?.number} ${element?.name}
-    &lt;/li&gt;`,
-};
-
-new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
-      </code></pre>
-    </section>
   </body>
 </html>

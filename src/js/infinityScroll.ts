@@ -48,24 +48,6 @@ const errorLang = LANG === 'ru' ? 'ru' : 'en';
 
 const errors = errorMsg[errorLang];
 
-const cssAnimationSkeletonText = `.loading .dots {
-    width: 0.5em;
-    animation: load 3s steps(4, end) infinite;
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: text-bottom;
-}
-
-@keyframes load {
-    from {
-        width: 0em;
-    }
-    to   {
-        width: 2em;
-    }
-}
-`;
-
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 // TODO: начать кэшировать некоторые настройки списка
@@ -161,6 +143,7 @@ class InfinityScroll {
     this.listWrapperHeight = props.listWrapperHeight;
 
     this.isDebugMode = props.isDebugMode || false;
+    // this.isDebugMode = props.isDebugMode || true;
 
     this.listEl = this.createInnerList();
 
@@ -172,11 +155,11 @@ class InfinityScroll {
 
     this.vsb = new Vsb(this.isDebugMode, () => {
       if (this.isSyncing) {
-        // console.log('Внещний скролл, поэтому не тригерим handleScroll');
+        console.log('Внещний скролл, поэтому не тригерим handleScroll - 2.0');
         return;
       }
-
-      this.isSyncing = true;
+      console.log('VSB scroll listener - 2.1');
+      this.vsb.isSyncing = true;
 
       this.scroll.setScrollDirection(
         this.vsb.elem.scrollTop,
@@ -186,20 +169,15 @@ class InfinityScroll {
       this.vsb.handleScroll();
       this.calcCurrentDOMRender();
 
-      // this.isSyncing = false;
-
-      setTimeout(() => {
-        if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
-          // console.error(
-          //   'не совпадает!',
-          //   this.vsb.scroll,
-          //   this.vsb.elem.scrollTop
-          // );
-          this.vsb.handleScroll();
-          // this.calcCurrentDOMRender();
-        }
-        this.isSyncing = false;
-      }, 0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          console.log('Убираем синхронизацию - 2.2');
+          if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
+            this.vsb.handleScroll();
+          }
+          this.vsb.isSyncing = false;
+        });
+      });
     });
 
     this.dbmanager = new IndexedTTLStoreManager(this.selectorId);
@@ -213,8 +191,6 @@ class InfinityScroll {
     const domChangerProps = {
       skeleton: this.skeleton,
       targetElem: this.listEl,
-      // TODO: этот пропс тут НЕ НУЖЕН??
-      template: props.templateString,
     };
     this.domMngr = new DomManager(domChangerProps);
 
@@ -242,6 +218,22 @@ class InfinityScroll {
     }
 
     // TODO: проблема в том что мы "перекрываем" кешированные данные свежими
+    // Решение будет после того как функция setInitialListData будет разбита на несколько функций
+
+    // 1. получаем данные из IndexedDB
+    // 2. если есть, устанавливаем их в список
+    // 3. получаем параметры АПИ и начальные данные для отрисовки
+    // 4. Стартуем список
+
+    // проблема - пункты 1 и 3 - асинхронные
+
+    // 2 всегда идёт после 1
+    // 1 и 3 могут (и должны) выполняться параллельно
+    // 4 идёт всегда последним
+
+    // Если в кэше ничего нет, то ничего и не делаем
+    // Если интернет не работате, то запускаем start без ожидания
+
     this.getSavedListData().then((data) => {
       if (data.length) {
         this.list.data = data;
@@ -279,8 +271,7 @@ class InfinityScroll {
       );
     }
 
-    this.vsb.setHeight = () =>
-      this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    this.vsb.setHeight = () => this.domMngr.setHeightToList(this.list);
 
     this.chunk.lastPageLastRenderIndex =
       this.list.lastPageLength > this.list.halfOfExistingSizeInDOM
@@ -288,13 +279,12 @@ class InfinityScroll {
         : 1;
 
     const renderProps = {
-      halfOfExistingSizeInDOM: this.list.halfOfExistingSizeInDOM,
       lastRenderIndex: this.chunk.lastRenderIndex,
       lastPageLastRenderIndex: this.chunk.lastPageLastRenderIndex,
       listLength: this.list.length,
       listlastPageLength: this.list.lastPageLength,
       chunkAmount: this.chunk.amount,
-      tailingElementsAmount: this.list.tailingElementsAmount,
+      // tailingElementsAmount: this.list.tailingElementsAmount,
     };
     console.log(renderProps);
     if (isPropsUndefined(renderProps)) {
@@ -302,7 +292,7 @@ class InfinityScroll {
     }
     this.render = new RenderController(renderProps);
     this.domMngr.fillList(this.list);
-    this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
+    this.domMngr.setHeightToList(this.list);
 
     this.scroll.maxScroll =
       this.list.length * this.list.itemHeight -
@@ -315,9 +305,11 @@ class InfinityScroll {
     this.createVirtualScroll();
 
     this.middleWrapper.addEventListener('scroll', (e) => {
-      if (this.isSyncing) {
+      if (this.vsb.isSyncing) {
+        console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
+      console.log('main scroll listener - 1.1');
       this.isSyncing = true;
       this.scroll.setScrollDirection(
         this.middleWrapper.scrollTop,
@@ -339,22 +331,17 @@ class InfinityScroll {
           this.vsb.currentPage
         );
         this.refreshList();
-
-        // TODO: кажется это не нужно
-        // if (this.scroll.direction === 'up') {
-        //   this.chunk.setRenderIndex(
-        //     this.chunk.prevPageRenderIndex,
-        //     this.vsb.currentPage,
-        //     this.list.length
-        //   );
-        // }
       } else {
         this.calcCurrentDOMRender();
       }
-      setTimeout(() => {
-        this.vsb.isPageChanged = false;
-        this.isSyncing = false;
-      }, 0);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          console.log('Убираем синхронизацию - 1.2');
+          this.vsb.isPageChanged = false;
+          this.isSyncing = false;
+        });
+      });
     });
     //
     // this.test();
@@ -441,71 +428,16 @@ class InfinityScroll {
       this.domMngr.targetElem.append(this.domMngr.createItem(elemData, 0));
       listItem = list.firstChild as HTMLElement;
     }
-
-    // TODO: вынести в отдельную функцию?
-    // Set required styles
-    const innerElementClassName = `${this.selectorId}_${this.listType
-      .charAt(0)
-      .toUpperCase()}${this.listType.slice(1)}`;
-
-    const mapOfChildSelector = {
-      list: 'li',
-      table: 'tbody > tr',
-      div: 'div',
-    };
-
-    const childElementTagName = mapOfChildSelector[this.listType];
-
-    const cssText = `.${this.selectorId}_List {
-      overflow: hidden; 
-      margin: 0;
-      }
-      
-.${this.selectorId}_List li { 
-      white-space: nowrap;
-    }
-
-    
-.${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}`;
-
-    const styleELem = document.createElement('style');
-    styleELem.appendChild(document.createTextNode(cssText));
-    this.wrapperEl.prepend(styleELem);
-    // End - Set required styles
-
     this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
-    const styleELemLoading = document.createElement('style');
-
-    const cssTextLoading = `.${this.selectorId}_List li.loading { 
-      min-height: ${this.list.itemHeight}px;
-      box-sizing: border-box;
-    }
-    
-.${this.selectorId}_List li.loading img { 
-      width: 100%;
-      aspect-ratio: 1;
-      background: #ccc;
-      animation: opacityLoader 3s ease-in-out infinite alternate;
-      border-radius: 10px;
-    }
-    
-@keyframes opacityLoader {
-    from {
-        opacity: 1;
-    }
-    to   {
-        opacity: 0.1;
-    }
-}
-    `;
-    styleELemLoading.appendChild(document.createTextNode(cssTextLoading));
-    styleELem.after(styleELemLoading);
+    // Set required styles
+    this.initializeBaseStyles();
 
     this.chunk.amount = Math.ceil(
       this.list.wrapperHeight / this.list.itemHeight
     );
 
+    // TODO: сделать несколько проверок на случай если всего 1 страница и айтемов меньше чем амаунт * 4
     this.list.existingSizeInDOM = this.chunk.amount * 4; // TODO: может быть ситуация, когда деток меньше чем (чанк * 4) - сделать сеттер или проверку (лучше сеттер)
     this.list.halfOfExistingSizeInDOM = this.list.existingSizeInDOM / 2;
 
@@ -550,6 +482,71 @@ class InfinityScroll {
     }
   }
 
+  initializeBaseStyles() {
+    const cssAnimationSkeletonText = `.loading .dots {
+    width: 0.5em;
+    animation: load 3s steps(4, end) infinite;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: text-bottom;
+}
+
+@keyframes load {
+    from {
+        width: 0em;
+    }
+    to   {
+        width: 2em;
+    }
+}
+`;
+
+    const innerElementClassName = `${this.selectorId}_${this.listType
+      .charAt(0)
+      .toUpperCase()}${this.listType.slice(1)}`;
+
+    const childElementTagName = {
+      list: 'li',
+      table: 'tbody > tr',
+      div: 'div',
+    }[this.listType];
+
+    const allStyles = `
+    .${this.selectorId}_List {
+      overflow: hidden; 
+      margin: 0;
+    }
+    
+    .${this.selectorId}_List li { 
+      white-space: nowrap;
+    }
+    
+    .${innerElementClassName} > ${childElementTagName}${cssAnimationSkeletonText}
+    
+    .${this.selectorId}_List li.loading { 
+      min-height: ${this.list.itemHeight}px;
+      box-sizing: border-box;
+    }
+    
+    .${this.selectorId}_List li.loading img { 
+      width: 100%;
+      aspect-ratio: 1;
+      background: #ccc;
+      animation: opacityLoader 3s ease-in-out infinite alternate;
+      border-radius: 10px;
+    }
+    
+    @keyframes opacityLoader {
+      from { opacity: 1; }
+      to { opacity: 0.1; }
+    }
+  `;
+
+    const styleElement = document.createElement('style');
+    styleElement.textContent = allStyles.trim();
+    this.wrapperEl.prepend(styleElement);
+  }
+
   createVirtualScroll() {
     this.list.tailingElementsAmount = this.list.length % this.chunk.amount;
     this.list.pageTailingElementsAmount = this.list.length % this.chunk.amount;
@@ -583,8 +580,8 @@ class InfinityScroll {
       );
     }
 
-    this.domMngr.setPaddingToList(this.list, this.chunk.htmlHeight);
-    this.skeleton.setListHeight(this.list.fullLength);
+    this.domMngr.setHeightToList(this.list);
+    this.skeleton.setListLength(this.list.fullLength);
 
     // Не нужно?
     // this.list.startIndexOfLastPart =
@@ -983,9 +980,11 @@ class InfinityScroll {
     // TODO: change this
     // const safeDataSize = 100000;
     const safeDataSize = 10;
+    const dataSizeLimit = this.isLazy ? safeDataSize : size;
+    // const dataSizeLimit = 10; // for tests
     console.log(size);
     let listData;
-    if (size < safeDataSize) {
+    if (size <= dataSizeLimit) {
       listData = await this.dbmanager.readAll();
     } else {
       console.warn('Объем закешированных данных слишком большой');
@@ -995,7 +994,14 @@ class InfinityScroll {
     return listData;
   }
 
+  /*
+   * Define length of list and length of last page;
+   * Also define apiSettings, html-height and fetch initial data
+   * */
+
+  // TODO: кажеься надо разбить на несколько отдельных функций
   async setInitialListData(data: object[] | DataURLType) {
+    console.log('---- setInitialListData ----');
     let newLength = null;
     if (this.dataLoadPlace === 'local') {
       this.list.data = data as [];
@@ -1012,6 +1018,7 @@ class InfinityScroll {
         await getRemoteData(dataUrl as string).then((fetchedData): void => {
           const extractedData = this.extractResponse(fetchedData);
           // this.list.data = extractedData;
+          console.log('after get remote data');
           this.setListData(extractedData);
           newLength =
             this.forcedListLength || (extractedData && extractedData.length);
@@ -1048,7 +1055,7 @@ class InfinityScroll {
     console.log('newLength', newLength);
     this.list.fullLength = newLength;
     this.list.length = newLength;
-    this.skeleton.setListHeight(this.list.length);
+    this.skeleton.setListLength(this.list.length);
   }
 
   // TODO: renderIndex or itemIndex ??? -> truly this is itemIndex, but name is no difference?

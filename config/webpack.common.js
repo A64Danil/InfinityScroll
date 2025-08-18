@@ -20,23 +20,47 @@ function escapeHtml(string) {
 
 
 function generateHtmlPlugins(templateDir) {
-    const templateFiles = fs.readdirSync(path.resolve(__dirname, templateDir));
-    return templateFiles.map(item => {
+    function getTemplateFiles(dir, basePath = '') {
+        const items = fs.readdirSync(path.resolve(__dirname, dir), { withFileTypes: true });
+        let files = [];
+
+        items.forEach(item => {
+            if (item.isFile()) {
+                const relativePath = basePath ? path.join(basePath, item.name) : item.name;
+                files.push({
+                    fullPath: path.join(dir, item.name),
+                    relativePath: relativePath
+                });
+            } else if (item.isDirectory()) {
+                const newBasePath = basePath ? path.join(basePath, item.name) : item.name;
+                files = files.concat(getTemplateFiles(path.join(dir, item.name), newBasePath));
+            }
+        });
+
+        return files;
+    }
+
+    const templateFiles = getTemplateFiles(templateDir);
+
+    return templateFiles.map(fileInfo => {
+        const item = path.basename(fileInfo.relativePath);
         const parts = item.split('.');
         const name = parts[0];
         const namedTitle = name.split('_').join(' ');
         const extension = parts[1];
-        // console.log(path.resolve(__dirname, `${templateDir}/${name}.${extension}`))
+
+        // Сохраняем структуру папок в filename
+        const outputPath = fileInfo.relativePath.replace(path.extname(fileInfo.relativePath), '.html');
         return new HtmlWebpackPlugin({
             title: namedTitle,
-            origName: name.replace('demoList_', ''),
-            filename: `${name}.html`,
-            template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`),
+            libVersion: process.env.VERSION,
+            filename: outputPath, // Теперь включает путь с папками
+            template: path.resolve(__dirname, fileInfo.fullPath),
             mode: process.env.mode,
             inject: process.env.mode === 'development',
             // inject: true,
             templateParameters: {
-                escapeHtml, // Передаём функцию экранирования в шаблон
+                escapeHtml,
             },
         })
     })
@@ -59,7 +83,7 @@ module.exports = {
         extensions: ['.js', '.ts'],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         // Copies files from target to destination folder
         new CopyWebpackPlugin({
             patterns: [

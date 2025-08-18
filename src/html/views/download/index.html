@@ -1,0 +1,30 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+    <section class="container">
+      <h2>Download:</h2>
+      <p>
+        <%=
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p>2. Or just connect it to your project like romete link</p>
+
+      <pre class="code">
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+      </pre>
+      <a href="old_versions.html">Old versions</a>
+    </section>
+  </body>
+</html>

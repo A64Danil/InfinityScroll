@@ -1,8 +1,6 @@
 import { IScrollDirection } from '../../types/IScrollDirection';
 
 export class RenderController {
-  private readonly halfOfExistingSizeInDOM: number;
-
   private lastRenderIndex: number;
 
   private readonly lastPageLastRenderIndex: number;
@@ -13,35 +11,24 @@ export class RenderController {
 
   private readonly chunkAmount: number;
 
-  private tailingElementsAmount: number;
-
   constructor(renderProps: {
-    halfOfExistingSizeInDOM: number;
     lastRenderIndex: number;
     lastPageLastRenderIndex: number;
     listLength: number;
     listlastPageLength: number;
     chunkAmount: number;
-    tailingElementsAmount: number;
   }) {
-    this.halfOfExistingSizeInDOM = renderProps.halfOfExistingSizeInDOM; // TODO: now - useless?
     this.lastRenderIndex = renderProps.lastRenderIndex;
     this.lastPageLastRenderIndex = renderProps.lastPageLastRenderIndex;
     this.listLength = renderProps.listLength;
     this.listlastPageLength = renderProps.listlastPageLength;
     this.chunkAmount = renderProps.chunkAmount;
-    this.tailingElementsAmount = renderProps.tailingElementsAmount;
     console.log(this);
   }
 
-  reInitValues(
-    lastRenderIndex: number,
-    length: number,
-    tailingElementsAmount: number
-  ) {
+  reInitValues(lastRenderIndex: number, length: number) {
     this.lastRenderIndex = lastRenderIndex;
     this.listLength = length;
-    this.tailingElementsAmount = tailingElementsAmount;
   }
 
   // TODO: провести тесты, где startRenderIndex равен сравниваемым значениям - скорее всего надо писать "больше или равно" => да, "больше или равно" работает лучше

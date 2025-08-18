@@ -1,0 +1,49 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+    <section class="container">
+      <h2>Settings</h2>
+    </section>
+
+    <section class="container">
+      <p class="codeDescription">Types of config:</p>
+      <pre class="code"><code class="language-typescript">
+const REMOTE_LAZY_000ITEMS_PROPS = {
+  data: object[] | DataURLType;
+  selectorId: string;
+  templateString: (
+      element: { [key: string]: unknown },
+      listLength?: number,
+      elemNum?: number
+    ) => string;
+  listWrapperHeight?: string;
+  forcedListLength?: number;
+  listType?: 'list' | 'table' | 'div';
+  subDir?: string;
+
+};
+
+new InfinityScroll(REMOTE_LAZY_000ITEMS_PROPS);
+      </code></pre>
+    </section>
+
+
+
+    <section class="container">
+      <%=
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupFull.html'))(data)
+      %>
+    </section>
+  </body>
+</html>

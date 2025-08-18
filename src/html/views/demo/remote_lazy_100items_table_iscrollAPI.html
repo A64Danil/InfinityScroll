@@ -1,0 +1,156 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+    <section>
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)
+      %>
+    </section>
+
+    <section class="container">
+      <h2>How to use it:</h2>
+      <p class="codeDescription">
+        <%=
+        _.template(require('html-loader!./../../includes/demoDescriptions/whereDownLoadScript.html'))(data)
+        %>
+      </p>
+      <p class="codeDescription">2. Put script to the head tag:</p>
+      <pre class="code"><code class="language-html">
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
+      </code></pre>
+      <p class="codeDescription">
+        3. Place any tag with your unique ID into your html-code:
+      </p>
+      <pre class="code"><code class="language-html">
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)) %>
+      </code></pre>
+      <p class="codeDescription">
+        4. Configure list and start it by call new InfinityScroll(config):
+      </p>
+      <pre class="code"><code class="language-javascript">
+&lt;script type="module"&gt;
+  console.log('start: <%= data.title %> ');
+
+  const REMOTE_LAZY_API_PROPS_100ITEMS = {
+  data: ({ start, end }) =>
+    `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}&isFullSchema=true`,
+  selectorId: 'REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI',
+  forcedListLength: 100,
+  listType: 'table',
+  tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
+  templateString: ({ item }) =&gt; `&lt;tr
+              class="REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem"
+      &gt;
+          &lt;td&gt;${item?.id}&lt;/td&gt;
+          &lt;td&gt;${item?.name} (${item?.country_code})&lt;/td&gt;
+          &lt;td&gt;${item?.industry}&lt;/td&gt;
+          &lt;td&gt;${item?.founded}&lt;/td&gt;
+          &lt;td&gt;${item?.size}&lt;/td&gt;
+          &lt;td&gt;${item?.city} (${item?.state})&lt;/td&gt;
+    &lt;/tr&gt;`,
+};
+
+  new InfinityScroll(REMOTE_LAZY_API_PROPS_100ITEMS );
+&lt;/script&gt;
+      </code></pre>
+      <p class="codeDescription">5. Add your styles:</p>
+      <pre class="code"><code class="language-css">
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI {
+    color: #333;
+    height: 600px;
+    background-color: #fff;
+    outline: 3px solid #a9a9a9
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_Table {
+    position: relative;
+    table-layout: fixed
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem {
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px;
+    height: 3.75em;
+    overflow: hidden;
+    vertical-align: top
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem:nth-child(2n) {
+    background-color: #f7f7f7
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem:hover {
+    background: #eee
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem:before {
+    content: attr(aria-posinset) ") ";
+    display: table-cell
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem td,.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem:before {
+    padding: 6px 10px
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI thead {
+    position: sticky;
+    top: 0;
+    background: #ddd;
+    z-index: 1
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI thead tr {
+    height: 1em
+}
+
+.REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI thead .REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem:before {
+    content: attr(aria-posinset) "№ "
+}
+      </code></pre>
+    </section>
+
+    <section class="container">
+      <%=
+      _.template(require('html-loader!./../../includes/demoDescriptions/listSetupShort.html'))(data)
+      %>
+    </section>
+    <% if (data.mode === 'production') {%>
+    <script>
+      console.log('start: <%= data.title %> ');
+
+      const REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI = {
+        data: ({ start, end }) =>
+          `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}&isFullSchema=true`,
+        selectorId: 'REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI',
+        forcedListLength: 100,
+        listType: 'table',
+        tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
+        templateString: ({ item }) => `<tr
+          class="REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem"
+          >
+            <td>${item?.id}</td>
+            <td>${item?.name} (${item?.country_code})</td>
+            <td>${item?.industry}</td>
+            <td>${item?.founded}</td>
+            <td>${item?.size}</td>
+            <td>${item?.city} (${item?.state})</td>
+      </tr>`,
+      };
+
+      new InfinityScroll(REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI);
+    </script>
+    <% } %>
+  </body>
+</html>

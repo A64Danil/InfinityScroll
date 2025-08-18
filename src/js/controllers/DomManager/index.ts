@@ -3,7 +3,6 @@ import { ChunkController } from '../Chunk';
 import { Skeleton } from '../Skeleton';
 import { Vsb } from '../VirtualScrollbar';
 import { IScrollDirection } from '../../types/IScrollDirection';
-import { TemplateStringFunction } from '../../types/TemplateStringFunction';
 import {
   ChunkPropsToModifyDom,
   ListPropsToModifyDom,
@@ -14,20 +13,7 @@ import { Rec } from '../../types/utils';
 import { checkChildrenAmount } from '../../helpers';
 
 export class DomManager {
-  public isStopRender = false;
-
-  // даже не знаю зачем эта переменная, нужна для нулевого сетТаймайт
-  private delay = 0;
-
-  // хранит в себе id сетТаймаута
-  private fillListTimerId: number | undefined;
-
   readonly targetElem;
-
-  targetElemSavedOffset = 0;
-
-  // Содержит в себе хтмл-шаблон, в который мы положим данные из БД
-  private readonly template;
 
   // Общий счётчик элементов (создан для рекурсивной функции чтобы она не добавляла слишком много за раз)
   private GLOBAL_ITEM_COUNTER = 0;
@@ -36,39 +22,22 @@ export class DomManager {
 
   offsetElem: HTMLElement | null;
 
-  constructor(props: {
-    skeleton: Skeleton;
-    template: TemplateStringFunction;
-    targetElem: HTMLElement;
-  }) {
+  constructor(props: { skeleton: Skeleton; targetElem: HTMLElement }) {
     // this.data = props.data;
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
-    this.template = props.template;
     this.offsetElem = null;
   }
 
-  // TODO: rename to setHeight
-  setPaddingToList(
-    list: ListPropsToModifyDom,
-    chunkHtmlHeight: number,
-    vsb?: Vsb,
-    offset = 0
-  ): void {
+  setHeightToList(list: ListPropsToModifyDom, vsb?: Vsb, offset = 0): void {
     let { length } = list;
 
     if (vsb && vsb.currentPage !== 1 && vsb.currentPage === vsb.totalPages) {
       length = list.lastPageLength;
     }
 
-    // console.log('length', length);
-    // let paddingBottom = length * list.itemHeight - chunkHtmlHeight * 4 - offset;
+    console.log(this.targetElem);
     const height = length * list.itemHeight - offset;
-
-    // if (paddingBottom < 0) {
-    //   paddingBottom = 0;
-    // }
-    // this.targetElem.style.paddingBottom = `${paddingBottom}px`;
     this.targetElem.style.height = `${height}px`;
   }
 
@@ -132,7 +101,7 @@ export class DomManager {
     // }
 
     this.offsetElem.style.height = `${offset}px`;
-    this.setPaddingToList(list, chunk.htmlHeight, vsb, offset);
+    this.setHeightToList(list, vsb, offset);
   }
 
   createItem(elemData: Rec, elemNum: number): HTMLElement {
