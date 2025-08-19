@@ -158,7 +158,6 @@ class InfinityScroll {
         console.log('Внещний скролл, поэтому не тригерим handleScroll - 2.0');
         return;
       }
-      console.log('VSB scroll listener - 2.1');
       this.vsb.isSyncing = true;
 
       this.scroll.setScrollDirection(
@@ -171,7 +170,6 @@ class InfinityScroll {
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          console.log('Убираем синхронизацию - 2.2');
           if (this.vsb.scroll !== this.vsb.elem.scrollTop) {
             this.vsb.handleScroll();
           }
@@ -309,7 +307,6 @@ class InfinityScroll {
         console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
-      console.log('main scroll listener - 1.1');
       this.isSyncing = true;
       this.scroll.setScrollDirection(
         this.middleWrapper.scrollTop,
@@ -337,7 +334,6 @@ class InfinityScroll {
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          console.log('Убираем синхронизацию - 1.2');
           this.vsb.isPageChanged = false;
           this.isSyncing = false;
         });
@@ -399,7 +395,6 @@ class InfinityScroll {
       return this.middleWrapper.appendChild(newEl).appendChild(tbody);
     }
 
-    // return this.wrapperEl.appendChild(newEl);
     return this.middleWrapper.appendChild(newEl);
   }
 
@@ -459,7 +454,6 @@ class InfinityScroll {
       this.list.lastPageLength = this.list.length;
     }
 
-    // this.chunk.lastRenderIndex = this.list.length - this.list.halfOfExistingSizeInDOM;
     this.chunk.lastRenderIndex =
       this.list.length -
       this.list.halfOfExistingSizeInDOM -
@@ -474,8 +468,6 @@ class InfinityScroll {
     );
 
     this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
-
-    // this.list.tailingElementsAmount = this.list.length % this.chunk.amount; // TODO: возможно уже не нужно после включения VSB
 
     if (listItem) {
       this.domMngr.removeItem('firstChild');
@@ -552,20 +544,11 @@ class InfinityScroll {
     this.list.pageTailingElementsAmount = this.list.length % this.chunk.amount;
     this.list.lastPageTailingElementsAmount =
       this.list.lastPageLength % this.chunk.amount;
-    // this.list.setState(this.vsb.isLastPage);
-
-    //
-    //
-    // this.list[0].tailingElementsAmount = this.list[0].length % this.chunk.amount;
-    // this.list[1].tailingElementsAmount = this.list[1].length % this.chunk.amount;
 
     console.log(
       'this.list.tailingElementsAmount',
       this.list.tailingElementsAmount
     );
-
-    // this.chunk.lastRenderIndex =
-    //   this.list.length - this.list.halfOfExistingSizeInDOM;
 
     this.chunk.prevPageRenderIndex =
       this.chunk.lastRenderIndex +
@@ -573,19 +556,11 @@ class InfinityScroll {
       (this.chunk.lastRenderIndex % this.chunk.amount);
 
     if (this.render) {
-      this.render.reInitValues(
-        this.chunk.lastRenderIndex,
-        this.list.length,
-        this.list.tailingElementsAmount
-      );
+      this.render.reInitValues(this.chunk.lastRenderIndex, this.list.length);
     }
 
     this.domMngr.setHeightToList(this.list);
     this.skeleton.setListLength(this.list.fullLength);
-
-    // Не нужно?
-    // this.list.startIndexOfLastPart =
-    //   this.list.length - this.list.existingSizeInDOM;
 
     this.list.lastPageStartIndexOfLastPart =
       this.list.lastPageLength - this.list.existingSizeInDOM;
@@ -697,18 +672,9 @@ class InfinityScroll {
     if (isBigDiff || this.vsb.isPageChanged) {
       console.log('isBigDiff', isBigDiff, renderIndexDiff);
       clearTimeout(this.timerIdRefreshList);
-      // console.log(
-      //   'this.vsb.isLastPage',
-      //   this.vsb.isLastPage,
-      //   this.vsb.currentPage
-      // );
       this.setTimerToRefreshList();
     }
 
-    const isEndOfList =
-      this.vsb.isLastPage &&
-      (scroll >= this.scroll.lastPageMaxScroll ||
-        resultIndex >= this.chunk.lastPageLastRenderIndex);
     // Если скролл поменялся - устанавливаем новый скролл и меняем ДОМ
     if (this.chunk.startRenderIndex !== resultIndex) {
       const oldIndex = this.chunk.startRenderIndex;
@@ -776,35 +742,14 @@ class InfinityScroll {
           this.vsb
         );
 
-        // TODO: нужна только 1 из 2?
-        // if (!this.timerIdRefreshList) {
-        //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
-        // }
-
         if (process.env.NODE_ENV === 'development') {
           // For tests - 1
           if (!isBigDiff) {
             this.checkIndexOrdering(this.scroll.isGoingFromBottom);
-            // if (!this.checkIndexOrdering()) {
-            //   console.warn('stop scroll!');
-            //   this.middleWrapper.style.overflow = 'hidden';
-            //   this.vsb.elem.style.overflow = 'hidden';
-            //   console.log(mainChunkProps);
-            //
-            //   setTimeout(() => {
-            //     this.middleWrapper?.removeAttribute('style');
-            //     this.vsb.elem.removeAttribute('style');
-            //   }, 8000);
-            // }
           }
         }
       }
     }
-
-    // TODO: не нужно?
-    // if (!this.timerIdRefreshList) {
-    //   this.fixElemsOrdering(this.scroll.direction, isEndOfList);
-    // }
   }
 
   checkBigDiff(scrollDiff: number): boolean {
@@ -1284,93 +1229,6 @@ class InfinityScroll {
       throw new Error(errors.fetchedIsNotArray);
     }
     return res;
-  }
-
-  // TODO: useless??
-  fixElemsOrdering(direction: IScrollDirection, isEndOfList?: boolean) {
-    const firstElemPosition = Number(this.listEl.firstChild.ariaPosInSet);
-    const lastElemPosition = Number(this.listEl.lastChild.ariaPosInSet);
-    const lastElemPositionByOnePage =
-      lastElemPosition - (this.vsb.currentPage - 1) * this.list.length;
-
-    const sizeOfAnotherElements = this.list.existingSizeInDOM - 1;
-    if (isEndOfList && lastElemPositionByOnePage !== this.list.lastPageLength) {
-      console.clear();
-      console.warn(
-        'Конец списка  поломан- надо ребутать по особому',
-        lastElemPositionByOnePage
-      );
-      const [sequenceStart] = this.getSequence(
-        this.chunk.itemIndex,
-        true,
-        true
-      );
-      this.domMngr.resetAllList(
-        this.chunk,
-        this.list.lastPageStartIndexOfLastPart + this.chunk.amount,
-        sequenceStart,
-        this.list,
-        this.scroll.direction,
-        this.vsb
-      );
-
-      return;
-    }
-    let isOrderBreaked = false;
-    let renderIndex;
-    if (direction === 'down') {
-      // console.log('Если сломалось, то ориентирйся на низ списка, т.к. сломан верх!')
-      // console.log('Низ правильный, а верх плохой?');
-      if (lastElemPosition - sizeOfAnotherElements !== firstElemPosition) {
-        console.warn('Дай угадаю - верх списка поломался?');
-        // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
-        // console.log(
-        //   lastElemPosition - sizeOfAnotherElements,
-        //   firstElemPosition
-        // );
-        renderIndex =
-          lastElemPosition - this.list.existingSizeInDOM + this.chunk.amount;
-        isOrderBreaked = true;
-      }
-    } else if (direction === 'up') {
-      // console.log('Если сломалось, то ориентирйся на верх списка, т.к. сломан низ')
-      // console.log('Верх правильный, а низ плохой?');
-      if (firstElemPosition + sizeOfAnotherElements !== lastElemPosition) {
-        console.warn('Дай угадаю - низ списка поломался?');
-        // console.log(firstElemPosition, lastElemPosition, sizeOfAnotherElements); // 249
-        // console.log(
-        //   firstElemPosition + sizeOfAnotherElements,
-        //   lastElemPosition
-        // );
-
-        renderIndex = firstElemPosition + this.chunk.amount;
-        isOrderBreaked = true;
-      }
-    }
-
-    if (isOrderBreaked) {
-      renderIndex -= this.list.length * (this.vsb.currentPage - 1);
-      console.warn(
-        'Ребутаем список чтобы спасти ситацию =)',
-        renderIndex,
-        this.chunk.startRenderIndex,
-        this.scroll.direction,
-        isEndOfList
-      );
-      const [sequenceStart, sequenceEnd] = this.getSequence(
-        this.chunk.itemIndex,
-        true
-      );
-      // this.domMngr.resetAllList(
-      //   this.chunk,
-      //   // renderIndex,
-      //   this.chunk.startRenderIndex,
-      //   sequenceStart,
-      //   this.list,
-      //   this.scroll.direction,
-      //   this.vsb
-      // );
-    }
   }
 
   async setIndexedDb() {
