@@ -1,11 +1,5 @@
 import { Rec } from '../../types/utils';
 
-type ListState = {
-  name?: string;
-  tailingElementsAmount: number;
-  length: number;
-};
-
 export class ListController {
   // Массив данных для превращения в хтмл-ссписок
   public data: Rec[];
@@ -27,10 +21,8 @@ export class ListController {
 
   wrapperHeight = 0;
 
-  // TODO: какая-то шляпа, почему размер айтама хранится в контрллере списка?
   itemHeight = 0;
 
-  // TODO: перенести в чанк?
   // Количество элементов в крайнем чанке
   tailingElementsAmount = 0;
 
@@ -39,21 +31,6 @@ export class ListController {
 
   // Количество элементов в крайнем чанке на последней странице
   lastPageTailingElementsAmount = 0;
-
-  // НА БУДУЩЕЕ
-  // State for usual pages
-  // 0: ListState = {
-  //   name: "page",
-  //   tailingElementsAmount: 0,
-  //   length: 0,
-  // };
-  //
-  // // State only for last page
-  // 1: ListState = {
-  //   name: "lastPage",
-  //   tailingElementsAmount: 0,
-  //   length: 0,
-  // };
 
   // Стартовый индекс последней части списка
   public startIndexOfLastPart = 0;
