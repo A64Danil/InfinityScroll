@@ -159,10 +159,6 @@ export class Vsb {
     console.log('totalListHeight', formattedTotalListHeight);
     console.log({ standartLimit, formattedSafeLimit });
 
-    // TODO: this is a fake, don't belive it
-    this.totalPages = Math.ceil(totalHeight / this.safeLimit);
-    console.log('(fake) this.totalPages', this.totalPages);
-
     let onePageSize = listLength;
     if (onePageSize > fullLength) {
       onePageSize = fullLength;
@@ -173,30 +169,8 @@ export class Vsb {
     console.log('lastPageSize', lastPageSize);
 
     const additionalPageCounter = lastPageSize === 0 ? 0 : 1;
-
-    console.log(fullLength);
     const computedTotalPages =
       (fullLength - lastPageSize) / onePageSize + additionalPageCounter;
-    // 500 - 0 / 100 == 5 + 1 = 6
-    // 420 - 20 / 100 == 4 + 1 =  5
-    // 287 - 87 / 100 == 2 + 1 = 3
-    console.log('computedTotalPages', computedTotalPages, this.totalPages);
-
-    const controlCheck = computedTotalPages === this.totalPages;
-
-    // 500 === 100 * 5 + 0
-    // 500 === 100 * 5 - 0
-
-    // 420 == 100 * 4 + 20
-    // 480 == 100 * 5 - 20
-
-    console.log('controlCheck', controlCheck);
-
-    if (controlCheck) {
-      console.log('Всё сходится');
-    } else {
-      console.warn('controlCheck не пройден!!!');
-    }
 
     this.totalPages = computedTotalPages;
 
@@ -271,9 +245,6 @@ export class Vsb {
     direction?: IScrollDirection,
     forceChange?: boolean
   ) {
-    // TODO: попробовать статические данные вместо динамики?
-    // console.log('this.isPageChanged', this.isPageChanged);
-
     if (forceChange) {
       if (direction === 'down') {
         this.origScrollElem.scrollTop = 1;
@@ -331,11 +302,7 @@ export class Vsb {
     return currentPage;
   }
 
-  setScrollRatio(
-    fullLength: number,
-    listLength: number,
-    lastPageLength: number
-  ) {
+  setScrollRatio(fullLength: number, listLength: number) {
     const completedPagesLength = listLength * this.totalPages;
     const incompletedPagesLength = fullLength;
     console.log(completedPagesLength, incompletedPagesLength);
