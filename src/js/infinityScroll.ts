@@ -1118,25 +1118,6 @@ class InfinityScroll {
     }
   }
 
-  // TODO: useless?
-  async getListItem(index): Promise<Rec | undefined> {
-    let elem;
-    if (this.list.data[index] !== undefined) {
-      elem = this.list.data[index];
-    } else {
-      console.log('Элемента в быстром доступе нет. Будем искать в БД', index);
-      if (await this.dbmanager.has(index)) {
-        console.log('Нашли его в БД');
-        elem = await this.dbmanager.get(index);
-        console.log(elem);
-      } else {
-        console.log('Элемента в БД нет, вот что отдаёт БД');
-        console.log(await this.dbmanager.get(index));
-      }
-    }
-    return elem;
-  }
-
   async getItemsFromDB(sequenceStart: number, sequenceEnd: number) {
     const result = await this.dbmanager.readRange(
       sequenceStart,
