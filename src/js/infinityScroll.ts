@@ -852,10 +852,7 @@ class InfinityScroll {
       if (timerID && timerID !== this.timerIdRefreshList) {
         return;
       }
-      // TODO: проверить с выключенным fixOrdering
-      // END Fetch new DATA
 
-      console.log(renderIndex);
       this.domMngr.resetAllList(
         this.chunk,
         renderIndex,
@@ -1005,9 +1002,8 @@ class InfinityScroll {
     this.skeleton.setListLength(this.list.length);
   }
 
-  // TODO: renderIndex or itemIndex ??? -> truly this is itemIndex, but name is no difference?
   getSequence(
-    renderIndex: number,
+    itemIndex: number,
     isFetchToReset = false,
     isLastPage = false
   ): number[] {
@@ -1027,7 +1023,7 @@ class InfinityScroll {
       sequenceStart = calcSequenceByDirection(
         this.scroll.direction,
         this.list.halfOfExistingSizeInDOM,
-        renderIndex,
+        itemIndex,
         this.chunk.amount
       );
       sequenceEnd = sequenceStart + this.chunk.amount;
@@ -1037,7 +1033,7 @@ class InfinityScroll {
         sequenceEnd = hightestEndIndexByPage;
       }
     } else {
-      const tempStartIndex = renderIndex - this.chunk.amount;
+      const tempStartIndex = itemIndex - this.chunk.amount;
 
       const lowestIndexByPage = this.list.length * (this.vsb.currentPage - 1);
 
