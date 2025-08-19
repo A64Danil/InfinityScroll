@@ -49,4 +49,8 @@ export class ListController {
     const totalListHeight = this.itemHeight * this.fullLength;
     return totalListHeight;
   }
+
+  setExistingSizeInDOM(chunkAmount: number): void {
+    this.existingSizeInDOM = Math.min(this.length, chunkAmount * 4);
+  }
 }
