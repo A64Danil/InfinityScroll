@@ -988,6 +988,8 @@ class InfinityScroll {
   }
 
   setListLength() {
+    // TODO: не выбрасывать ошибку, если данные есть в indexedDB
+
     if (!Array.isArray(this.list.data)) {
       throw new Error(errors.notArray);
     }
