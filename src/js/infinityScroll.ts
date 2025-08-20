@@ -942,63 +942,59 @@ class InfinityScroll {
    * Define length of list and length of last page;
    * Also define apiSettings, html-height and fetch initial data
    * */
-
-  // TODO: кажеься надо разбить на несколько отдельных функций
-  async setInitialListData(data: object[] | DataURLType) {
+  async setInitialListData(data: Rec[] | DataURLType) {
     console.log('---- setInitialListData ----');
-    let newLength = null;
     if (this.dataLoadPlace === 'local') {
-      this.list.data = data as [];
-      newLength = this.forcedListLength || (data && data.length);
+      await this.setLocalData(data as Rec[]);
     } else {
-      const dataUrl = data as DataURLType;
-      const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
+      await this.setRemoteData(data as DataURLType);
+    }
+    this.setListLength();
+  }
 
-      if (!isDataUrlString && !isDataUrlReturnString) {
-        throw new Error(errors.notValidUrl);
-      }
+  async setLocalData(data: Rec[]) {
+    this.list.data = data;
+    this.list.fullLength = this.forcedListLength || (data && data.length);
+  }
 
-      if (!isDataUrlReturnString) {
-        await getRemoteData(dataUrl as string).then((fetchedData): void => {
-          const extractedData = this.extractResponse(fetchedData);
-          // this.list.data = extractedData;
-          console.log('after get remote data');
-          this.setListData(extractedData);
-          newLength =
-            this.forcedListLength || (extractedData && extractedData.length);
-        });
-      } else {
-        this.isLazy = true;
-        await this.checkApiSettings();
-        console.log('Конечный индекс includeEnd? ', this.includeEnd);
-        console.log('Индекс считается с ', this.basedIndex);
-        const startIdx = this.basedIndex;
-        const endIdx = this.basedIndex + Number(!this.includeEnd);
-        const fetchedData = await this.getListDataLazy(startIdx, endIdx);
-        console.log(fetchedData);
-        // this.list.data = fetchedData;
-        this.setListData(fetchedData);
+  async setRemoteData(dataUrl: DataURLType) {
+    const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
 
-        if (this.forcedListLength) {
-          newLength = this.forcedListLength;
-        } else {
-          newLength =
-            (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
-            Number(!this.basedIndex);
-        }
-      }
+    if (!isDataUrlString && !isDataUrlReturnString) {
+      throw new Error(errors.notValidUrl);
     }
 
+    if (!isDataUrlReturnString) {
+      const fetchedData = await getRemoteData(dataUrl as string);
+      const extractedData = this.extractResponse(fetchedData);
+      this.setListData(extractedData);
+      this.list.fullLength =
+        this.forcedListLength || (extractedData && extractedData.length);
+    } else {
+      this.isLazy = true;
+      await this.checkApiSettings();
+      const startIdx = this.basedIndex;
+      const endIdx = this.basedIndex + Number(!this.includeEnd);
+      const fetchedData = await this.getListDataLazy(startIdx, endIdx);
+      this.setListData(fetchedData);
+      if (this.forcedListLength) {
+        this.list.fullLength = this.forcedListLength;
+      } else {
+        this.list.fullLength =
+          (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
+          Number(!this.basedIndex);
+      }
+    }
+  }
+
+  setListLength() {
     if (!Array.isArray(this.list.data)) {
       throw new Error(errors.notArray);
     }
-    if (!newLength) {
+    if (!this.list.fullLength) {
       throw new Error(errors.zeroListSize);
     }
-
-    console.log('newLength', newLength);
-    this.list.fullLength = newLength;
-    this.list.length = newLength;
+    this.list.length = this.list.fullLength;
     this.skeleton.setListLength(this.list.length);
   }
 

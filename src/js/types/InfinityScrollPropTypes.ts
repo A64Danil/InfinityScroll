@@ -1,9 +1,10 @@
 import { TemplateStringFunction } from './TemplateStringFunction';
 import { DataURLType } from './DataURL';
+import { Rec } from './utils';
 // import { XOR } from './utils';
 
 export type InfinityScrollPropTypes = {
-  data: object[] | DataURLType;
+  data: Rec[] | DataURLType;
   selectorId: string;
   templateString: TemplateStringFunction;
   listWrapperHeight?: string;
