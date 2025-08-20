@@ -11,6 +11,7 @@ import { REMOTE_SIMPLE_API_100ITEMS_PROPS } from './demoScripts/remote_simple_AP
 import { REMOTE_LAZY_DUMMYJSON_API_PROPS } from './demoScripts/remote_lazy_dummyjson_API';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
 import { REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS } from './demoScripts/remote_lazy_100items_table_iscrollAPI';
+import { REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS } from './demoScripts/remote_lazy_5kk_items_table_iscrollAPI';
 
 console.log('Entry point');
 
@@ -87,16 +88,28 @@ console.log('Entry point');
     window.iScroll = myLazyAPIScroll;
   }
 
-  const lazyAPIList100 = document.getElementById(
+  const lazyAPITable100 = document.getElementById(
       REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS.selectorId
   );
 
-  if (lazyAPIList100 !== null) {
+  if (lazyAPITable100 !== null) {
     console.log('Lazy API list Started');
     const myLazyAPIScroll100 = new InfinityScroll(
         REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS
     );
     window.iScroll = myLazyAPIScroll100;
+  }
+
+  const lazyAPITable5kk = document.getElementById(
+      REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS.selectorId
+  );
+
+  if (lazyAPITable5kk !== null) {
+    console.log('Lazy API Table 5kk Started');
+    const myLazyAPITable5kk = new InfinityScroll(
+        REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS
+    );
+    window.iScroll = myLazyAPITable5kk;
   }
 
   const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(

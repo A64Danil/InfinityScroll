@@ -1,0 +1,54 @@
+.REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI {
+  color: #333;
+  height: 600px;
+  background-color: #fff;
+  outline: 3px solid darkgray;
+
+  &_Table {
+    position: relative;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  &__listItem {
+    font-weight: normal;
+    border-radius: 4px;
+    font-size: 18px;
+    height: 3.75em;
+    overflow: hidden;
+    vertical-align: top;
+
+    &:nth-child(2n) {
+      background-color: #f7f7f7;
+    }
+
+    &:hover {
+      background: #eee;
+    }
+    &:before {
+      content: attr(aria-posinset) ') ';
+      display: table-cell;
+    }
+
+    td,
+    &:before {
+      padding: 6px 10px;
+    }
+  }
+
+  thead {
+    //position: absolute;
+    position: sticky;
+    top: 0;
+    background: #ddd;
+    z-index: 1;
+
+    tr {
+      height: 1em;
+    }
+
+    .REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI__listItem:before {
+      content: attr(aria-posinset) '№ ';
+    }
+  }
+}
