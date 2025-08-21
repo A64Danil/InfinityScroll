@@ -1,18 +1,12 @@
-const greenLogStyle =
-  'background-color: lightgreen; color: white; font-weight: bold;';
+import {
+  greenLogStyle,
+  darkGreenLogStyle,
+  grayLogStyle,
+  redLogStyle,
+  yellowLogStyle,
+} from '../helpers/logStyles';
 
-const darkGreenLogStyle =
-  'background-color: darkgreen; color: white; font-weight: bold;';
-
-const grayLogStyle = 'background-color: gray; color: white; font-weight: bold;';
-
-const redLogStyle =
-  'background-color: tomato; color: white; font-weight: bold;';
-
-const yellowLogStyle =
-  'background-color: yellow; color: #333; font-weight: bold;';
-
-export function iScrollTester() {
+export async function iScrollTester() {
   this.tests.name = '';
   this.tests.errors.clear();
 
@@ -71,7 +65,7 @@ export function iScrollTester() {
   const scrollToTopNow = () => scrollToNow(0);
   const scrollToBottomNow = () => scrollToNow(fillerHeight);
 
-  console.clear();
+  // console.clear();
   console.log('start iScroll testing!');
 
   async function testStartSignal(counterValue = 3) {
