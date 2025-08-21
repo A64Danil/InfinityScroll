@@ -1,0 +1,69 @@
+<% var data = { title: htmlWebpackPlugin.options.title, origName:
+htmlWebpackPlugin.options.origName, mode: htmlWebpackPlugin.options.mode,
+author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  </head>
+  <body>
+    <section class="container">
+      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+    </section>
+
+
+
+    <section class="container">
+      <h2>All Demo test</h2>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/local_basic_10000items.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_simple_500items.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_simple_api_100items.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_simple_15items_dummyjson_API.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_dummyjson_API.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_api.html'))(data)
+      %>
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)
+      %>
+
+
+      <%=
+      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_5kk_items_table_iscrollAPI.html'))(data)
+      %>
+
+
+    </section>
+
+    <section class="container">
+
+    </section>
+
+    <section class="container">
+
+    </section>
+
+  </body>
+</html>
