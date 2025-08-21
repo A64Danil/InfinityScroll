@@ -1,6 +1,5 @@
 import {
   greenLogStyle,
-  darkGreenLogStyle,
   grayLogStyle,
   redLogStyle,
   yellowLogStyle,
@@ -53,20 +52,21 @@ export async function iScrollTester() {
   const needToReset = true;
 
   // Start all tests
-  (async () => {
-    await t.run.fastUpDownScrollDomTest(1, needToReset);
-    await t.run.chaoticScrollDomTest(1, needToReset);
-    await t.run.asyncChaoticScrollDomTest(1, needToReset);
-    await t.run.smoothUpDownScrollDomTest(1, needToReset);
-    await t.run.testLocalSimple100item(1, needToReset);
-    await t.run.testRemoteLazyDummyjsonAPI(1, needToReset);
-    console.log('after func');
-    await t.run.testRemoteSimple500item(1);
-    // await testRemoteSimple500item(1);
-    // await testRemoteSimple500item(1);
-    // await testRemoteSimple500item(1);
-    // await testRemoteSimple500item(1);
 
-    showErrors.call(this);
-  })();
+  await t.run.fastUpDownScrollDomTest(1, needToReset);
+  await t.run.chaoticScrollDomTest(1, needToReset);
+  await t.run.asyncChaoticScrollDomTest(1, needToReset);
+  await t.run.smoothUpDownScrollDomTest(1, needToReset);
+  await t.run.testLocalSimple100item(1, needToReset);
+  await t.run.testRemoteLazyDummyjsonAPI(1, needToReset);
+  console.log('after func');
+  await t.run.testRemoteSimple500item(1);
+  // await testRemoteSimple500item(1);
+  // await testRemoteSimple500item(1);
+  // await testRemoteSimple500item(1);
+  // await testRemoteSimple500item(1);
+
+  showErrors.call(this);
+  // showErrors();
+  return Promise.resolve();
 }
