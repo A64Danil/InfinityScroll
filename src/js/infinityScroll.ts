@@ -1060,17 +1060,7 @@ class InfinityScroll {
       // console.log('sequenceStart', sequenceStart);
       sequenceEnd = sequenceStart + this.list.existingSizeInDOM;
     }
-    const lastStartIndex = this.list.fullLength - this.list.existingSizeInDOM;
-    const lastEndIndex = this.list.fullLength;
-    // const lastStartIndex = this.list.length - this.list.existingSizeInDOM;
-    // const lastEndIndex = this.list.length;
 
-    // console.log(lastStartIndex, lastEndIndex);
-    // TODO: возможно это всё еще нужно - проверить на разных тестах при одной большой странице
-    // if (sequenceStart > lastStartIndex) {
-    //   console.log('Случай сложный');
-    //   [sequenceStart, sequenceEnd] = [lastStartIndex, lastEndIndex];
-    // }
     return [sequenceStart, sequenceEnd];
   }
 
