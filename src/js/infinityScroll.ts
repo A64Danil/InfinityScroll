@@ -116,7 +116,7 @@ class InfinityScroll {
 
   private readonly test: () => void;
 
-  private tests: {
+  public tests: {
     name: string;
     errors: Map<string, string[]>;
   };
@@ -304,7 +304,7 @@ class InfinityScroll {
 
     this.middleWrapper.addEventListener('scroll', (e) => {
       if (this.vsb.isSyncing) {
-        console.log('Отменяемmain scroll listener - 1.0');
+        // console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
       this.isSyncing = true;
