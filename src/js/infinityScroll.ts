@@ -51,6 +51,8 @@ const errors = errorMsg[errorLang];
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
 // TODO: начать кэшировать некоторые настройки списка
+
+// TODO: требуется поле, отобажающее состояние списка (инициилизация, загрукзка данных, готово)
 class InfinityScroll {
   // хранит в себе id сетТаймаута
   private timerIdRefreshList: number | undefined;
