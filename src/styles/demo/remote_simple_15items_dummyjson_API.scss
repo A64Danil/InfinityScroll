@@ -1,0 +1,83 @@
+.REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API {
+  color: #333;
+  height: 610px;
+
+
+  &_List {
+    padding: 0;
+    margin: 0;
+  }
+
+  &__listItem {
+    display: flex;
+    padding: 12px 10px 20px;
+    font-weight: normal;
+    //transition: background-color 0.3s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &:nth-child(2n) {
+      background-color: #f7f7f7;
+    }
+
+
+    &:hover {
+      background: #eee;
+    }
+    &:before {
+      content: attr(aria-posinset) ')';
+      font-size: 24px;
+      padding-right: 5px;
+
+    }
+
+
+    .imgWrapper {
+      width: 120px;
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    }
+
+
+    .contentWrapper {
+
+
+      .title {
+        font-size: 24px;
+        margin-bottom: 6px;
+
+        span {
+          color: gray;
+          font-size: 14px;
+        }
+
+      }
+
+      .desc {
+        margin-bottom: 20px;
+      }
+
+      em {
+        color: gray;
+      }
+
+      .reviewList {
+        background-color: #f7f7f7;
+        border-left: 10px solid #ccc;
+        padding: 20px;
+
+        .review {
+          margin-bottom: 10px;
+        }
+      }
+    }
+
+  }
+}
+
+.REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_List {
+
+}

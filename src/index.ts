@@ -8,6 +8,7 @@ import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000ite
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
 import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
 import { REMOTE_SIMPLE_API_100ITEMS_PROPS } from './demoScripts/remote_simple_API_100items';
+import { REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS } from './demoScripts/remote_simple_15items_dummyjson_API';
 import { REMOTE_LAZY_DUMMYJSON_API_PROPS } from './demoScripts/remote_lazy_dummyjson_API';
 import { REMOTE_LAZY_API_PROPS } from './demoScripts/remote_lazy_API';
 import { REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS } from './demoScripts/remote_lazy_100items_table_iscrollAPI';
@@ -68,6 +69,16 @@ console.log('Entry point');
     console.log('Remote Api_100_items list Started');
     const myLazyScroll = new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
     window.iScroll = myLazyScroll;
+  }
+
+  const simpleDummyJsonList = document.getElementById(
+    REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS.selectorId
+  );
+
+  if (simpleDummyJsonList !== null) {
+    console.log('Simle DummyJson list Started');
+    const mySimpleScroll = new InfinityScroll(REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS);
+    window.iScroll = mySimpleScroll;
   }
 
   const lazyDummyJsonList = document.getElementById(
