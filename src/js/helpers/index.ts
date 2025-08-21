@@ -148,3 +148,8 @@ export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
 
   return leftIndex;
 }
+
+export const wait = (time = 0) =>
+  new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), time);
+  });
