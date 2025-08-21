@@ -6,11 +6,16 @@ import {
   yellowLogStyle,
 } from '../helpers/logStyles';
 
+import { DOMTest } from './testFunctions';
+
 export async function iScrollTester() {
   this.tests.name = '';
   this.tests.errors.clear();
 
   console.log('iScrollTester log msg');
+
+  const t = new DOMTest({ vsb: this.vsb, chunk: this.chunk });
+  console.log(t);
 
   const { fillerHeight, elem: scrollElem } = this.vsb;
 
