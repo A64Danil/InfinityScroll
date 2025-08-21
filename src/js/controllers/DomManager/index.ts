@@ -36,7 +36,6 @@ export class DomManager {
       length = list.lastPageLength;
     }
 
-    console.log(this.targetElem);
     const height = length * list.itemHeight - offset;
     this.targetElem.style.height = `${height}px`;
   }
