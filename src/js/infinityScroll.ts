@@ -7,6 +7,7 @@ import {
   Skeleton,
   Vsb,
   IndexedTTLStoreManager,
+  StatusManager,
 } from './controllers';
 
 import {
@@ -24,7 +25,7 @@ import { iScrollTester } from './domTests';
 
 import { errorMsg } from '../locales/errors';
 
-import { NumRange, Rec } from './types/utils';
+import { NumRange, Rec, Status } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
@@ -116,6 +117,8 @@ class InfinityScroll {
 
   private readonly dbmanager: IndexedTTLStoreManager;
 
+  private isDebugMode = false;
+
   private readonly test: () => void;
 
   public tests: {
@@ -123,7 +126,7 @@ class InfinityScroll {
     errors: Map<string, string[]>;
   };
 
-  private isDebugMode = false;
+  public status: StatusManager;
 
   constructor(props: InfinityScrollPropTypes) {
     this.selectorId = props.selectorId;
@@ -148,6 +151,8 @@ class InfinityScroll {
     // this.isDebugMode = props.isDebugMode || true;
 
     this.listEl = this.createInnerList();
+
+    this.status = new StatusManager();
 
     this.scroll = new ScrollDetector();
 
@@ -344,6 +349,8 @@ class InfinityScroll {
     //
     // this.test();
     this.setIndexedDb();
+
+    this.status.setStatus(Status.Ready);
   }
 
   setDefaultStyles() {
@@ -949,6 +956,7 @@ class InfinityScroll {
     if (this.dataLoadPlace === 'local') {
       await this.setLocalData(data as Rec[]);
     } else {
+      this.status.setStatus(Status.Loading);
       await this.setRemoteData(data as DataURLType);
     }
     this.setListLength();
@@ -1187,7 +1195,10 @@ class InfinityScroll {
       this.dataUrl,
       start,
       end
-    ).then((data) => this.extractResponse(data));
+    ).then(
+      (data) => this.extractResponse(data),
+      () => this.status.setStatus(Status.Error)
+    );
 
     return fetchedData;
   }
