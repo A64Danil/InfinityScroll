@@ -3,6 +3,7 @@ import './js/scripts';
 import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
+import { InfinityScrollProps } from './js/types/InfinityScrollPropTypes';
 
 import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000items';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
@@ -48,10 +49,29 @@ console.log('Entry point');
     return null;
   }).filter(Boolean);
 
-  listElements.forEach(({ props, instance }) => {
+
+  const allInstancePromises = listElements.map(({ props, instance }: { props: InfinityScrollProps ; instance: InfinityScroll }) => {
     const name = props.selectorId.replaceAll('_', ' ').toLowerCase();
-    console.log(`"${name}" list started!`);
-    window.iScroll.push(instance);
+
+    return instance.status.whenReady()
+        .then(() => {
+          console.log(`"${name}" list is ready!`);
+          console.log("Status is " + instance.status.is);
+          window.iScroll.push(instance);
+          return {instance, success: true, error: null}
+        })
+        .catch(error => ({ instance, success: false, error }))
+
+  });
+
+  Promise.allSettled(allInstancePromises).then(results => {
+    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
+    const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
+
+    console.log('---------------');
+    console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
+    console.log('Successful instances:', successful.map(r => r.value?.instance));
+    console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
   });
 
   const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
