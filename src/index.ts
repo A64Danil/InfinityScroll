@@ -72,6 +72,11 @@ console.log('Entry point');
     console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
     console.log('Successful instances:', successful.map(r => r.value?.instance));
     console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
+
+    if(successful.length > 0) {
+      const allDemosIsReadyToTest = new Event("allDemosIsReadyToTest");
+      window.dispatchEvent(allDemosIsReadyToTest);
+    }
   });
 
   const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
