@@ -1,9 +1,4 @@
-enum Status {
-  Initial = 'initialization',
-  Loading = 'loading data',
-  Ready = 'ready',
-  Error = 'error',
-}
+import { Status } from '../../types/utils';
 
 export class StatusManager {
   private statusListeners: ((status: Status) => void)[] = [];
