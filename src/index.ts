@@ -79,11 +79,4 @@ console.log('Entry point');
     }
   });
 
-  const StartBtn: HTMLElement | null = document.querySelector<HTMLElement>(
-    '#infinityScrollListStartBtn'
-  );
-
-  StartBtn?.addEventListener('click', () => {
-    console.log('Nothing happens');
-  });
 })();

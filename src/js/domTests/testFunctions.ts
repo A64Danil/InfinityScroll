@@ -115,7 +115,7 @@ export class DOMTest {
 
   createAsyncTestFunction(name: string, fn: () => Promise<void>) {
     const newFn = async (delay = 3, needToResetState = true) => {
-      this.context.tests.name = name;
+      this.context.testResults.name = name;
       await this.testStartSignal(delay);
       console.log(`%c --- start  fn: ${name}  --- `, greenLogStyle);
       await fn();
@@ -125,7 +125,7 @@ export class DOMTest {
         await this.resetState();
       }
 
-      this.context.tests.name = '';
+      this.context.testResults.name = '';
       console.log(`%c --- END TEST: ${name}  --- `, darkGreenLogStyle);
     };
 
