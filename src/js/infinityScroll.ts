@@ -122,7 +122,8 @@ class InfinityScroll {
   private readonly test: () => void;
 
   public testResults: {
-    name: string;
+    listName: string;
+    currentTestName: string;
     errors: Map<string, string[]>;
   };
 
@@ -214,7 +215,8 @@ class InfinityScroll {
     this.test = iScrollTester;
 
     this.testResults = {
-      name: '',
+      listName: props.selectorId,
+      currentTestName: '',
       errors: new Map(),
     };
 
@@ -1166,14 +1168,18 @@ class InfinityScroll {
           const errorText = `Индексы поломались на элементе ${elemIndex} (ожидали ${
             prevIndex + 1
           }), isGoingFromBottom - ${isGoingFromBottom}`;
-          console.error(`${this.testResults.name} -- ${errorText})`);
+          console.error(`${this.testResults.currentTestName} -- ${errorText})`);
 
           if (
-            !Array.isArray(this.testResults.errors.get(this.testResults.name))
+            !Array.isArray(
+              this.testResults.errors.get(this.testResults.currentTestName)
+            )
           ) {
-            this.testResults.errors.set(this.testResults.name, []);
+            this.testResults.errors.set(this.testResults.currentTestName, []);
           }
-          this.testResults.errors.get(this.testResults.name).push(errorText);
+          this.testResults.errors
+            .get(this.testResults.currentTestName)
+            .push(errorText);
           isGoodOrdering = false;
         }
         prevIndex = elemIndex;

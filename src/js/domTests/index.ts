@@ -8,7 +8,6 @@ import {
 import { DOMTest } from './testFunctions';
 
 export async function iScrollTester(): Promise<object> {
-  this.testResults.name = '';
   this.testResults.errors.clear();
 
   console.log('iScrollTester log msg');
