@@ -7,7 +7,7 @@ import {
 
 import { DOMTest } from './testFunctions';
 
-export async function iScrollTester() {
+export async function iScrollTester(): Promise<object> {
   this.tests.name = '';
   this.tests.errors.clear();
 
@@ -68,5 +68,5 @@ export async function iScrollTester() {
 
   showErrors.call(this);
   // showErrors();
-  return Promise.resolve();
+  return Promise.resolve(this.tests);
 }

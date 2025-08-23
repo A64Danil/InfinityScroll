@@ -58,17 +58,24 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     </section>
 
     <script>
-        // console.clear();
-        // console.log("tests");
-        // console.log(window.iScroll);
-        //
-        // const allTest = window.iScroll;
-
         window.addEventListener('allDemosIsReadyToTest', function() {
             console.log('all demo is loaded')
 
-            console.log(window.iScroll);
-        })
+
+            const allTestsResult = []
+
+            window.iScroll.reduce(async (acc, iScroll) => {
+                await acc;
+                console.log('---------------------------------------');
+                const results = await iScroll.test();
+                allTestsResult.push(results);
+                return Promise.resolve();
+            }, Promise.resolve()).then(() => {
+                console.clear();
+                console.log('all demo is tested');
+                console.log(allTestsResult);
+            });
+        });
 
     </script>
 

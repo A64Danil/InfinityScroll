@@ -68,7 +68,7 @@ console.log('Entry point');
     const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
     const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
 
-    console.log('---------------');
+    console.clear();
     console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
     console.log('Successful instances:', successful.map(r => r.value?.instance));
     console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
