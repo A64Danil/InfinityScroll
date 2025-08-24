@@ -57,7 +57,8 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
     </section>
 
-    <script>
+    <script type="module">
+
         window.addEventListener('allDemosIsReadyToTest', function() {
             console.log('all demo is loaded')
 
@@ -74,8 +75,65 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                 console.clear();
                 console.log('all demo is tested');
                 console.log(allTestsResult);
+
+                <% if (data.mode === 'development') {%>
+                 sendReport(allTestsResult)
+                 <% } %>
             });
         });
+
+        <% if (data.mode === 'development') {%>
+        function prepareReportData(report) {
+            const date = new Date().toISOString();
+
+            const currentVersion = '<%= data.libVersion %>'; // writed by webpack
+
+            const dataErrors = report.map(entry => {
+                const errors = [];
+
+                // Map -> массив ошибок
+                entry.errors.forEach((value, key) => {
+                    value.forEach(msg => {
+                        errors.push({ test: key, message: msg });
+                    });
+                });
+
+                return {
+                    listName: entry.listName,
+                    errors: errors,
+                };
+            });
+
+            return {
+                version: currentVersion,
+                publishedAt: date,
+                device: report[0].device,
+                data: dataErrors
+            }
+        }
+
+        async function sendReport(report) {
+            const ENDPOINT = '';
+
+            const prepared = prepareReportData(report);
+
+            console.log(prepared);
+
+            const response = await fetch(ENDPOINT, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(prepared)
+            });
+
+            const json = await response.json();
+            console.log("Данные отправлены, вот ответ: ");
+            console.log(json);
+        }
+
+        <% } %>
 
     </script>
 
