@@ -58,6 +58,8 @@ export class Vsb {
 
   isSyncing = false;
 
+  deviceType: ReturnType<typeof getDeviceType>;
+
   constructor(isDebugMode: boolean, scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
@@ -83,13 +85,15 @@ export class Vsb {
 
     this.scrollRatio = 1;
 
+    this.deviceType = getDeviceType();
+
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
     const browserName = getBrowserName();
     this.elem.classList.add(`vSrcollbar_${browserName}`);
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
-    if (getDeviceType() !== 'desktop') {
+    if (this.deviceType !== 'desktop') {
       const simpleBar = new SimpleBar(this.elem, {
         autoHide: false, // Всегда показывать на iOS
         scrollbarMinSize: 60,
