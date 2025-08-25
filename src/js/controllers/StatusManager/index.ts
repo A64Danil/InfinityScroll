@@ -5,10 +5,17 @@ export class StatusManager {
 
   is: Status = Status.Initial;
 
+  cb: (status: Status) => undefined;
+
+  constructor(callback) {
+    this.cb = callback;
+  }
+
   setStatus(newStatus: Status) {
     if (this.is !== newStatus) {
       this.is = newStatus;
       this.statusListeners.forEach((listener) => listener(newStatus));
+      this.cb(newStatus);
     }
   }
 
