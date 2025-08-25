@@ -153,7 +153,12 @@ class InfinityScroll {
 
     this.listEl = this.createInnerList();
 
-    this.status = new StatusManager();
+    this.onChangeStatus = (newStatus: Status) => {
+      // alert(`Status changed: ${newStatus}`);
+      this.middleWrapper.dataset.status = newStatus;
+    };
+
+    this.status = new StatusManager(this.onChangeStatus);
 
     this.scroll = new ScrollDetector();
 
@@ -353,6 +358,10 @@ class InfinityScroll {
     this.setIndexedDb();
 
     this.status.setStatus(Status.Ready);
+    this.middleWrapper.classList.add('hiddingStatus');
+    setTimeout(() => {
+      this.middleWrapper.classList.remove('hiddingStatus', 'showStatus');
+    }, 2000);
   }
 
   setDefaultStyles() {
@@ -374,7 +383,8 @@ class InfinityScroll {
     // Create middle wrapper
 
     this.middleWrapper = document.createElement('div');
-    this.middleWrapper.classList.add('middleWrapper');
+    this.middleWrapper.classList.add('middleWrapper', 'showStatus');
+    this.middleWrapper.dataset.status = Status.Initial;
 
     this.wrapperEl.append(this.middleWrapper);
 
