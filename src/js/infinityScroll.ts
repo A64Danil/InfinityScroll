@@ -98,6 +98,8 @@ class InfinityScroll {
   // Содержит генерируемый элемент внутри корневого
   private readonly listEl: HTMLElement;
 
+  private readonly onChangeStatus: (newStatus: Status) => void;
+
   // Содержит генерируемый элемент внутри корневого для задания искусственного отступа
   private readonly offsetElem: HTMLElement | undefined;
 
