@@ -1,0 +1,35 @@
+<section>
+    <h3>1) this.status.whenReady<i>: () => Promise&lt;void&gt;</i></h3>
+    <p class="codeDescription">
+      Returns a promise and allows using then-callback when the list is in ready status.
+    </p>
+    <pre class="code"><code class="language-typescript">
+new InfinityScroll(props).status.whenReady()
+  .then(() => {
+    console.log(`List is ready!`);
+    return {instance, success: true, error: null}
+  })
+      </code></pre>
+
+</section>
+
+
+
+<section>
+  <h3>2) this.status.waitForStatus<i>: (targetStatus: Status) => Promise&lt;Status&gt;</i></h3>
+  <p class="codeDescription">
+    Returns a promise and allows using then-callback when the list reaches the target status
+  </p>
+  <pre class="code"><code class="language-typescript">
+type Status = "initialization" | "loading data" | "ready" | "error"
+  </code></pre>
+
+  <pre class="code"><code class="language-typescript">
+new InfinityScroll(props).status.waitForStatus("loading data")
+  .then(() => {
+    console.log(`Now list is in loading data!`);
+    return {instance, success: true, error: null}
+  })
+  </code></pre>
+
+</section>
