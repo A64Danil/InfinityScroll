@@ -22,20 +22,20 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       <p class="codeDescription">
         2. Put script to the head tag or before your closing body tag:
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-typescript">
 <%= escapeHtml(_.template(require('html-loader!./../../includes/demoDescriptions/howToIncludeScriptFile.html'))(data)) %>
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         3. Place any tag with your unique ID into your html-code:
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-typescript">
 &lt;div id=&quot;demo_list_iscroll&quot;&gt;&lt;/div&gt;
-      </pre>
+      </code></pre>
       <p class="codeDescription">
         4. Configure list in your script file or an inline script tag. And then,
         start it by call new InfinityScroll(config):
       </p>
-      <pre class="code">
+      <pre class="code"><code class="language-typescript">
 &lt;script type="module"&gt;
   import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
 
@@ -54,7 +54,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
   new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
 &lt;/script&gt
-      </pre>
+      </code></pre>
     </section>
 
     <section class="container">
