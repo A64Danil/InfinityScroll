@@ -5,9 +5,9 @@ export class StatusManager {
 
   is: Status = Status.Initial;
 
-  cb: (status: Status) => undefined;
+  cb: ((status: Status) => void) | undefined;
 
-  constructor(callback) {
+  constructor(callback?: (status: Status) => void) {
     this.cb = callback;
   }
 
@@ -15,7 +15,7 @@ export class StatusManager {
     if (this.is !== newStatus) {
       this.is = newStatus;
       this.statusListeners.forEach((listener) => listener(newStatus));
-      this.cb(newStatus);
+      if (this.cb) this.cb(newStatus);
     }
   }
 
