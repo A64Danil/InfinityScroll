@@ -19,6 +19,21 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     <section class="container">
       <ul class="listOfOldVersions">
         <li>
+          <h3><a href="/js/infinityScroll-1.9.5.js">1.9.5</a></h3>
+          <ul>
+            <li>Added SimpleBar for scroll support on Android (1.9.4 had poor testing for this feature)</li>
+            <li>Added StatusManager
+              <ul>
+                <li>Provides "whenReady" and "waitForStatus" methods that return promises for callback execution</li>
+                <li>Show errors directly in loader</li>
+              </ul>
+            </li>
+            <li>Added loader with status text</li>
+            <li>Improved error handling - added dedicated error function that also updates status on error</li>
+          </ul>
+        </li><li>
+
+
           <h3><a href="/js/infinityScroll-1.9.4.js">1.9.4</a></h3>
           <p class="codeDescription">Working with scrollBars</p>
           <ul>
