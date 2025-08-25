@@ -5,16 +5,18 @@
     <li>just array</li>
     <li>URL-string to your array in network</li>
     <li>
-        Function, that's return URL-string to your array in network <br>
-        <i>(obj: { <br>
-            start?: number;<br>
-            end?: number;<br>
-            page?: number;<br>
-            limit?: number;<br>
-            }) =&gt; string;</i>
+        Function, that's return URL-string to your array in network
+      <pre class="code"><code class="language-typescript">
+(obj: {
+  start?: number;
+  end?: number;
+  page?: number;
+  limit?: number;
+}) =&gt; string;
+        </code></pre>
     </li>
   </ol>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 data: BigJson1, // just array
 // OR
 data: 'https://jsonplaceholder.typicode.com/comments', // url-string
@@ -24,34 +26,33 @@ data: (&#123; start, end, page, limit &#125;) => `https://dummyjson.com/products
 // OR
 // function, returning URL-string (based on start-end)
 data: (&#123; start, end &#125;) => `https://restapi.qoobeo.ru/api/v1/companys?start=$&#123;start&#125;&end=$&#123;end&#125;&isFullSchema=true`, //
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
   <h3>2) SelectorId<i>: string</i></h3>
   <p class="codeDescription">ID of your root element</p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 selectorId: 'myRootID';
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
   <h3>3) TemplateString<i>: (obj) => string</i></h3>
-  <h4><i>obj: {<br>
-      item: { [key: string]: unknown }; <br>
-      listLength?: number; <br>
-      idx?: number; <br>
-      templateCb?: Record&lt;string, (arg: any) =&gt; any>; <br>
-      }</i></h4>
+  <pre class="code"><code class="language-typescript">
+obj: {
+  item: { [key: string]: unknown };
+  listLength?: number;
+  idx?: number;
+  templateCb?: Record&lt;string, (arg: any) =&gt; any>;
+}
+        </code></pre>
   <p class="codeDescription">Template of list items</p>
-  <pre class="code">
-templateString: ({element, listLength}) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;&gt;
-            $&#123;element?.number&#125; $&#123;element?.name&#125;
+  <pre class="code"><code class="language-typescript">
+templateString: ({item, listLength}) => `&lt;li class=&quot;REMOTE_LAZY_000ITEM_List__listItem big&quot;&gt;
+            $&#123;item?.number&#125; $&#123;item?.name&#125;
     &lt;/li&gt;`,
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
@@ -59,10 +60,9 @@ templateString: ({element, listLength}) => `&lt;li class=&quot;REMOTE_LAZY_000IT
   <p class="codeDescription">
     Height of your root element. Set in styles or in JS.
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 listWrapperHeight: '350px',
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
@@ -72,10 +72,9 @@ listWrapperHeight: '350px',
     accelerate initializating of list (to prevent automatical searching of list
     length).
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 forcedListLength: 100,
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
@@ -86,10 +85,9 @@ forcedListLength: 100,
       <br>
       <strong>Attention:</strong> if you are using a TABLE, we strongly recommend setting the min-height of your TR (table row) based on the size of the maximum content that may be inside the cells.
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 listType?: 'list';
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
@@ -97,10 +95,9 @@ listType?: 'list';
   <p class="codeDescription">
     Title of your colums, while using table-mode intead of list
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
-      </pre
-  >
+      </code></pre>
 </section>
 
 <section>
@@ -109,19 +106,17 @@ tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
     Set additional directory to parce your API-response. In case, if you have
     response not like array, but like object with array
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
 const response = &#123;
     status: 200,
     products: [&#123;&#125;, &#123;&#125;, &#123;&#125;, ...],
     total: 286,
     offset: 38,
 &#125;;
-      </pre
-  >
-  <pre class="code">
+      </code></pre>
+  <pre class="code"><code class="language-typescript">
 subDir: 'products',
-      </pre
-  >
+      </code></pre>
 </section>
 
 
@@ -131,7 +126,7 @@ subDir: 'products',
     Set additional directory to parce your API-response. In case, if you have
     response not like array, but like object with array
   </p>
-  <pre class="code">
+  <pre class="code"><code class="language-typescript">
  templateCb: &lcub;
     reviewShower(reviewsAray = [&lcub;&rcub;]) &lcub;
       return reviewsAray
@@ -146,7 +141,7 @@ subDir: 'products',
     &rcub;,
     anyOtherFunc() &lcub;&rcub;,
   &rcub;
-      </pre>
+      </code></pre>
 
 </section>
 
@@ -156,8 +151,8 @@ subDir: 'products',
     <p class="codeDescription">
        Feature description in progress...
     </p>
-    <pre class="code">
+    <pre class="code"><code class="language-typescript">
 isDebugMode: true,
-      </pre>
+      </code></pre>
 
 </section>

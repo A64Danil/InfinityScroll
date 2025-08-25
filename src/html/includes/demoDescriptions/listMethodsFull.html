@@ -7,7 +7,7 @@
 new InfinityScroll(props).status.whenReady()
   .then(() => {
     console.log(`List is ready!`);
-    return {instance, success: true, error: null}
+    return {success: true, error: null} // example
   })
       </code></pre>
 
@@ -28,7 +28,7 @@ type Status = "initialization" | "loading data" | "ready" | "error"
 new InfinityScroll(props).status.waitForStatus("loading data")
   .then(() => {
     console.log(`Now list is in loading data!`);
-    return {instance, success: true, error: null}
+    return {success: true, error: null} // example
   })
   </code></pre>
 
