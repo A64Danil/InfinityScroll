@@ -61,8 +61,6 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
         window.addEventListener('allDemosIsReadyToTest', function() {
             console.log('all demo is loaded')
-
-
             const allTestsResult = []
 
             window.iScroll.reduce(async (acc, iScroll) => {
@@ -113,7 +111,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         }
 
         async function sendReport(report) {
-            const ENDPOINT = '';
+            const ENDPOINT = (<%= _.template(require('html-loader!../../../../env_config.html'))() %>);
 
             const prepared = prepareReportData(report);
 
@@ -128,9 +126,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                 body: JSON.stringify(prepared)
             });
 
-            const json = await response.json();
+            const t = await response.text();
             console.log("Данные отправлены, вот ответ: ");
-            console.log(json);
+            console.log(t);
         }
 
         <% } %>
