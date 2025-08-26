@@ -269,7 +269,12 @@ class InfinityScroll {
       const [savedData, initialData] = results;
       console.log(results);
 
-      if (initialData.value.length === 0 && savedData.value.length) {
+      if (
+        initialData.status === 'fulfilled' &&
+        savedData.status === 'fulfilled' &&
+        initialData.value.length === 0 &&
+        savedData.value.length
+      ) {
         console.log('get data from cache');
         this.list.data = savedData.value;
       }
@@ -381,6 +386,7 @@ class InfinityScroll {
     this.setIndexedDb();
 
     this.status.setStatus(Status.Ready);
+
     this.middleWrapper.classList.add('hiddingStatus');
     setTimeout(() => {
       this.middleWrapper.classList.remove('hiddingStatus', 'showStatus');
