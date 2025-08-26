@@ -31,7 +31,7 @@ module.exports = {
         extensions: ['.js', '.ts'],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         // ESLint configuration
         new ESLintPlugin({
             files: ['.', 'src', 'config'],
@@ -42,6 +42,23 @@ module.exports = {
     ],
     module: {
         rules: [
+            // TODO: remove this if you don't use SimpleBar
+            {
+                test: /\.(scss|css)$/,
+                use: [
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                            sourceMap: false,
+                            modules: false,
+                            // modules: true,
+                        },
+                    },
+                    'postcss-loader',
+                    'sass-loader',
+                ],
+            },
             // JavaScript
             {
                 test: /\.js$/,
