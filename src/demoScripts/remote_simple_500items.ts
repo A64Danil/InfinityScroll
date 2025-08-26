@@ -8,7 +8,7 @@ export const REMOTE_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   forcedListLength: 470,
   listWrapperHeight: '590px',
   templateString: ({ item, listLength, idx }) => `<li 
-        class="REMOTE_SIMPLE_500ITEM_List__listItem" 
+        class="REMOTE_SIMPLE_500ITEMS_List__listItem" 
         >
             <div class="listItemContainer">
              <p class="header"><em>User:</em> ${item.email} <span>(user.id - ${item.id})</span></p>
