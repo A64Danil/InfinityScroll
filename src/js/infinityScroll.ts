@@ -29,6 +29,8 @@ import { NumRange, Rec, Status } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
+import { createElem } from './helpers/domHelpers';
+
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
 import { DataUrlFunction } from './types/DataUrlFunction';
@@ -276,11 +278,39 @@ class InfinityScroll {
         savedData.value.length
       ) {
         console.log('get data from cache');
+        this.showLocalModeHint();
         this.list.data = savedData.value;
       }
 
       this.start();
     });
+  }
+
+  showLocalModeHint() {
+    const warningHint = createElem({
+      tagName: 'div',
+      className: 'warningHint',
+      text: 'You are in local mode',
+    });
+
+    const okBtn = createElem({
+      tagName: 'button',
+      className: 'warningHint__Btn',
+      text: 'OK!',
+    });
+    okBtn.addEventListener('click', () => {
+      warningHint.classList.add('collapsed');
+      warningHint.textContent = '';
+      warningHint.setAttribute('title', 'Try to fetch data');
+      okBtn.remove();
+
+      warningHint.addEventListener('click', () => {
+        console.log('Try to fetch data');
+      });
+    });
+    warningHint.append(okBtn);
+
+    this.wrapperEl?.prepend(warningHint);
   }
 
   throwError(message: string): void {
