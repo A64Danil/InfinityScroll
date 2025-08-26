@@ -82,6 +82,27 @@ const mainProdConfig = merge(common, {
         // libraryTarget: 'window', // Указываем, что класс добавляется в глобальный объект (window)
         libraryExport: 'InfinityScroll', // Экспортирует конкретное свойство, а не весь объект
     },
+    module: {
+        rules: [
+            // TODO: remove this if you don't use SimpleBar
+            {
+                test: /\.(scss|css)$/,
+                use: [
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                            sourceMap: false,
+                            modules: false,
+                            // modules: true,
+                        },
+                    },
+                    'postcss-loader',
+                    'sass-loader',
+                ],
+            },
+        ],
+    },
     optimization: {
         minimize: true,
         minimizer: [
