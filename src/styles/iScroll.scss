@@ -115,6 +115,19 @@
         font-weight: bold;
       }
     }
+
+
+    &.errorFetch {
+      &:before {
+        text-shadow: 0px 0px 5px red;
+      }
+    }
+
+    &.successFetch {
+      &:before {
+        text-shadow: 0px 0px 5px green;
+      }
+    }
   }
 
 
