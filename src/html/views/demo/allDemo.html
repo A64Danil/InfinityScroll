@@ -6,7 +6,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <html lang="en">
   <head>
     <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
-    <link rel="stylesheet" href="/styles/local_simple_100item.css" />
+    <link rel="stylesheet" href="/styles/local_simple_100items.css" />
     <link rel="stylesheet" href="/styles/remote_simple_500items.css" />
     <link rel="stylesheet" href="/styles/remote_simple_API_100items.css" />
     <link rel="stylesheet" href="/styles/remote_simple_15items_dummyjson_API.css" />
@@ -26,7 +26,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       %>
 
       <%=
-      _.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)
+      _.template(require('html-loader!./../../includes/demoLists/local_simple_100items.html'))(data)
       %>
 
       <%=

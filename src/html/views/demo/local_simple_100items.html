@@ -14,7 +14,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
     <section class="container">
       <%=
-      _.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)
+      _.template(require('html-loader!./../../includes/demoLists/local_simple_100items.html'))(data)
       %>
     </section>
 
@@ -33,7 +33,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         3. Place any tag with your unique ID into your html-code:
       </p>
       <pre class="code"><code class="language-html">
-<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/local_simple_100item.html'))(data)) %>
+<%= escapeHtml(_.template(require('html-loader!./../../includes/demoLists/local_simple_100items.html'))(data)) %>
       </code></pre>
       <p class="codeDescription">
         4. Configure list and start it by call new InfinityScroll(config):
