@@ -53,6 +53,7 @@ function generateHtmlPlugins(templateDir) {
         const outputPath = fileInfo.relativePath.replace(path.extname(fileInfo.relativePath), '.html');
         return new HtmlWebpackPlugin({
             title: namedTitle,
+            origName: name,
             libVersion: process.env.VERSION,
             filename: outputPath, // Теперь включает путь с папками
             template: path.resolve(__dirname, fileInfo.fullPath),
