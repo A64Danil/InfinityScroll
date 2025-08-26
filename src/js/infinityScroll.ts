@@ -248,17 +248,32 @@ class InfinityScroll {
     // Если в кэше ничего нет, то ничего и не делаем
     // Если интернет не работате, то запускаем start без ожидания
 
-    this.getSavedListData().then((data) => {
-      if (data.length) {
-        this.list.data = data;
-        console.log(data);
-        console.log(this);
+    // this.getSavedListData().then((data) => {
+    //   if (data.length) {
+    //     this.list.data = data;
+    //     console.log(data);
+    //     console.log(this);
+    //   }
+    // });
+    //
+    // // return
+    //
+    // this.setInitialListData(props.data).then(() => {
+    //   this.start();
+    // });
+
+    Promise.allSettled([
+      this.getSavedListData(),
+      this.setInitialListData(props.data),
+    ]).then((results) => {
+      const [savedData, initialData] = results;
+      console.log(results);
+
+      if (initialData.value.length === 0 && savedData.value.length) {
+        console.log('get data from cache');
+        this.list.data = savedData.value;
       }
-    });
 
-    // return
-
-    this.setInitialListData(props.data).then(() => {
       this.start();
     });
   }
@@ -980,6 +995,7 @@ class InfinityScroll {
       await this.setRemoteData(data as DataURLType);
     }
     this.setListLength();
+    return Promise.resolve(this.list.data);
   }
 
   async setLocalData(data: Rec[]) {
