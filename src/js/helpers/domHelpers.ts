@@ -25,3 +25,28 @@ export function setTdPlaceholder(item: HTMLElement): void {
   // eslint-disable-next-line no-param-reassign
   item.innerHTML = '<td colspan="2">Loading<span class="dots">...</span></td>';
 }
+
+type ElemProps = {
+  tagName: string;
+  className?: string[] | string;
+  text?: string;
+};
+
+export function createElem({
+  tagName,
+  className,
+  text,
+}: ElemProps): HTMLElement {
+  const element = document.createElement(tagName);
+
+  if (Array.isArray(className)) {
+    className.forEach((classNameItem) => {
+      element.classList.add(classNameItem);
+    });
+  } else if (className) {
+    element.classList.add(className);
+  }
+
+  if (text) element.textContent = text;
+  return element;
+}
