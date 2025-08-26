@@ -1023,6 +1023,7 @@ class InfinityScroll {
    * Also define apiSettings, html-height and fetch initial data
    * */
   async setInitialListData(data: Rec[] | DataURLType) {
+    // TODO: это всё надо жестко распиливать на отдельное получение данных и на инициализацию после получения из сети/бд
     console.log('---- setInitialListData ----');
     if (this.dataLoadPlace === 'local') {
       await this.setLocalData(data as Rec[]);
