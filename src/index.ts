@@ -64,19 +64,23 @@ console.log('Entry point');
 
   });
 
-  Promise.allSettled(allInstancePromises).then(results => {
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
-    const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
 
-    console.clear();
-    console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
-    console.log('Successful instances:', successful.map(r => r.value?.instance));
-    console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
+  if (window.location.href.endsWith('allDemo.html')) {
+    Promise.allSettled(allInstancePromises).then(results => {
+      const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
+      const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
 
-    if(successful.length > 0) {
-      const allDemosIsReadyToTest = new Event("allDemosIsReadyToTest");
-      window.dispatchEvent(allDemosIsReadyToTest);
-    }
-  });
+      console.clear();
+      console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
+      console.log('Successful instances:', successful.map(r => r.value?.instance));
+      console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
+
+      if(successful.length > 0) {
+        const allDemosIsReadyToTest = new Event("allDemosIsReadyToTest");
+        window.dispatchEvent(allDemosIsReadyToTest);
+      }
+    });
+  }
+
 
 })();
