@@ -2,7 +2,7 @@ import { InfinityScrollPropTypes } from '../js/types/InfinityScrollPropTypes';
 
 export const REMOTE_SIMPLE_500ITEMS_PROPS: InfinityScrollPropTypes = {
   data: 'https://jsonplaceholder.typicode.com/comments',
-  selectorId: 'REMOTE_SIMPLE_500ITEM',
+  selectorId: 'REMOTE_SIMPLE_500ITEMS',
   listType: 'list',
   // forcedListLength: 100,
   forcedListLength: 470,

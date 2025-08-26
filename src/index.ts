@@ -7,7 +7,7 @@ import { InfinityScrollProps } from './js/types/InfinityScrollPropTypes';
 
 import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000items';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
-import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500item';
+import { REMOTE_SIMPLE_500ITEMS_PROPS } from './demoScripts/remote_simple_500items';
 import { REMOTE_SIMPLE_API_100ITEMS_PROPS } from './demoScripts/remote_simple_API_100items';
 import { REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS } from './demoScripts/remote_simple_15items_dummyjson_API';
 import { REMOTE_LAZY_DUMMYJSON_API_PROPS } from './demoScripts/remote_lazy_dummyjson_API';

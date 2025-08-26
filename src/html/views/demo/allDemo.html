@@ -7,7 +7,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   <head>
     <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
     <link rel="stylesheet" href="/styles/local_simple_100item.css" />
-    <link rel="stylesheet" href="/styles/remote_simple_500item.css" />
+    <link rel="stylesheet" href="/styles/remote_simple_500items.css" />
     <link rel="stylesheet" href="/styles/remote_simple_API_100items.css" />
     <link rel="stylesheet" href="/styles/remote_simple_15items_dummyjson_API.css" />
   </head>
@@ -175,11 +175,11 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
         const REMOTE_SIMPLE_500ITEMS_PROPS = {
             data: 'https://jsonplaceholder.typicode.com/comments',
-            selectorId: 'REMOTE_SIMPLE_500ITEM',
+            selectorId: 'REMOTE_SIMPLE_500ITEMS',
             forcedListLength: 470,
             listWrapperHeight: '590px',
             templateString: ({ item, listLength, idx }) => `<li
-          class="REMOTE_SIMPLE_500ITEM_List__listItem"
+          class="REMOTE_SIMPLE_500ITEMS_List__listItem"
           >
               <div class="listItemContainer">
                <p class="header"><em>User:</em> ${item.email} <span>(user.id - ${item.id})</span></p>

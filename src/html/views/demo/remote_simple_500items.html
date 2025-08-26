@@ -44,11 +44,11 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
   const REMOTE_SIMPLE_500ITEMS_PROPS = {
       data: 'https://jsonplaceholder.typicode.com/comments', // link to json (response from API)
-      selectorId: 'REMOTE_SIMPLE_500ITEM',  // Container's ID
+      selectorId: 'REMOTE_SIMPLE_500ITEMS',  // Container's ID
       forcedListLength: 470,
       listWrapperHeight: '590px',
       templateString: ({ item, listLength, idx }) => `&lt;li
-                  class="REMOTE_SIMPLE_500ITEM_List__listItem"
+                  class="REMOTE_SIMPLE_500ITEMS_List__listItem"
           &gt;
                 &lt;div class="listItemContainer"&gt;
                  &lt;p class="header"&gt;&lt;em&gt;User:&lt;/em&gt; ${item.email} &lt;span&gt;(user.id - ${item.id})&lt;/span&gt;&lt;/p&gt;
@@ -62,7 +62,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       </code></pre>
       <p class="codeDescription">5. Add your styles:</p>
       <pre class="code"><code class="language-css">
-.listWrapper_500item {
+.listWrapper_500items {
     overflow: hidden;
     border-radius: 10px;
     -webkit-box-shadow: 0 0 20px 0 rgba(0,0,0,.47);
@@ -71,7 +71,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     position: relative
 }
 
-.listWrapper_500item:before,.listWrapper_500item:after {
+.listWrapper_500items:before,.listWrapper_500items:after {
     content: "";
     display: block;
     position: absolute;
@@ -82,31 +82,31 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     z-index: 2
 }
 
-.listWrapper_500item:before {
+.listWrapper_500items:before {
     top: 0;
     background: -webkit-gradient(linear, left top, left bottom, from(rgb(255, 255, 255)), to(rgba(255, 255, 255, 0)));
     background: linear-gradient(to bottom, rgb(255, 255, 255) 0%, rgba(255, 255, 255, 0) 100%)
 }
 
-.listWrapper_500item:after {
+.listWrapper_500items:after {
     bottom: 0;
     background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(rgb(255, 255, 255)));
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 100%)
 }
 
-#REMOTE_SIMPLE_500ITEM {
+#REMOTE_SIMPLE_500ITEMS {
     height: 285px;
     position: relative
 }
 
-.REMOTE_SIMPLE_500ITEM_List {
+.REMOTE_SIMPLE_500ITEMS_List {
     color: #333;
     padding-left: 0;
     list-style: none;
     margin-top: 0
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem {
+.REMOTE_SIMPLE_500ITEMS_List__listItem {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -115,29 +115,29 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     border-bottom: 1px dashed #ccc
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem:hover {
+.REMOTE_SIMPLE_500ITEMS_List__listItem:hover {
     background: #eee
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem:before {
+.REMOTE_SIMPLE_500ITEMS_List__listItem:before {
     content: attr(aria-posinset) ")"
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem .listItemContainer {
+.REMOTE_SIMPLE_500ITEMS_List__listItem .listItemContainer {
     padding-left: 10px
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem .listItemContainer .header {
+.REMOTE_SIMPLE_500ITEMS_List__listItem .listItemContainer .header {
     font-weight: 500;
     margin-bottom: 5px
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem .listItemContainer .header span {
+.REMOTE_SIMPLE_500ITEMS_List__listItem .listItemContainer .header span {
     color: #777;
     font-size: 14px
 }
 
-.REMOTE_SIMPLE_500ITEM_List__listItem .listItemContainer .descr {
+.REMOTE_SIMPLE_500ITEMS_List__listItem .listItemContainer .descr {
     white-space: normal;
     height: 3.45em;
     overflow: hidden;
@@ -158,11 +158,11 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
       const REMOTE_SIMPLE_500ITEMS_PROPS = {
         data: 'https://jsonplaceholder.typicode.com/comments',
-        selectorId: 'REMOTE_SIMPLE_500ITEM',
+        selectorId: 'REMOTE_SIMPLE_500ITEMS',
         forcedListLength: 470,
         listWrapperHeight: '590px',
         templateString: ({ item, listLength, idx }) => `<li
-          class="REMOTE_SIMPLE_500ITEM_List__listItem"
+          class="REMOTE_SIMPLE_500ITEMS_List__listItem"
           >
               <div class="listItemContainer">
                <p class="header"><em>User:</em> ${item.email} <span>(user.id - ${item.id})</span></p>
