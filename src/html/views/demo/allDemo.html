@@ -6,6 +6,10 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 <html lang="en">
   <head>
     <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+    <link rel="stylesheet" href="/styles/local_simple_100item.css" />
+    <link rel="stylesheet" href="/styles/remote_simple_500item.css" />
+    <link rel="stylesheet" href="/styles/remote_simple_API_100items.css" />
+    <link rel="stylesheet" href="/styles/remote_simple_15items_dummyjson_API.css" />
   </head>
   <body>
     <section class="container">
@@ -57,6 +61,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
     </section>
 
+    <% if (data.mode === 'development') {%>
     <script type="module">
 
         window.addEventListener('allDemosIsReadyToTest', function() {
@@ -74,13 +79,11 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                 console.log('all demo is tested');
                 console.log(allTestsResult);
 
-                <% if (data.mode === 'development') {%>
                  sendReport(allTestsResult)
-                 <% } %>
             });
         });
 
-        <% if (data.mode === 'development') {%>
+
         function prepareReportData(report) {
             const date = new Date().toISOString();
 
@@ -131,9 +134,134 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
             console.log(t);
         }
 
-        <% } %>
+
 
     </script>
+    <% } %>
 
+    <% if (data.mode === 'production') {%>
+    <script type="module">
+        import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
+
+        const BigJson1 = BigDataList10000.data;
+
+        const LOCAL_BASIC_10000ITEMS_PROPS =  {
+            data: BigJson1,
+            selectorId: 'LOCAL_BASIC_10000ITEMS',
+            listWrapperHeight: '350px',
+            templateString: ({ item, idx }) => `<li>
+            ${item.name} ${item.number} - ${idx}
+    </li>`,
+        };
+
+        new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
+
+        import BigDataList100 from '../assets/json/bigList100.js'; // import mock data
+
+
+        const BigJson100 = BigDataList100.data;
+
+        const LOCAL_SIMPLE_100ITEMS_PROPS = {
+            data: BigJson100,
+            selectorId: 'LOCAL_SIMPLE_100ITEMS',
+            templateString: ({ item, listLength, idx }) => `<li
+          class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
+            ${item.name} ${item.number} <span>(order number ${idx} of ${listLength})</span>
+    </li>`,
+        };
+
+        new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+
+
+        const REMOTE_SIMPLE_500ITEMS_PROPS = {
+            data: 'https://jsonplaceholder.typicode.com/comments',
+            selectorId: 'REMOTE_SIMPLE_500ITEM',
+            forcedListLength: 470,
+            listWrapperHeight: '590px',
+            templateString: ({ item, listLength, idx }) => `<li
+          class="REMOTE_SIMPLE_500ITEM_List__listItem"
+          >
+              <div class="listItemContainer">
+               <p class="header"><em>User:</em> ${item.email} <span>(user.id - ${item.id})</span></p>
+               <p class="descr"><em>Text:</em> ${item.body} </p>
+             </div>
+      </li>`
+        };
+
+        new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+
+
+        const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
+            data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`,
+            selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
+            listWrapperHeight: '490px',
+            templateString: ({ item, listLength, idx }) => `<li
+          class="REMOTE_SIMPLE_API_100ITEMS__listItem"
+          >
+              <div class="contentWrapper">
+                <p class="title">
+                  <em>Company:</em> ${item?.name}
+                  <span>(${idx})</span>
+                  </p>
+                <p class="desc">
+                  <em>website:</em> ${item?.website}  <em>(industry: ${item?.industry})</em>
+                </p>
+
+              </div>
+      </li>`,
+        };
+
+        new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
+
+
+        const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS = {
+            data: ({ start, end, page, limit }) =>
+                `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
+            selectorId: 'REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API',
+            subDir: 'products',
+            templateString: ({ item, templateCb }) => {
+                const { thumbnail, title, brand, website, industry, reviews } = item;
+
+                return `<li
+        class="REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API__listItem"
+        >
+            <div class="imgWrapper">
+                <img src="${thumbnail}" alt="">
+            </div>
+            <div class="contentWrapper">
+
+              <p class="title">
+                ${title} <em>(${brand})</em>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${website}  <em>(industry: ${industry})</em>
+              </p>
+
+              <div class="reviewList">
+              ${templateCb.reviewShower(reviews)}
+              </div>
+
+            </div>
+    </li>`;
+            },
+            templateCb: {
+                reviewShower(reviewsAray = [{}]) {
+                    return reviewsAray
+                        ?.map(
+                            (el, i) => `<div class="review">
+        <p>${el.reviewerName} <em>${el.reviewerEmail}</em> <strong>${el.rating} / 5</strong></p>
+        <p>${el.comment}</p>
+        <p><em>${el.date}</em></p>
+</div>`
+                        )
+                        .join('');
+                },
+                anyOtherFunc() {},
+            },
+        };
+
+        new InfinityScroll(REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS);
+    </script>
+    <% } %>
   </body>
 </html>
