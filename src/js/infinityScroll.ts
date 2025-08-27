@@ -29,7 +29,7 @@ import { NumRange, Rec, Status } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
-import { createElem } from './helpers/domHelpers';
+import { createElem, addFadedClass } from './helpers/domHelpers';
 
 import { InfinityScrollPropTypes } from './types/InfinityScrollPropTypes';
 import { DataURLType } from './types/DataURL';
@@ -307,7 +307,8 @@ class InfinityScroll {
       className: 'warningHint__Btn',
       text: 'OK!',
     });
-    okBtn.addEventListener('click', () => {
+    okBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
       warningHint.classList.add('collapsed');
       warningHint.textContent = '';
       warningHint.setAttribute('title', 'Try to fetch data');
@@ -315,18 +316,27 @@ class InfinityScroll {
 
       warningHint.addEventListener('click', async () => {
         console.log('Try to fetch data');
-        const initialData = await this.getInitialListData(this.dataUrl);
+        addFadedClass(warningHint, 'active');
 
-        if (initialData) {
-          this.setInitialListData(initialData);
-          this.domMngr.resetAllList(
-            this.chunk,
-            0,
-            0,
-            this.list,
-            this.scroll.direction,
-            this.vsb
-          );
+        try {
+          const initialData = await this.getInitialListData(this.dataUrl);
+          console.log(initialData);
+          if (initialData) {
+            warningHint.classList.remove('errorFetch');
+            addFadedClass(warningHint, 'successFetch');
+            this.setInitialListData(initialData);
+            this.domMngr.resetAllList(
+              this.chunk,
+              0,
+              0,
+              this.list,
+              this.scroll.direction,
+              this.vsb
+            );
+          }
+        } catch (e) {
+          warningHint.classList.remove('successFetch');
+          addFadedClass(warningHint, 'errorFetch');
         }
       });
     });
