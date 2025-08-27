@@ -276,7 +276,7 @@ class InfinityScroll {
       event.stopPropagation();
       warningHint.classList.add('collapsed');
       warningHint.textContent = '';
-      warningHint.setAttribute('title', 'Try to fetch data');
+      warningHint.setAttribute('title', text.message.tryLoadData);
       okBtn.remove();
 
       warningHint.addEventListener('click', async () => {
