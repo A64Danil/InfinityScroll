@@ -14,16 +14,15 @@ export function isPropsUndefined(obj: { [key: string]: unknown }): boolean {
 }
 
 export function getRemoteData(url: string): Promise<Rec[]> {
-  return fetch(url)
-    .then((response) =>
-      response
-        .json()
-        .then((data) => data)
-        .catch((err) => {
-          console.log(err);
-        })
-    )
-    .catch(() => []);
+  return fetch(url).then((response) =>
+    response
+      .json()
+      .then((data) => data)
+      .catch((err) => {
+        console.log(err);
+      })
+  );
+  // .catch(() => []);
 }
 
 export function getRemoteDataByRange(
