@@ -266,8 +266,8 @@ class InfinityScroll {
 
     Promise.allSettled([
       this.getSavedListData(),
-      this.setInitialListData(props.data),
-    ]).then((results) => {
+      this.getInitialListData(props.data),
+    ]).then(async (results) => {
       const [savedData, initialData] = results;
       console.log(results);
 
@@ -279,9 +279,17 @@ class InfinityScroll {
       ) {
         console.log('get data from cache');
         this.showLocalModeHint();
-        this.list.data = savedData.value;
+        this.setInitialListData(savedData.value);
+        this.setListFulLength(savedData.value);
+      } else if (initialData.status === 'fulfilled') {
+        this.setInitialListData(initialData.value);
+        await this.setListFulLength(
+          initialData.value,
+          props.data as DataUrlFunction
+        );
       }
 
+      this.setListLength();
       this.start();
     });
   }
@@ -304,8 +312,14 @@ class InfinityScroll {
       warningHint.setAttribute('title', 'Try to fetch data');
       okBtn.remove();
 
-      warningHint.addEventListener('click', () => {
+      warningHint.addEventListener('click', async () => {
         console.log('Try to fetch data');
+        const initialData = await this.getInitialListData(this.dataUrl);
+
+        if (initialData) {
+          this.setInitialListData(initialData);
+          this.start();
+        }
       });
     });
     warningHint.append(okBtn);
@@ -965,6 +979,7 @@ class InfinityScroll {
     // console.log('Timer started by id', this.timerIdRefreshList);
   }
 
+  // TODO: rename to getApiSettings?
   async checkApiSettings() {
     this.includeEnd = await checkIncludeEnd(
       this.dataUrl as DataUrlFunction,
@@ -1018,56 +1033,68 @@ class InfinityScroll {
     return listData;
   }
 
-  /*
-   * Define length of list and length of last page;
-   * Also define apiSettings, html-height and fetch initial data
-   * */
-  async setInitialListData(data: Rec[] | DataURLType) {
+  async getInitialListData(data: Rec[] | DataURLType): Promise<Rec[]> {
+    console.log('---- get Initial  Data ----');
+    if (this.dataLoadPlace === 'local') {
+      return Promise.resolve(data);
+    }
+
+    this.status.setStatus(Status.Loading);
+    await this.setRemoteDataSettings(data as DataURLType);
+    const fetchedData = await this.getInitialRemoteData(data as DataURLType);
+    return Promise.resolve(fetchedData);
+  }
+
+  setInitialListData(data: Rec[]) {
     // TODO: это всё надо жестко распиливать на отдельное получение данных и на инициализацию после получения из сети/бд
     console.log('---- setInitialListData ----');
     if (this.dataLoadPlace === 'local') {
-      await this.setLocalData(data as Rec[]);
+      this.setLocalData(data);
     } else {
-      this.status.setStatus(Status.Loading);
-      await this.setRemoteData(data as DataURLType);
+      this.setListData(data);
     }
-    this.setListLength();
-    return Promise.resolve(this.list.data);
   }
 
-  async setLocalData(data: Rec[]) {
+  setLocalData(data: Rec[]) {
     this.list.data = data;
-    this.list.fullLength = this.forcedListLength || (data && data.length);
+    this.list.fullLength = this.forcedListLength || (data && data.length); // TODO: remove
   }
 
-  async setRemoteData(dataUrl: DataURLType) {
+  async setRemoteDataSettings(dataUrl: DataURLType) {
     const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
 
     if (!isDataUrlString && !isDataUrlReturnString) {
-      this.status.setStatus(Status.Error);
       this.throwError(errors.notValidUrl);
     }
 
-    if (!isDataUrlReturnString) {
-      const fetchedData = await getRemoteData(dataUrl as string);
-      const extractedData = this.extractResponse(fetchedData);
-      this.setListData(extractedData);
-      this.list.fullLength =
-        this.forcedListLength || (extractedData && extractedData.length);
-    } else {
+    if (isDataUrlReturnString) {
       this.isLazy = true;
       await this.checkApiSettings();
+    }
+  }
+
+  async getInitialRemoteData(dataUrl: DataURLType): Promise<Rec[]> {
+    if (this.isLazy) {
       const startIdx = this.basedIndex;
       const endIdx = this.basedIndex + Number(!this.includeEnd);
-      const fetchedData = await this.getListDataLazy(startIdx, endIdx);
-      this.setListData(fetchedData);
-      if (this.forcedListLength) {
-        this.list.fullLength = this.forcedListLength;
-      } else {
-        this.list.fullLength =
-          (await getListLength(dataUrl as DataUrlFunction, this.subDir)) +
-          Number(!this.basedIndex);
-      }
+      return this.getListDataLazy(startIdx, endIdx);
+    }
+    const fetchedData = await getRemoteData(dataUrl as string);
+    return this.extractResponse(fetchedData);
+  }
+
+  async setListFulLength(data: Rec[], dataUrl?: DataUrlFunction) {
+    if (this.forcedListLength) {
+      this.list.fullLength = this.forcedListLength;
+      return;
+    }
+
+    if (this.isLazy) {
+      this.list.fullLength =
+        (await getListLength(data as DataUrlFunction, this.subDir)) +
+        Number(!this.basedIndex);
+    } else {
+      this.list.fullLength = data.length;
     }
   }
 
@@ -1275,10 +1302,7 @@ class InfinityScroll {
       this.dataUrl,
       start,
       end
-    ).then(
-      (data) => this.extractResponse(data),
-      () => this.status.setStatus(Status.Error)
-    );
+    ).then((data) => this.extractResponse(data));
 
     return fetchedData;
   }
