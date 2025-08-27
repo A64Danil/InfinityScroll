@@ -272,9 +272,8 @@ class InfinityScroll {
       console.log(results);
 
       if (
-        initialData.status === 'fulfilled' &&
+        initialData.status === 'rejected' &&
         savedData.status === 'fulfilled' &&
-        initialData.value.length === 0 &&
         savedData.value.length
       ) {
         console.log('get data from cache');
@@ -287,6 +286,8 @@ class InfinityScroll {
           initialData.value,
           props.data as DataUrlFunction
         );
+      } else if (initialData.status === 'rejected') {
+        this.throwError(errors.cantFetchData);
       }
 
       this.setListLength();
@@ -298,7 +299,7 @@ class InfinityScroll {
     const warningHint = createElem({
       tagName: 'div',
       className: 'warningHint',
-      text: 'You are in local mode',
+      text: errors.localMode,
     });
 
     const okBtn = createElem({
@@ -1048,7 +1049,7 @@ class InfinityScroll {
     this.status.setStatus(Status.Loading);
     await this.setRemoteDataSettings(data as DataURLType);
     const fetchedData = await this.getInitialRemoteData(data as DataURLType);
-    return Promise.resolve(fetchedData);
+    return fetchedData;
   }
 
   setInitialListData(data: Rec[]) {
