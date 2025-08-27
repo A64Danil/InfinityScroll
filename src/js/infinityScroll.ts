@@ -229,6 +229,7 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
     }
 
+    // TODO: использовать сохраненные даные, пока актуальные грузятся
     Promise.allSettled([
       this.getSavedListData(),
       this.getInitialListData(props.data),
@@ -1072,16 +1073,16 @@ class InfinityScroll {
     this.setListData(shiftedArr);
   }
 
+  // TODO: refactor this
   async setListFulLength(data: Rec[], dataUrl?: DataUrlFunction) {
     if (this.forcedListLength) {
       this.list.fullLength = this.forcedListLength;
       return;
     }
 
-    if (this.isLazy) {
+    if (this.isLazy && dataUrl) {
       this.list.fullLength =
-        (await getListLength(data as DataUrlFunction, this.subDir)) +
-        Number(!this.basedIndex);
+        (await getListLength(dataUrl, this.subDir)) + Number(!this.basedIndex);
     } else {
       this.list.fullLength = data.length;
     }
