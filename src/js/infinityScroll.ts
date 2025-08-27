@@ -52,10 +52,6 @@ const currentLang = LANG === 'ru' ? 'ru' : 'en';
 const text = i18n[currentLang];
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
-
-// TODO: начать кэшировать некоторые настройки списка
-
-// TODO: требуется поле, отобажающее состояние списка (инициилизация, загрукзка данных, готово)
 class InfinityScroll {
   // хранит в себе id сетТаймаута
   private timerIdRefreshList: number | undefined;
@@ -233,37 +229,6 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
     }
 
-    // TODO: проблема в том что мы "перекрываем" кешированные данные свежими
-    // Решение будет после того как функция setInitialListData будет разбита на несколько функций
-
-    // 1. получаем данные из IndexedDB
-    // 2. если есть, устанавливаем их в список
-    // 3. получаем параметры АПИ и начальные данные для отрисовки
-    // 4. Стартуем список
-
-    // проблема - пункты 1 и 3 - асинхронные
-
-    // 2 всегда идёт после 1
-    // 1 и 3 могут (и должны) выполняться параллельно
-    // 4 идёт всегда последним
-
-    // Если в кэше ничего нет, то ничего и не делаем
-    // Если интернет не работате, то запускаем start без ожидания
-
-    // this.getSavedListData().then((data) => {
-    //   if (data.length) {
-    //     this.list.data = data;
-    //     console.log(data);
-    //     console.log(this);
-    //   }
-    // });
-    //
-    // // return
-    //
-    // this.setInitialListData(props.data).then(() => {
-    //   this.start();
-    // });
-
     Promise.allSettled([
       this.getSavedListData(),
       this.getInitialListData(props.data),
@@ -325,6 +290,9 @@ class InfinityScroll {
             warningHint.classList.remove('errorFetch');
             addFadedClass(warningHint, 'successFetch');
             this.setInitialListData(initialData);
+            if (this.isLazy) {
+              await this.setInitialLazyRemoteData();
+            }
             this.domMngr.resetAllList(
               this.chunk,
               0,
@@ -362,6 +330,10 @@ class InfinityScroll {
     this.offsetElem.classList.add('offsetElem');
     this.middleWrapper.prepend(this.offsetElem);
     this.domMngr.offsetElem = this.offsetElem;
+
+    if (this.isLazy) {
+      await this.setInitialLazyRemoteData();
+    }
 
     this.vsb.setHeight = () => this.domMngr.setHeightToList(this.list);
 
@@ -1083,11 +1055,21 @@ class InfinityScroll {
   async getInitialRemoteData(dataUrl: DataURLType): Promise<Rec[]> {
     if (this.isLazy) {
       const startIdx = this.basedIndex;
-      const endIdx = this.list.existingSizeInDOM;
+      const endIdx = this.basedIndex + Number(!this.includeEnd);
       return this.getListDataLazy(startIdx, endIdx);
     }
     const fetchedData = await getRemoteData(dataUrl as string);
     return this.extractResponse(fetchedData);
+  }
+
+  async setInitialLazyRemoteData(): Promise<Rec[]> {
+    const startIdx = this.basedIndex + 1;
+    const data = await this.getListDataLazy(
+      startIdx,
+      this.list.existingSizeInDOM
+    );
+    const shiftedArr = new Array(1).concat(data);
+    this.setListData(shiftedArr);
   }
 
   async setListFulLength(data: Rec[], dataUrl?: DataUrlFunction) {
