@@ -362,17 +362,6 @@ class InfinityScroll {
     this.middleWrapper.prepend(this.offsetElem);
     this.domMngr.offsetElem = this.offsetElem;
 
-    if (this.isLazy) {
-      const startIdx = this.basedIndex + 1;
-
-      await this.getListDataLazy(startIdx, this.list.existingSizeInDOM).then(
-        (data): void => {
-          const shiftedArr = new Array(1).concat(data);
-          this.setListData(shiftedArr);
-        }
-      );
-    }
-
     this.vsb.setHeight = () => this.domMngr.setHeightToList(this.list);
 
     this.chunk.lastPageLastRenderIndex =
@@ -1315,13 +1304,13 @@ class InfinityScroll {
       this.throwError(errors.dataUrlNotAFn);
     }
 
-    const fetchedData = await getRemoteDataByRange(
-      this.dataUrl,
-      start,
-      end
-    ).then((data) => this.extractResponse(data));
+    try {
+      const fetchedData = await getRemoteDataByRange(this.dataUrl, start, end);
+      return this.extractResponse(fetchedData);
+    } catch (e) {
+      return [];
+    }
 
-    return fetchedData;
   }
 
   extractResponse(data: Rec[]): Rec[] {
