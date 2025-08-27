@@ -318,7 +318,14 @@ class InfinityScroll {
 
         if (initialData) {
           this.setInitialListData(initialData);
-          this.start();
+          this.domMngr.resetAllList(
+            this.chunk,
+            0,
+            0,
+            this.list,
+            this.scroll.direction,
+            this.vsb
+          );
         }
       });
     });
