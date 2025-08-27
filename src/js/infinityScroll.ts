@@ -333,6 +333,7 @@ class InfinityScroll {
               this.scroll.direction,
               this.vsb
             );
+            setTimeout(() => warningHint.remove(), 2000);
           }
         } catch (e) {
           warningHint.classList.remove('successFetch');
