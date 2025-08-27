@@ -1,6 +1,6 @@
 {
   "name": "InfinityScroll",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "description": "Endless HTML-list with virtual scroll",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "lint:fix": "eslint ./src --fix --format table --color",
     "lintts": "tsc --noEmit",
     "lintall": "eslint ./src --format table && tsc --noEmit",
+    "complexity": "eslint ./src --format ./complexity-formatter.js",
     "killLS": "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :8080') do taskkill /F /PID %a",
     "jsonServer": "json-server --watch mocks/bigList10000.json"
   },
