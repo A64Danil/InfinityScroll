@@ -1,5 +1,8 @@
 export const errorMsg: Record<string, any> = {
   en: {
+    localMode: 'Failed to load data from server. \nUsing previously saved data',
+    cantFetchData:
+      'Failed to load data from server. Please check server availability or try again later',
     zeroHeight:
       'Your list height is less than 10px. You need to set your list-height from STYLES (by css) or pass like property in JS',
     elementNotExist: 'This element does not exist in DOM',
@@ -18,6 +21,10 @@ export const errorMsg: Record<string, any> = {
     fetchedIsNotArray: 'Your fetched data does not have Array type',
   },
   ru: {
+    localMode:
+      'Не удалось загрузить данные с сервера. \nИспользуются ранее сохранённые данные',
+    cantFetchData:
+      'Не удалось загрузить данные с сервера. Проверьте доступность сервера или попробуйте позже',
     zeroHeight:
       'Высота вашего списка меньше чем 10px. Вам нужно установить высоту вашего списка из СТИЛЕЙ (через CSS) или передавать как свойство в JS',
     elementNotExist: 'Такого элемента не существует в DOM',
