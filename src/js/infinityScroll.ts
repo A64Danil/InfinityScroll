@@ -23,7 +23,7 @@ import {
 
 import { iScrollTester } from './domTests';
 
-import { errorMsg } from '../locales/errors';
+import { i18n } from '../locales/i18n';
 
 import { NumRange, Rec, Status } from './types/utils';
 
@@ -47,9 +47,9 @@ const nameToTag: NameToTagObj = {
 };
 
 const LANG: string = navigator.language.split('-')[0];
-const errorLang = LANG === 'ru' ? 'ru' : 'en';
+const currentLang = LANG === 'ru' ? 'ru' : 'en';
 
-const errors = errorMsg[errorLang];
+const text = i18n[currentLang];
 
 // START OF CLASS REALIZATION OF INFINITYSCROLL
 
@@ -138,7 +138,7 @@ class InfinityScroll {
 
     const wrapper = document.getElementById(props.selectorId);
     if (wrapper === null) {
-      this.throwError(`${props.selectorId} - ${errors.elementNotExist}`);
+      this.throwError(`${props.selectorId} - ${text.error.elementNotExist}`);
     }
     this.wrapperEl = wrapper;
 
@@ -287,7 +287,7 @@ class InfinityScroll {
           props.data as DataUrlFunction
         );
       } else if (initialData.status === 'rejected') {
-        this.throwError(errors.cantFetchData);
+        this.throwError(text.error.cantFetchData);
       }
 
       this.setListLength();
@@ -299,7 +299,7 @@ class InfinityScroll {
     const warningHint = createElem({
       tagName: 'div',
       className: 'warningHint',
-      text: errors.localMode,
+      text: text.message.localMode,
     });
 
     const okBtn = createElem({
@@ -379,7 +379,7 @@ class InfinityScroll {
     };
     console.log(renderProps);
     if (isPropsUndefined(renderProps)) {
-      this.throwError(errors.undefinedProps);
+      this.throwError(text.error.undefinedProps);
     }
     this.render = new RenderController(renderProps);
     this.domMngr.fillList(this.list);
@@ -450,7 +450,7 @@ class InfinityScroll {
     }
 
     if (this.wrapperEl.offsetHeight < 10) {
-      const msg = errors.zeroHeight;
+      const msg = text.error.zeroHeight;
       this.wrapperEl.innerHTML = `<h3>${msg}</h3>`;
       this.throwError(msg);
     }
@@ -501,7 +501,7 @@ class InfinityScroll {
 
   getAllSizes(): void {
     if (this.domMngr === undefined) {
-      this.throwError(errors.domManagerIsUndefined);
+      this.throwError(text.error.domManagerIsUndefined);
     }
     const listWrp = this.wrapperEl;
     const list = this.listEl;
@@ -518,7 +518,7 @@ class InfinityScroll {
 
     if (!listItem) {
       if (!this.list.data) {
-        this.throwError(errors.dataIsUndefined);
+        this.throwError(text.error.dataIsUndefined);
       }
       const elemData = this.list.data[0];
       this.domMngr.targetElem.append(this.domMngr.createItem(elemData, 0));
@@ -789,7 +789,7 @@ class InfinityScroll {
       );
 
       if (!this.render) {
-        this.throwError(errors.renderControllerIsUndefined);
+        this.throwError(text.error.renderControllerIsUndefined);
       }
       const isAllowRender = this.render.isAllowRenderNearBorder(
         this.scroll.direction,
@@ -1070,7 +1070,7 @@ class InfinityScroll {
     const [isDataUrlString, isDataUrlReturnString] = checkDataUrl(dataUrl);
 
     if (!isDataUrlString && !isDataUrlReturnString) {
-      this.throwError(errors.notValidUrl);
+      this.throwError(text.error.notValidUrl);
     }
 
     if (isDataUrlReturnString) {
@@ -1082,7 +1082,7 @@ class InfinityScroll {
   async getInitialRemoteData(dataUrl: DataURLType): Promise<Rec[]> {
     if (this.isLazy) {
       const startIdx = this.basedIndex;
-      const endIdx = this.basedIndex + Number(!this.includeEnd);
+      const endIdx = this.list.existingSizeInDOM;
       return this.getListDataLazy(startIdx, endIdx);
     }
     const fetchedData = await getRemoteData(dataUrl as string);
@@ -1108,10 +1108,10 @@ class InfinityScroll {
     // TODO: не выбрасывать ошибку, если данные есть в indexedDB
 
     if (!Array.isArray(this.list.data)) {
-      this.throwError(errors.notArray);
+      this.throwError(text.error.notArray);
     }
     if (!this.list.fullLength) {
-      this.throwError(errors.zeroListSize);
+      this.throwError(text.error.zeroListSize);
     }
     this.list.length = this.list.fullLength;
     this.skeleton.setListLength(this.list.length);
@@ -1260,7 +1260,7 @@ class InfinityScroll {
     const list = this.domMngr?.targetElem;
 
     if (!list) {
-      this.throwError(errors.noTargetElem);
+      this.throwError(text.error.noTargetElem);
     }
 
     let prevIndex: number | null = null;
@@ -1298,10 +1298,10 @@ class InfinityScroll {
 
   async getListDataLazy(start = 0, end = 1) {
     if (!this.dataUrl) {
-      this.throwError(errors.noDataUrl);
+      this.throwError(text.error.noDataUrl);
     }
     if (typeof this.dataUrl === 'string') {
-      this.throwError(errors.dataUrlNotAFn);
+      this.throwError(text.error.dataUrlNotAFn);
     }
 
     try {
@@ -1310,13 +1310,12 @@ class InfinityScroll {
     } catch (e) {
       return [];
     }
-
   }
 
   extractResponse(data: Rec[]): Rec[] {
     const res = Array.isArray(data) ? data : this.subDir && data[this.subDir];
     if (!Array.isArray(res)) {
-      this.throwError(errors.fetchedIsNotArray);
+      this.throwError(text.error.fetchedIsNotArray);
     }
     return res;
   }

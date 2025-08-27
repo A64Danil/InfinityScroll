@@ -1,4 +1,4 @@
-export const errorMsg: Record<string, any> = {
+export const i18n: Record<string, any> = {
   en: {
     error: {
       cantFetchData:
