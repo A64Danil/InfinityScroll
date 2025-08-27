@@ -979,8 +979,7 @@ class InfinityScroll {
     // console.log('Timer started by id', this.timerIdRefreshList);
   }
 
-  // TODO: rename to getApiSettings?
-  async checkApiSettings() {
+  async setApiSettings() {
     this.includeEnd = await checkIncludeEnd(
       this.dataUrl as DataUrlFunction,
       this.subDir
@@ -1069,7 +1068,7 @@ class InfinityScroll {
 
     if (isDataUrlReturnString) {
       this.isLazy = true;
-      await this.checkApiSettings();
+      await this.setApiSettings();
     }
   }
 
