@@ -31,9 +31,10 @@
 //    "@typescript-eslint/lines-between-class-members": "off",
 //    "@typescript-eslint/comma-dangle": "off",
 //    "import/no-cycle": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
 //    "no-underscore-dangle": "off",
 //    "consistent-return": "off"
+    "complexity": ["warn", 4]
   },
   "ignorePatterns": ["*config/*", "OLDwebpack.config.js", "package-lock.json", "*.json", "*mocks/*", "*lib/*", "src/index.ts", "public/*"]
 }
