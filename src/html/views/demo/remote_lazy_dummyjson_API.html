@@ -54,6 +54,8 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   templateString: ({ item, templateCb }) => {
     const { thumbnail, title, brand, website, industry, reviews } = item;
 
+    const imgSrc = (!thumbnail || thumbnail === 'Loading') ? "" : thumbnail; // to avoid unnecessary loading
+
     return `&lt;li
               class="REMOTE_LAZY_DUMMYJSON_API__listItem"
       &gt;
@@ -189,11 +191,13 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         templateString: ({ item, templateCb }) => {
               const { thumbnail, title, brand, website, industry, reviews } = item;
 
+              const imgSrc = (!thumbnail || thumbnail === 'Loading') ? "" : thumbnail;
+
               return `<li
         class="REMOTE_LAZY_DUMMYJSON_API__listItem"
         >
             <div class="imgWrapper">
-                <img src="${thumbnail}" alt="">
+                <img src="${imgSrc}" alt="">
             </div>
             <div class="contentWrapper">
 

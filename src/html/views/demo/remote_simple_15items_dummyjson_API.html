@@ -54,11 +54,13 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
   templateString: ({ item, templateCb }) => {
     const { thumbnail, title, brand, website, industry, reviews } = item;
 
+    const imgSrc = (!thumbnail || thumbnail === 'Loading') ? "" : thumbnail; // to avoid unnecessary loading
+
     return `&lt;li
               class="REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API__listItem"
       &gt;
             &lt;div class="imgWrapper"&gt;
-                &lt;img src="${thumbnail}" alt=""&gt;
+                &lt;img src="${imgSrc}" alt=""&gt;
             &lt;/div&gt;
             &lt;div class="contentWrapper"&gt;
         
@@ -182,18 +184,19 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
       console.log('start: <%= data.title %> ');
 
       const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS = {
-        data: ({ start, end, page, limit }) =>
-          `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
+        data: `https://dummyjson.com/products?limit=15`,
         selectorId: 'REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API',
         subDir: 'products',
         templateString: ({ item, templateCb }) => {
-              const { thumbnail, title, brand, website, industry, reviews } = item;
+            const { thumbnail, title, brand, website, industry, reviews } = item;
 
-              return `<li
+            const imgSrc = (!thumbnail || thumbnail === 'Loading') ? "" : thumbnail;
+
+            return `<li
         class="REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API__listItem"
         >
             <div class="imgWrapper">
-                <img src="${thumbnail}" alt="">
+                <img src="${imgSrc}" alt="">
             </div>
             <div class="contentWrapper">
 
