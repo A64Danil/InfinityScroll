@@ -50,3 +50,14 @@ export function createElem({
   if (text) element.textContent = text;
   return element;
 }
+
+export function addFadedClass(
+  elem: HTMLElement,
+  className: string,
+  delay = 700
+): void {
+  elem.classList.add(className);
+  setTimeout(() => {
+    elem.classList.remove(className);
+  }, delay);
+}
