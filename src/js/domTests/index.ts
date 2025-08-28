@@ -9,7 +9,7 @@ import { DOMTest } from './testFunctions';
 
 export async function iScrollTester(): Promise<object> {
   this.testResults.errors.clear();
-  this.testResults.listName = `${this.testResults.listName} (${this.vsb.deviceType})`;
+  this.testResults.listName = `${this.testResults.listName} (${this.vsb.deviceType} - ${this.vsb.browserName})`;
 
   console.log('iScrollTester log msg');
 
