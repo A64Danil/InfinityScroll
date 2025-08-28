@@ -109,6 +109,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         console.log('all demo is loaded')
         const allTestsResult = []
 
+        const startTime = performance.now()
+        console.log('Начало выполнения тестов:', new Date().toLocaleTimeString())
+
         window.iScroll.reduce(async (acc, iScroll) => {
             await acc;
             console.log('---------------------------------------');
@@ -116,8 +119,13 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
             allTestsResult.push(results);
             return Promise.resolve();
         }, Promise.resolve()).then(() => {
+            const endTime = performance.now()
+            const executionTime = endTime - startTime;
+
             console.clear();
             console.log('all demo is tested');
+            console.log('Окончание тестов:', new Date().toLocaleTimeString());
+            console.log('Время выполнения всех тестов:', (executionTime / 1000).toFixed(2) + ' сек');
             console.log(allTestsResult);
 
             sendReport(allTestsResult)
@@ -467,10 +475,12 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         startTests.addEventListener('click', () => {
 
             const runTests = () => {
+                console.log('----------------- Tests started! ----------------------');
+                console.log('------------ (order of tests is random) ---------------')
+
                 return window.iScroll.reduce(async (acc, iScroll) => {
                     await acc;
-                    console.log('----------------- Tests started! ----------------------');
-                    console.log('------------ (order of tests is random) ---------------');
+                    console.log('---------------------------------------');
                     const results = await iScroll.test();
                     allTestsResult.push(results);
                     return Promise.resolve();
