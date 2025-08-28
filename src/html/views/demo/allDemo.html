@@ -466,8 +466,6 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         console.log('all demo is loaded')
         const allTestsResult = []
 
-        const startTime = performance.now()
-        console.log('Начало выполнения тестов:', new Date().toLocaleTimeString())
 
         const reportUrlInput = document.getElementById('reportUrlInput');
         const startTests = document.getElementById('startTests');
@@ -476,6 +474,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         console.log(startTests);
 
         startTests.addEventListener('click', () => {
+
+            const startTime = performance.now()
+            console.log('Начало выполнения тестов:', new Date().toLocaleTimeString())
 
             const runTests = () => {
                 console.log('----------------- Tests started! ----------------------');
