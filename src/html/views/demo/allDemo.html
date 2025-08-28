@@ -72,12 +72,12 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <script>
 
-    function prepareReportData(report) {
+    function prepareReportData({ testResults, estimatedTime }) {
         const date = new Date().toISOString();
 
         const currentVersion = '<%= data.libVersion %> (<%= data.mode %>)'; // writed by webpack
 
-        const dataErrors = report.map(entry => {
+        const dataErrors = testResults.map(entry => {
             const errors = [];
 
             // Map -> массив ошибок
@@ -96,8 +96,8 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         return {
             version: currentVersion,
             publishedAt: date,
-            device: report[0].device,
-            data: dataErrors
+            data: dataErrors,
+            estimatedTime,
         }
     }
 </script>
@@ -120,24 +120,25 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
             return Promise.resolve();
         }, Promise.resolve()).then(() => {
             const endTime = performance.now()
-            const executionTime = endTime - startTime;
+            const executionTime = ((endTime - startTime) / 1000).toFixed(2);
 
             console.clear();
             console.log('all demo is tested');
             console.log('Окончание тестов:', new Date().toLocaleTimeString());
-            console.log('Время выполнения всех тестов:', (executionTime / 1000).toFixed(2) + ' сек');
+            console.log('Время выполнения всех тестов:', executionTime + ' сек');
             console.log(allTestsResult);
 
-            sendReport(allTestsResult)
+            sendReport({
+                testResults: allTestsResult,
+                estimatedTime: executionTime
+            })
         });
     });
 
-
-
-    async function sendReport(report) {
+    async function sendReport({ testResults, estimatedTime }) {
         const ENDPOINT = ("<%= _.template(require('html-loader!../../../../env_config.html'))() %>");
 
-        const prepared = prepareReportData(report);
+        const prepared = prepareReportData({ testResults, estimatedTime });
 
         console.log(prepared);
 
@@ -154,7 +155,6 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         console.log("Данные отправлены, вот ответ: ");
         console.log(t);
     }
-
 
 </script>
 <% } %>
@@ -466,6 +466,9 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
         console.log('all demo is loaded')
         const allTestsResult = []
 
+        const startTime = performance.now()
+        console.log('Начало выполнения тестов:', new Date().toLocaleTimeString())
+
         const reportUrlInput = document.getElementById('reportUrlInput');
         const startTests = document.getElementById('startTests');
 
@@ -486,11 +489,22 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                     return Promise.resolve();
                 }, Promise.resolve())
                 .then(() => {
-                    // console.clear();
+                    const endTime = performance.now()
+                    const executionTime = ((endTime - startTime) / 1000).toFixed(2);
+
+                    console.clear();
                     console.log('all demo is tested');
+                    console.log('Окончание тестов:', new Date().toLocaleTimeString());
+                    console.log('Время выполнения всех тестов:', executionTime + ' сек');
                     console.log(allTestsResult);
+
+
+
                     if(reportUrlInput.value) {
-                        sendReport(allTestsResult, reportUrlInput.value);
+                        sendReport({
+                            testResults: allTestsResult,
+                            estimatedTime: executionTime
+                        }, reportUrlInput.value);
                     }
                 });
             };
@@ -513,10 +527,10 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     });
 
 
-    async function sendReport(report, endpointUrl) {
+    async function sendReport({ testResults, estimatedTime }, endpointUrl) {
         const ENDPOINT = endpointUrl;
 
-        const prepared = prepareReportData(report);
+        const prepared = prepareReportData({ testResults, estimatedTime });
 
         console.log(prepared);
 
