@@ -7,6 +7,8 @@ import {
 
 import { DOMTest } from './testFunctions';
 
+const reportLog = console.log;
+
 export async function iScrollTester(): Promise<object> {
   this.testResults.errors.clear();
   this.testResults.listName = `${this.testResults.listName} (${this.vsb.deviceType} - ${this.vsb.browserName})`;
@@ -17,7 +19,7 @@ export async function iScrollTester(): Promise<object> {
   console.log(t);
 
   function showErrors() {
-    console.log('%c ☆ Тест завершен! ☆ ', grayLogStyle);
+    reportLog('%c ☆ Тест завершен! ☆ ', grayLogStyle);
 
     const errorCounter = Array.from(this.testResults.errors).reduce(
       (acc, item) => {
@@ -28,23 +30,23 @@ export async function iScrollTester(): Promise<object> {
     );
 
     if (this.testResults.errors.size !== 0) {
-      console.log(
+      reportLog(
         `%c Тестов не пройдено: ${this.testResults.errors.size} <----`,
         yellowLogStyle
       );
 
-      console.log(`%c Ошибок обнаружено: ${errorCounter} <----`, redLogStyle);
+      reportLog(`%c Ошибок обнаружено: ${errorCounter} <----`, redLogStyle);
 
       this.testResults.errors.forEach((value, key) => {
         const allErrors = value;
         const errorName = key;
-        console.log(`%c Тест: ${errorName}`, redLogStyle);
+        reportLog(`%c Тест: ${errorName}`, redLogStyle);
         allErrors.forEach((errorTxt, i) => {
-          console.log(i + 1, errorTxt);
+          reportLog(i + 1, errorTxt);
         });
       });
     } else {
-      console.log(
+      reportLog(
         '%c ☆☆☆☆☆ Все тесты завершены без ошибок! Поздравляю! ☆☆☆☆☆',
         greenLogStyle
       );
