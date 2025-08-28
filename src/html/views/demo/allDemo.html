@@ -4,181 +4,190 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
-    <link rel="stylesheet" href="/styles/local_simple_100items.css" />
-    <link rel="stylesheet" href="/styles/remote_simple_500items.css" />
-    <link rel="stylesheet" href="/styles/remote_simple_API_100items.css" />
-    <link rel="stylesheet" href="/styles/remote_simple_15items_dummyjson_API.css" />
-  </head>
-  <body>
-    <section class="container">
-      <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
-    </section>
+<head>
+  <%= _.template(require('html-loader!./../../includes/head.html'))(data) %>
+  <link rel="stylesheet" href="/styles/local_simple_100items.css"/>
+  <link rel="stylesheet" href="/styles/remote_simple_500items.css"/>
+  <link rel="stylesheet" href="/styles/remote_simple_API_100items.css"/>
+  <link rel="stylesheet" href="/styles/remote_simple_15items_dummyjson_API.css"/>
+  <link rel="stylesheet" href="/styles/remote_lazy_dummyjson_API.css"/>
+  <link rel="stylesheet" href="/styles/remote_lazy_API.css"/>
+  <link rel="stylesheet" href="/styles/remote_lazy_100items_table_iscrollAPI.css"/>
+  <link rel="stylesheet" href="/styles/remote_lazy_5kk_items_table_iscrollAPI.css"/>
+</head>
+<body>
+<section class="container">
+  <%= _.template(require('html-loader!./../../includes/header.html'))(data) %>
+</section>
 
 
+<section class="container">
+  <h2>All Demo test</h2>
 
-    <section class="container">
-      <h2>All Demo test</h2>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/local_basic_10000items.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/local_basic_10000items.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/local_simple_100items.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/local_simple_100items.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_simple_500items.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_simple_500items.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_simple_api_100items.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_simple_api_100items.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_simple_15items_dummyjson_API.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_simple_15items_dummyjson_API.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_lazy_dummyjson_API.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_dummyjson_API.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_lazy_api.html'))(data)
+  %>
 
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_api.html'))(data)
-      %>
-
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)
-      %>
-
-
-      <%=
-      _.template(require('html-loader!./../../includes/demoLists/remote_lazy_5kk_items_table_iscrollAPI.html'))(data)
-      %>
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_lazy_100items_table_iscrollAPI.html'))(data)
+  %>
 
 
-    </section>
-
-    <% if (data.mode === 'development') {%>
-    <script type="module">
-
-        window.addEventListener('allDemosIsReadyToTest', function() {
-            console.log('all demo is loaded')
-            const allTestsResult = []
-
-            window.iScroll.reduce(async (acc, iScroll) => {
-                await acc;
-                console.log('---------------------------------------');
-                const results = await iScroll.test();
-                allTestsResult.push(results);
-                return Promise.resolve();
-            }, Promise.resolve()).then(() => {
-                console.clear();
-                console.log('all demo is tested');
-                console.log(allTestsResult);
-
-                 sendReport(allTestsResult)
-            });
-        });
+  <%=
+  _.template(require('html-loader!./../../includes/demoLists/remote_lazy_5kk_items_table_iscrollAPI.html'))(data)
+  %>
 
 
-        function prepareReportData(report) {
-            const date = new Date().toISOString();
+  <% if (data.mode === 'production') {%>
+  <h2>Для отладки</h2>
+  <input type="text" id="reportUrlInput" placeholder="Введите URL куда отправить отчет">
+  <button id="startTests">Start tests</button>
+  <% } %>
 
-            const currentVersion = '<%= data.libVersion %>'; // writed by webpack
+</section>
 
-            const dataErrors = report.map(entry => {
-                const errors = [];
+<script>
 
-                // Map -> массив ошибок
-                entry.errors.forEach((value, key) => {
-                    value.forEach(msg => {
-                        errors.push({ test: key, message: msg });
-                    });
+    function prepareReportData(report) {
+        const date = new Date().toISOString();
+
+        const currentVersion = '<%= data.libVersion %> (<%= data.mode %>)'; // writed by webpack
+
+        const dataErrors = report.map(entry => {
+            const errors = [];
+
+            // Map -> массив ошибок
+            entry.errors.forEach((value, key) => {
+                value.forEach(msg => {
+                    errors.push({test: key, message: msg});
                 });
-
-                return {
-                    listName: entry.listName,
-                    errors: errors,
-                };
             });
 
             return {
-                version: currentVersion,
-                publishedAt: date,
-                device: report[0].device,
-                data: dataErrors
-            }
+                listName: entry.listName,
+                errors: errors,
+            };
+        });
+
+        return {
+            version: currentVersion,
+            publishedAt: date,
+            device: report[0].device,
+            data: dataErrors
         }
+    }
+</script>
 
-        async function sendReport(report) {
-            const ENDPOINT = (<%= _.template(require('html-loader!../../../../env_config.html'))() %>);
+<% if (data.mode === 'development') {%>
+<script type="module">
 
-            const prepared = prepareReportData(report);
+    window.addEventListener('allDemosIsReadyToTest', function () {
+        console.log('all demo is loaded')
+        const allTestsResult = []
 
-            console.log(prepared);
+        window.iScroll.reduce(async (acc, iScroll) => {
+            await acc;
+            console.log('---------------------------------------');
+            const results = await iScroll.test();
+            allTestsResult.push(results);
+            return Promise.resolve();
+        }, Promise.resolve()).then(() => {
+            console.clear();
+            console.log('all demo is tested');
+            console.log(allTestsResult);
 
-            const response = await fetch(ENDPOINT, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(prepared)
-            });
-
-            const t = await response.text();
-            console.log("Данные отправлены, вот ответ: ");
-            console.log(t);
-        }
-
+            sendReport(allTestsResult)
+        });
+    });
 
 
-    </script>
-    <% } %>
 
-    <% if (data.mode === 'production') {%>
-    <script type="module">
-        import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
+    async function sendReport(report) {
+        const ENDPOINT = ("<%= _.template(require('html-loader!../../../../env_config.html'))() %>");
 
-        const BigJson1 = BigDataList10000.data;
+        const prepared = prepareReportData(report);
 
-        const LOCAL_BASIC_10000ITEMS_PROPS =  {
-            data: BigJson1,
-            selectorId: 'LOCAL_BASIC_10000ITEMS',
-            listWrapperHeight: '350px',
-            templateString: ({ item, idx }) => `<li>
+        console.log(prepared);
+
+        const response = await fetch(ENDPOINT, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(prepared)
+        });
+
+        const t = await response.text();
+        console.log("Данные отправлены, вот ответ: ");
+        console.log(t);
+    }
+
+
+</script>
+<% } %>
+
+<% if (data.mode === 'production') {%>
+<script type="module">
+    import BigDataList10000 from '../assets/json/bigList10000.js'; // import mock data
+    import BigDataList100 from '../assets/json/bigList100.js'; // import mock data
+
+    const BigJson1 = BigDataList10000.data;
+    const LOCAL_BASIC_10000ITEMS_PROPS = {
+        data: BigJson1,
+        selectorId: 'LOCAL_BASIC_10000ITEMS',
+        listWrapperHeight: '350px',
+        templateString: ({item, idx}) => `<li>
             ${item.name} ${item.number} - ${idx}
     </li>`,
-        };
+    };
 
-        new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
-
-        import BigDataList100 from '../assets/json/bigList100.js'; // import mock data
+    // new InfinityScroll(LOCAL_BASIC_10000ITEMS_PROPS);
 
 
-        const BigJson100 = BigDataList100.data;
-
-        const LOCAL_SIMPLE_100ITEMS_PROPS = {
-            data: BigJson100,
-            selectorId: 'LOCAL_SIMPLE_100ITEMS',
-            templateString: ({ item, listLength, idx }) => `<li
+    const BigJson100 = BigDataList100.data;
+    const LOCAL_SIMPLE_100ITEMS_PROPS = {
+        data: BigJson100,
+        selectorId: 'LOCAL_SIMPLE_100ITEMS',
+        templateString: ({item, listLength, idx}) => `<li
           class="LOCAL_SIMPLE_100ITEMS_List__listItem" >
             ${item.name} ${item.number} <span>(order number ${idx} of ${listLength})</span>
     </li>`,
-        };
+    };
 
-        new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
+    // new InfinityScroll(LOCAL_SIMPLE_100ITEMS_PROPS);
 
 
-        const REMOTE_SIMPLE_500ITEMS_PROPS = {
-            data: 'https://jsonplaceholder.typicode.com/comments',
-            selectorId: 'REMOTE_SIMPLE_500ITEMS',
-            forcedListLength: 470,
-            listWrapperHeight: '590px',
-            templateString: ({ item, listLength, idx }) => `<li
+    const REMOTE_SIMPLE_500ITEMS_PROPS = {
+        data: 'https://jsonplaceholder.typicode.com/comments',
+        selectorId: 'REMOTE_SIMPLE_500ITEMS',
+        forcedListLength: 470,
+        listWrapperHeight: '590px',
+        templateString: ({item, listLength, idx}) => `<li
           class="REMOTE_SIMPLE_500ITEMS_List__listItem"
           >
               <div class="listItemContainer">
@@ -186,16 +195,16 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                <p class="descr"><em>Text:</em> ${item.body} </p>
              </div>
       </li>`
-        };
+    };
 
-        new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
+    // new InfinityScroll(REMOTE_SIMPLE_500ITEMS_PROPS);
 
 
-        const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
-            data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`,
-            selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
-            listWrapperHeight: '490px',
-            templateString: ({ item, listLength, idx }) => `<li
+    const REMOTE_SIMPLE_API_100ITEMS_PROPS = {
+        data: `https://restapi.qoobeo.ru/api/v1/companys?start=5000&end=5100`,
+        selectorId: 'REMOTE_SIMPLE_API_100ITEMS',
+        listWrapperHeight: '490px',
+        templateString: ({item, listLength, idx}) => `<li
           class="REMOTE_SIMPLE_API_100ITEMS__listItem"
           >
               <div class="contentWrapper">
@@ -209,24 +218,26 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
               </div>
       </li>`,
-        };
+    };
 
-        new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
+    // new InfinityScroll(REMOTE_SIMPLE_API_100ITEMS_PROPS);
 
 
-        const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS = {
-            data: ({ start, end, page, limit }) =>
-                `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
-            selectorId: 'REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API',
-            subDir: 'products',
-            templateString: ({ item, templateCb }) => {
-                const { thumbnail, title, brand, website, industry, reviews } = item;
+    const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS = {
+        data: ({start, end, page, limit}) =>
+            `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
+        selectorId: 'REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API',
+        subDir: 'products',
+        templateString: ({item, templateCb}) => {
+            const {thumbnail, title, brand, website, industry, reviews} = item;
 
-                return `<li
+            const imgSrc = !thumbnail || thumbnail === 'Loading' ? '' : thumbnail; // to avoid unnecessary loading
+
+            return `<li
         class="REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API__listItem"
         >
             <div class="imgWrapper">
-                <img src="${thumbnail}" alt="">
+                <img src="${imgSrc}" alt="">
             </div>
             <div class="contentWrapper">
 
@@ -243,25 +254,276 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
             </div>
     </li>`;
-            },
-            templateCb: {
-                reviewShower(reviewsAray = [{}]) {
-                    return reviewsAray
-                        ?.map(
-                            (el, i) => `<div class="review">
+        },
+        templateCb: {
+            reviewShower(reviewsAray = [{}]) {
+                return reviewsAray
+                    ?.map(
+                        (el, i) => `<div class="review">
         <p>${el.reviewerName} <em>${el.reviewerEmail}</em> <strong>${el.rating} / 5</strong></p>
         <p>${el.comment}</p>
         <p><em>${el.date}</em></p>
 </div>`
-                        )
-                        .join('');
-                },
-                anyOtherFunc() {},
+                    )
+                    .join('');
             },
-        };
+            anyOtherFunc() {
+            },
+        },
+    };
 
-        new InfinityScroll(REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS);
-    </script>
-    <% } %>
-  </body>
+    // new InfinityScroll(REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS);
+
+    const REMOTE_LAZY_DUMMYJSON_API_PROPS = {
+        data: ({start, end, page, limit}) =>
+            `https://dummyjson.com/products?limit=${limit}&skip=${start}`,
+        selectorId: 'REMOTE_LAZY_DUMMYJSON_API',
+        subDir: 'products',
+        forcedListLength: 194,
+        templateString: ({item, templateCb}) => {
+            const {thumbnail, title, brand, website, industry, reviews} = item;
+
+            const imgSrc = !thumbnail || thumbnail === 'Loading' ? '' : thumbnail; // to avoid unnecessary loading
+
+            return `<li
+        class="REMOTE_LAZY_DUMMYJSON_API__listItem"
+        >
+            <div class="imgWrapper">
+                <img src="${imgSrc}" alt="">
+            </div>
+            <div class="contentWrapper">
+
+              <p class="title">
+                ${title} <em>(${brand})</em>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${website}  <em>(industry: ${industry})</em>
+              </p>
+
+              <div class="reviewList">
+              ${templateCb.reviewShower(reviews)}
+              </div>
+
+            </div>
+    </li>`;
+        },
+        templateCb: {
+            reviewShower(reviewsAray = [{}]) {
+                return reviewsAray
+                    ?.map(
+                        (el, i) => `<div class="review">
+        <p>${el.reviewerName} <em>${el.reviewerEmail}</em> <strong>${el.rating} / 5</strong></p>
+        <p>${el.comment}</p>
+        <p><em>${el.date}</em></p>
+</div>`
+                    )
+                    .join('');
+            },
+            anyOtherFunc() {
+            },
+        },
+    };
+
+    // new InfinityScroll(REMOTE_LAZY_DUMMYJSON_API_PROPS);
+
+
+    const REMOTE_LAZY_API_PROPS = {
+        data: ({start, end}) =>
+            `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}`,
+        selectorId: 'REMOTE_LAZY_API',
+        forcedListLength: 17154017,
+        listType: 'list',
+        templateString: ({item, idx}) => `<li
+        class="REMOTE_LAZY_API__listItem" >
+            <div class="contentWrapper">
+              <p class="title">
+                <em>Company:</em> ${item?.name}
+                <span>(${idx})</span>
+                </p>
+              <p class="desc">
+                <em>website:</em> ${item?.website}  <em>(industry: ${item?.industry})</em>
+              </p>
+
+            </div>
+</li>`,
+    };
+
+    // new InfinityScroll(REMOTE_LAZY_API_PROPS);
+
+    const REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS = {
+        data: ({start, end}) =>
+            `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}&isFullSchema=true`,
+        selectorId: 'REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI',
+        forcedListLength: 100,
+        listType: 'table',
+        tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
+        templateString: ({item}) => `<tr
+        class="REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI__listItem"
+        >
+          <td>${item?.id}</td>
+          <td>${item?.name} (${item?.country_code})</td>
+          <td>${item?.industry}</td>
+          <td>${item?.founded}</td>
+          <td>${item?.size}</td>
+          <td>${item?.city} (${item?.state})</td>
+    </tr>`,
+    };
+    // new InfinityScroll(REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS);
+
+    const REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS = {
+        data: ({start, end}) =>
+            `https://restapi.qoobeo.ru/api/v1/companys?start=${start}&end=${end}&isFullSchema=true`,
+        selectorId: 'REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI',
+        forcedListLength: 5000000,
+        listType: 'table',
+        tHeadNames: ['id', 'name', 'industry', 'founded', 'size', 'city (state)'],
+        templateString: ({item}) => `<tr
+        class="REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI__listItem"
+        >
+          <td>${item?.id}</td>
+          <td>${item?.name} (${item?.country_code})</td>
+          <td>${item?.industry}</td>
+          <td>${item?.founded}</td>
+          <td>${item?.size}</td>
+          <td>${item?.city} (${item?.state})</td>
+    </tr>`,
+    };
+
+    // new InfinityScroll(REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS);
+
+    window.iScroll = [];
+
+    const listElements = [
+        LOCAL_BASIC_10000ITEMS_PROPS,
+        LOCAL_SIMPLE_100ITEMS_PROPS,
+        REMOTE_SIMPLE_500ITEMS_PROPS,
+        REMOTE_SIMPLE_API_100ITEMS_PROPS,
+        REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS,
+        REMOTE_LAZY_DUMMYJSON_API_PROPS,
+        REMOTE_LAZY_API_PROPS,
+        REMOTE_LAZY_100ITEMS_TABLE_ISCROLLAPI_PROPS,
+        REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS,
+    ].map((props) => {
+        const el = document.getElementById(props.selectorId);
+        if (el !== null) {
+            return {
+                props,
+                instance: new InfinityScroll(props),
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
+    console.log(listElements);
+
+    const allInstancePromises = listElements.map(({props, instance}) => {
+        const name = props.selectorId.replaceAll('_', ' ').toLowerCase();
+
+        return instance.status.whenReady()
+            .then(() => {
+                console.log(`"${name}" list is ready!`);
+                console.log("Status is " + instance.status.is);
+                window.iScroll.push(instance);
+                return {instance, success: true, error: null}
+            })
+            .catch(error => ({instance, success: false, error}))
+
+    });
+
+
+    Promise.allSettled(allInstancePromises).then(results => {
+        console.log(results);
+
+        const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
+        const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
+
+        // console.clear();
+        console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
+        console.log('Successful instances:', successful.map(r => r.value?.instance));
+        console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
+
+        if (successful.length > 0) {
+            const allDemosIsReadyToTest = new Event("allDemosIsReadyToTest");
+            window.dispatchEvent(allDemosIsReadyToTest);
+            console.log('after dispatch');
+        }
+    });
+
+
+</script>
+
+<script>
+
+    window.addEventListener('allDemosIsReadyToTest', function () {
+        console.log('all demo is loaded')
+        const allTestsResult = []
+
+        const reportUrlInput = document.getElementById('reportUrlInput');
+        const startTests = document.getElementById('startTests');
+
+        console.log(reportUrlInput);
+        console.log(startTests);
+
+        startTests.addEventListener('click', () => {
+
+            const runTests = () => {
+                return window.iScroll.reduce(async (acc, iScroll) => {
+                    await acc;
+                    console.log('----------------- Tests started! ----------------------');
+                    console.log('------------ (order of tests is random) ---------------');
+                    const results = await iScroll.test();
+                    allTestsResult.push(results);
+                    return Promise.resolve();
+                }, Promise.resolve())
+                .then(() => {
+                    // console.clear();
+                    console.log('all demo is tested');
+                    console.log(allTestsResult);
+                    if(reportUrlInput.value) {
+                        sendReport(allTestsResult, reportUrlInput.value);
+                    }
+                });
+            };
+
+            if(!reportUrlInput.value) {
+                const isContinue = confirm('Вы не ввели url для отправки отчета. Результат будет в консоли. Продолжить?');
+                if(!isContinue) {
+                    return;
+                }
+            }
+
+            runTests();
+
+
+
+
+        })
+
+
+    });
+
+
+    async function sendReport(report, endpointUrl) {
+        const ENDPOINT = endpointUrl;
+
+        const prepared = prepareReportData(report);
+
+        console.log(prepared);
+
+        const response = await fetch(ENDPOINT, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(prepared)
+        });
+
+        const t = await response.text();
+        console.log("Данные отправлены, вот ответ: ");
+        console.log(t);
+    }
+</script>
+<% } %>
+</body>
 </html>
