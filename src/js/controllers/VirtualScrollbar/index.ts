@@ -60,6 +60,8 @@ export class Vsb {
 
   deviceType: ReturnType<typeof getDeviceType>;
 
+  browserName: ReturnType<typeof getBrowserName>;
+
   constructor(isDebugMode: boolean, scrollTrigger: (e: Event) => void) {
     console.log('start VSB');
 
@@ -87,10 +89,11 @@ export class Vsb {
 
     this.deviceType = getDeviceType();
 
+    this.browserName = getBrowserName();
+
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
-    const browserName = getBrowserName();
-    this.elem.classList.add(`vSrcollbar_${browserName}`);
+    this.elem.classList.add(`vSrcollbar_${this.browserName}`);
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
     if (this.deviceType !== 'desktop') {
