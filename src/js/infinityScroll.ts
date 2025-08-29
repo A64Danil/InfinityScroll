@@ -675,7 +675,10 @@ class InfinityScroll {
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 
-    if (process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'development' ||
+      Number(process.env.VERSION[0]) < 2
+    ) {
       checkChildrenAmount(
         this.listEl.childNodes.length,
         this.list.existingSizeInDOM
@@ -819,7 +822,10 @@ class InfinityScroll {
           this.vsb
         );
 
-        if (process.env.NODE_ENV === 'development') {
+        if (
+          process.env.NODE_ENV === 'development' ||
+          Number(process.env.VERSION[0]) < 2
+        ) {
           // For tests - 1
           if (!isBigDiff) {
             this.checkIndexOrdering(this.scroll.isGoingFromBottom);
@@ -915,7 +921,10 @@ class InfinityScroll {
       );
 
       if (this.isLazy) {
-        if (process.env.NODE_ENV === 'development') {
+        if (
+          process.env.NODE_ENV === 'development' ||
+          Number(process.env.VERSION[0]) < 2
+        ) {
           // For tests - 2
           // await this.sleep(3000);
         }
@@ -937,7 +946,10 @@ class InfinityScroll {
         this.vsb
       );
       this.timerIdRefreshList = null;
-      if (process.env.NODE_ENV === 'development') {
+      if (
+        process.env.NODE_ENV === 'development' ||
+        Number(process.env.VERSION[0]) < 2
+      ) {
         // For tests - 3
         // console.log('BEFORE checkIndexOrdering (reset list)');
         this.checkIndexOrdering();
