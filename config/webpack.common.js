@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const PrettierPlugin = require('prettier-webpack-plugin')
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const webpack = require('webpack');
 
 const path = require('path')
 const fs = require('fs');
@@ -84,6 +85,10 @@ module.exports = {
         extensions: ['.js', '.ts'],
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env.VERSION': JSON.stringify(process.env.VERSION),
+        }),
+
         // new CleanWebpackPlugin(),
         // Copies files from target to destination folder
         new CopyWebpackPlugin({
