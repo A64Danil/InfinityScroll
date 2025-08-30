@@ -9,6 +9,10 @@ export class IndexedTTLStoreManager {
 
   private static TTL_STORE = '__ttl__';
 
+  private static waitingQueue: Array<(a: unknown) => void> = [];
+
+  private static isWorking = false;
+
   private readonly storeName: string;
 
   constructor(storeName: string) {
@@ -16,51 +20,47 @@ export class IndexedTTLStoreManager {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private async openDatabase(storeName: string): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(IndexedTTLStoreManager.DB_NAME);
+  public async sleep(ms = 1000) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
-      request.onupgradeneeded = () => {
-        const db = request.result;
+  private addToWaitingQueue(cb: () => Promise<TTLMeta>) {
+    return new Promise((resolve: (a: TTLMeta) => void) => {
+      console.log('push to queue', IndexedTTLStoreManager.waitingQueue.slice());
+      IndexedTTLStoreManager.waitingQueue.push(async () => {
+        console.log('before cb');
+        const res = await cb();
+        console.log('after cb');
+        resolve(res);
+      });
 
-        if (!db.objectStoreNames.contains(IndexedTTLStoreManager.TTL_STORE)) {
-          db.createObjectStore(IndexedTTLStoreManager.TTL_STORE, {
-            keyPath: 'storeName',
-          });
-        }
-
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName); // ✅ теперь используется `id` как ключ
-        }
-      };
-
-      request.onsuccess = () => {
-        const db = request.result;
-
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.close();
-          const upgradeRequest = indexedDB.open(
-            IndexedTTLStoreManager.DB_NAME,
-            db.version + 1
-          );
-
-          upgradeRequest.onupgradeneeded = () => {
-            const upgradeDb = upgradeRequest.result;
-            upgradeDb.createObjectStore(storeName);
-          };
-
-          upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
-          upgradeRequest.onerror = () => reject(upgradeRequest.error);
-        } else {
-          resolve(db);
-        }
-      };
-
-      request.onerror = () => reject(request.error);
+      if (!IndexedTTLStoreManager.isWorking) {
+        console.log('handle queue');
+        this.handleQueue();
+      }
     });
   }
 
-  public async setTTL(ttlMs: number): Promise<void> {
+  // eslint-disable-next-line class-methods-use-this
+  private async handleQueue() {
+    if (IndexedTTLStoreManager.isWorking) return;
+
+    IndexedTTLStoreManager.isWorking = true;
+
+    while (IndexedTTLStoreManager.waitingQueue.length > 0) {
+      console.log('queue length', IndexedTTLStoreManager.waitingQueue.length);
+      const task = IndexedTTLStoreManager.waitingQueue.shift();
+      console.log('task started');
+      // eslint-disable-next-line no-await-in-loop
+      await task?.();
+      console.log('task done');
+    }
+
+    IndexedTTLStoreManager.isWorking = false;
+  }
+
+  private async queuedOpenDb(ttlMs: number): Promise<TTLMeta> {
+    // await this.sleep(2000);
     const db = await this.openDatabase(IndexedTTLStoreManager.TTL_STORE);
     const tx = db.transaction(IndexedTTLStoreManager.TTL_STORE, 'readwrite');
     const store = tx.objectStore(IndexedTTLStoreManager.TTL_STORE);
@@ -76,8 +76,78 @@ export class IndexedTTLStoreManager {
     return new Promise((resolve) => {
       tx.oncomplete = () => {
         db.close();
-        resolve();
+        resolve(meta);
       };
+    });
+  }
+
+  public async setTTL(ttlMs: number): Promise<unknown> {
+    const res = await this.addToWaitingQueue(async () =>
+      this.queuedOpenDb(ttlMs)
+    );
+    const parsedRes = {
+      ...res,
+      createdAt: new Date(res.createdAt).toLocaleString(),
+    };
+    return parsedRes;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private async openDatabase(storeName: string): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(IndexedTTLStoreManager.DB_NAME);
+
+      request.onupgradeneeded = () => {
+        console.log('onupgradeneeded outer');
+        const db = request.result;
+
+        if (!db.objectStoreNames.contains(IndexedTTLStoreManager.TTL_STORE)) {
+          db.createObjectStore(IndexedTTLStoreManager.TTL_STORE, {
+            keyPath: 'storeName',
+          });
+        }
+
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName); // ✅ теперь используется `id` как ключ
+        }
+      };
+
+      request.onsuccess = () => {
+        console.log('onsuccess', this.storeName);
+        const db = request.result;
+        console.log(
+          this.storeName,
+          'is exist?',
+          db.objectStoreNames.contains(storeName)
+        );
+        if (!db.objectStoreNames.contains(storeName)) {
+          console.log('Стор не найден', this.storeName);
+          db.close();
+          const upgradeRequest = indexedDB.open(
+            IndexedTTLStoreManager.DB_NAME,
+            db.version + 1
+          );
+
+          upgradeRequest.onupgradeneeded = () => {
+            console.log('onupgradeneeded inner (создаём стор)', this.storeName);
+            const upgradeDb = upgradeRequest.result;
+            upgradeDb.createObjectStore(storeName);
+          };
+
+          upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
+          upgradeRequest.onerror = () => reject(upgradeRequest.error);
+        } else {
+          console.log(
+            'Стор найден!',
+            this.storeName,
+            Array.from(db.objectStoreNames).slice(),
+            db.objectStoreNames
+          );
+          resolve(db);
+        }
+      };
+
+      request.onerror = () => reject(request.error);
     });
   }
 
@@ -147,6 +217,8 @@ export class IndexedTTLStoreManager {
     entries: { index: number; value: Record<string, unknown> }[]
   ): Promise<void> {
     const db = await this.openDatabase(this.storeName);
+    console.log('try to write many', this.storeName);
+    console.log(db.objectStoreNames);
     const tx = db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
 
