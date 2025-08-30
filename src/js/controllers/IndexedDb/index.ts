@@ -9,7 +9,7 @@ export class IndexedTTLStoreManager {
 
   private static TTL_STORE = '__ttl__';
 
-  private static waitingQueue: Array<(a: unknown) => void> = [];
+  private static waitingQueue: Array<() => void> = [];
 
   private static isWorking = false;
 
@@ -47,16 +47,21 @@ export class IndexedTTLStoreManager {
 
     IndexedTTLStoreManager.isWorking = true;
 
-    while (IndexedTTLStoreManager.waitingQueue.length > 0) {
+    const runTask = async () => {
+      if (IndexedTTLStoreManager.waitingQueue.length === 0) {
+        IndexedTTLStoreManager.isWorking = false;
+        return;
+      }
+
       console.log('queue length', IndexedTTLStoreManager.waitingQueue.length);
       const task = IndexedTTLStoreManager.waitingQueue.shift();
       console.log('task started');
-      // eslint-disable-next-line no-await-in-loop
       await task?.();
       console.log('task done');
-    }
+      runTask();
+    };
 
-    IndexedTTLStoreManager.isWorking = false;
+    runTask();
   }
 
   private async queuedOpenDb(ttlMs: number): Promise<TTLMeta> {
