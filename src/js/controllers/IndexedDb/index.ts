@@ -195,51 +195,55 @@ export class IndexedTTLStoreManager {
     index: number | string,
     value: Record<string, unknown>
   ): Promise<void> {
-    const db = await this.openDatabase(this.storeName);
-    const tx = db.transaction(this.storeName, 'readwrite');
-    const store = tx.objectStore(this.storeName);
+    await this.addToWaitingQueue(async () => {
+      const db = await this.openDatabase(this.storeName);
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
 
-    store.put(value, index);
+      store.put(value, index);
 
-    return new Promise((resolve, reject) => {
-      tx.oncomplete = () => {
-        db.close();
-        resolve();
-      };
-      tx.onerror = () => {
-        db.close();
-        reject(tx.error);
-      };
+      return new Promise((resolve, reject) => {
+        tx.oncomplete = () => {
+          db.close();
+          resolve({} as TTLMeta); // Возвращаем пустой объект для совместимости с очередью
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
     });
   }
 
   public async writeMany(
     entries: { index: number; value: Record<string, unknown> }[]
   ): Promise<void> {
-    const db = await this.openDatabase(this.storeName);
-    console.log('try to write many', this.storeName);
-    console.log(db.objectStoreNames);
-    const tx = db.transaction(this.storeName, 'readwrite');
-    const store = tx.objectStore(this.storeName);
+    await this.addToWaitingQueue(async () => {
+      const db = await this.openDatabase(this.storeName);
+      console.log('try to write many', this.storeName);
+      console.log(db.objectStoreNames);
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
 
-    entries.forEach(({ value, index }) => {
-      if (!('id' in value)) {
-        throw new Error(
-          'All objects must contain an "id" property to be used as the key.'
-        );
-      }
-      store.put(value, index);
-    });
+      entries.forEach(({ value, index }) => {
+        if (!('id' in value)) {
+          throw new Error(
+            'All objects must contain an "id" property to be used as the key.'
+          );
+        }
+        store.put(value, index);
+      });
 
-    return new Promise((resolve, reject) => {
-      tx.oncomplete = () => {
-        db.close();
-        resolve();
-      };
-      tx.onerror = () => {
-        db.close();
-        reject(tx.error);
-      };
+      return new Promise((resolve, reject) => {
+        tx.oncomplete = () => {
+          db.close();
+          resolve({} as TTLMeta); // Возвращаем пустой объект для совместимости с очередью
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
     });
   }
 
