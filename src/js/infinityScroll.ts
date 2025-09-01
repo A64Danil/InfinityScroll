@@ -493,60 +493,79 @@ class InfinityScroll {
     if (this.domMngr === undefined) {
       this.throwError(text.error.domManagerIsUndefined);
     }
-    const listWrp = this.wrapperEl;
-    const list = this.listEl;
-    const listWrpStyles = window.getComputedStyle(listWrp);
-    let listItem = list.firstChild as HTMLElement;
 
+    this.calculateWrapperDimensions();
+    const listItem = this.ensureListItemExists();
+    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
+
+    this.initializeBaseStyles();
+    this.chunk.amount = Math.ceil(
+      this.list.wrapperHeight / this.list.itemHeight
+    );
+    this.list.setExistingSizeInDOM(this.chunk.amount);
+    this.list.halfOfExistingSizeInDOM = Math.ceil(
+      this.list.existingSizeInDOM / 2
+    );
+    this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
+    this.calculateListProperties();
+    this.calculateLastPageProperties();
+    this.calculateIndexProperties();
+
+    this.cleanupTemporaryItem(listItem);
+  }
+
+  private calculateWrapperDimensions(): void {
+    const listWrpStyles = window.getComputedStyle(this.wrapperEl);
     this.list.wrapperHeight =
       parseInt(listWrpStyles.getPropertyValue('height'), 10) || 1;
 
     if (this.list.wrapperHeight < 2) {
       console.error('You must set height to your list-wrapper more than 10px!');
-      return;
     }
+  }
+
+  private ensureListItemExists(): HTMLElement | null {
+    let listItem = this.listEl.firstChild as HTMLElement;
 
     if (!listItem) {
       if (!this.list.data) {
         this.throwError(text.error.dataIsUndefined);
       }
+
       const elemData = this.list.data[0];
       this.domMngr.targetElem.append(this.domMngr.createItem(elemData, 0));
-      listItem = list.firstChild as HTMLElement;
+      listItem = this.listEl.firstChild as HTMLElement;
     }
-    this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
-    // Set required styles
-    this.initializeBaseStyles();
+    return listItem;
+  }
 
-    this.chunk.amount = Math.ceil(
-      this.list.wrapperHeight / this.list.itemHeight
-    );
-
-    this.list.setExistingSizeInDOM(this.chunk.amount);
-
-    this.list.halfOfExistingSizeInDOM = Math.ceil(
-      this.list.existingSizeInDOM / 2
-    );
-
+  private calculateListProperties(): void {
     this.list.length = Math.round(this.vsb.safeLimit / this.list.itemHeight);
+
     if (this.list.length > this.list.fullLength) {
       this.list.length = this.list.fullLength;
     }
 
-    if (!this.isLazy && this.list.length > this.list.data.length) {
-      this.list.length = this.list.data.length;
-    } else if (this.list.length <= 0) {
+    const shouldUseDataLength =
+      (!this.isLazy && this.list.length > this.list.data.length) ||
+      this.list.length <= 0;
+
+    if (shouldUseDataLength) {
       this.list.length = this.list.data.length;
     }
+  }
 
+  private calculateLastPageProperties(): void {
     this.list.lastPageLength = this.list.fullLength % this.list.length;
 
     if (this.list.lastPageLength === 0) {
       console.log('this.list.lastPageLength', this.list.lastPageLength);
       this.list.lastPageLength = this.list.length;
     }
+  }
 
+  private calculateIndexProperties(): void {
     this.chunk.lastRenderIndex =
       this.list.length -
       this.list.halfOfExistingSizeInDOM -
@@ -559,9 +578,9 @@ class InfinityScroll {
     this.chunk.lastOrderNumber = Math.floor(
       this.list.length / this.chunk.amount
     );
+  }
 
-    this.chunk.htmlHeight = this.chunk.amount * this.list.itemHeight;
-
+  private cleanupTemporaryItem(listItem: HTMLElement | null): void {
     if (listItem) {
       this.domMngr.removeItem('firstChild');
     }
