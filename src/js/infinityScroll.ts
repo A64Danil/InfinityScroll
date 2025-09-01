@@ -1032,6 +1032,8 @@ class InfinityScroll {
     const safeDataSize = 10;
     const dataSizeLimit = this.isLazy ? safeDataSize : size;
     // const dataSizeLimit = 10; // for tests
+
+    // TODO: используется для определения длины списка - не факт что это правильно
     console.log(size);
     let listData;
     if (size <= dataSizeLimit) {
