@@ -115,7 +115,7 @@ class InfinityScroll {
 
   private readonly vsb: Vsb;
 
-  private readonly dbmanager: IndexedTTLStoreManager;
+  private dbmanager: IndexedTTLStoreManager | undefined;
 
   private isDebugMode = false;
 
@@ -191,8 +191,6 @@ class InfinityScroll {
       });
     });
 
-    this.dbmanager = new IndexedTTLStoreManager(this.selectorId);
-
     this.skeleton = new Skeleton({
       template: props.templateString,
       templateCb: props.templateCb,
@@ -215,8 +213,6 @@ class InfinityScroll {
 
     this.isSyncing = false;
 
-    console.log(props.data);
-
     this.test = iScrollTester;
 
     this.testResults = {
@@ -225,40 +221,7 @@ class InfinityScroll {
       errors: new Map(),
     };
 
-    if (this.dataLoadPlace === 'remote') {
-      this.dataUrl = props.data as DataURLType;
-    }
-
-    // TODO: использовать сохраненные даные, пока актуальные грузятся
-    Promise.allSettled([
-      this.getSavedListData(),
-      this.getInitialListData(props.data),
-    ]).then(async (results) => {
-      const [savedData, initialData] = results;
-      console.log(results);
-
-      if (
-        initialData.status === 'rejected' &&
-        savedData.status === 'fulfilled' &&
-        savedData.value.length
-      ) {
-        console.log('get data from cache');
-        this.showLocalModeHint();
-        this.setInitialListData(savedData.value);
-        this.setListFulLength(savedData.value);
-      } else if (initialData.status === 'fulfilled') {
-        this.setInitialListData(initialData.value);
-        await this.setListFulLength(
-          initialData.value,
-          props.data as DataUrlFunction
-        );
-      } else if (initialData.status === 'rejected') {
-        this.throwError(text.error.cantFetchData);
-      }
-
-      this.setListLength();
-      this.start();
-    });
+    this.init(props);
   }
 
   showLocalModeHint() {
@@ -319,6 +282,48 @@ class InfinityScroll {
     this.status.setStatus(Status.Error);
     this.middleWrapper.dataset.error = message;
     throw new Error(message);
+  }
+
+  async init(props) {
+    if (this.dataLoadPlace === 'remote') {
+      this.dataUrl = props.data as DataURLType;
+
+      this.dbmanager = await IndexedTTLStoreManager.build(this.selectorId);
+
+      const { storeName } = await this.setIndexedDb();
+      console.log(`xxxx storeName ${storeName} is setted`);
+    }
+
+    // TODO: использовать сохраненные даные, пока актуальные грузятся
+    Promise.allSettled([
+      this.getSavedListData(),
+      this.getInitialListData(props.data),
+    ]).then(async (results) => {
+      const [savedData, initialData] = results;
+      // console.log(results);
+
+      if (
+        initialData.status === 'rejected' &&
+        savedData.status === 'fulfilled' &&
+        savedData.value.length
+      ) {
+        console.log('get data from cache');
+        this.showLocalModeHint();
+        this.setInitialListData(savedData.value);
+        this.setListFulLength(savedData.value);
+      } else if (initialData.status === 'fulfilled') {
+        this.setInitialListData(initialData.value);
+        await this.setListFulLength(
+          initialData.value,
+          props.data as DataUrlFunction
+        );
+      } else if (initialData.status === 'rejected') {
+        this.throwError(text.error.cantFetchData);
+      }
+
+      this.setListLength();
+      this.start();
+    });
   }
 
   async start() {
