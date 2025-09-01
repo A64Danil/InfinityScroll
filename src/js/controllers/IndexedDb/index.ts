@@ -24,6 +24,10 @@ export class IndexedTTLStoreManager {
       (async_result) => {
         console.log(async_result);
         return new IndexedTTLStoreManager(selectorId);
+      },
+      (error): undefined => {
+        console.log(error);
+        return undefined;
       }
     );
   }
