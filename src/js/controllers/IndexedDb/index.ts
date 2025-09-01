@@ -77,16 +77,13 @@ export class IndexedTTLStoreManager {
 
   private addToWaitingQueue(cb: () => Promise<TTLMeta>) {
     return new Promise((resolve: (a: TTLMeta) => void) => {
-      console.log('push to queue', IndexedTTLStoreManager.waitingQueue.slice());
+      console.log('push to queue');
       IndexedTTLStoreManager.waitingQueue.push(async () => {
-        console.log('before cb');
         const res = await cb();
-        console.log('after cb');
         resolve(res);
       });
 
       if (!IndexedTTLStoreManager.isWorking) {
-        console.log('handle queue');
         this.handleQueue();
       }
     });
@@ -103,12 +100,8 @@ export class IndexedTTLStoreManager {
         IndexedTTLStoreManager.isWorking = false;
         return;
       }
-
-      console.log('queue length', IndexedTTLStoreManager.waitingQueue.length);
       const task = IndexedTTLStoreManager.waitingQueue.shift();
-      console.log('task started');
       await task?.();
-      console.log('task done');
       runTask();
     };
 
@@ -169,13 +162,7 @@ export class IndexedTTLStoreManager {
       };
 
       request.onsuccess = () => {
-        console.log('onsuccess', this.storeName);
         const db = request.result;
-        console.log(
-          this.storeName,
-          'is exist?',
-          db.objectStoreNames.contains(storeName)
-        );
         if (!db.objectStoreNames.contains(storeName)) {
           console.log('Стор не найден', this.storeName);
           db.close();
@@ -193,12 +180,6 @@ export class IndexedTTLStoreManager {
           upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
           upgradeRequest.onerror = () => reject(upgradeRequest.error);
         } else {
-          console.log(
-            'Стор найден!',
-            this.storeName,
-            Array.from(db.objectStoreNames).slice(),
-            db.objectStoreNames
-          );
           resolve(db);
         }
       };
@@ -276,8 +257,6 @@ export class IndexedTTLStoreManager {
   ): Promise<void> {
     await this.addToWaitingQueue(async () => {
       const db = await this.openDatabase(this.storeName);
-      console.log('try to write many', this.storeName);
-      console.log(db.objectStoreNames);
       const tx = db.transaction(this.storeName, 'readwrite');
       const store = tx.objectStore(this.storeName);
 
