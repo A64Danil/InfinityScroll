@@ -253,24 +253,7 @@ class InfinityScroll {
   }
 
   showLocalModeHint() {
-    const warningHint = createElem({
-      tagName: 'div',
-      className: 'warningHint',
-      text: text.message.localMode,
-    });
-
-    const okBtn = createElem({
-      tagName: 'button',
-      className: 'warningHint__Btn',
-      text: 'OK!',
-    });
-    okBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      warningHint.classList.add('collapsed');
-      warningHint.textContent = '';
-      warningHint.setAttribute('title', text.message.tryLoadData);
-      okBtn.remove();
-
+    this.showHint(text.message.localMode, (warningHint) => {
       warningHint.addEventListener('click', async () => {
         console.log('Try to fetch data');
         addFadedClass(warningHint, 'active');
@@ -301,9 +284,6 @@ class InfinityScroll {
         }
       });
     });
-    warningHint.append(okBtn);
-
-    this.wrapperEl?.prepend(warningHint);
   }
 
   throwError(message: string): void {
