@@ -19,9 +19,56 @@ export class IndexedTTLStoreManager {
     this.storeName = storeName;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public async sleep(ms = 1000) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  static build(selectorId: string) {
+    return IndexedTTLStoreManager.checkIndexedDBSupport().then(
+      (async_result) => {
+        console.log(async_result);
+        return new IndexedTTLStoreManager(selectorId);
+      }
+    );
+  }
+
+  static async checkIndexedDBSupport() {
+    return new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) {
+        reject(new Error('IndexedDB не поддерживается браузером'));
+        return;
+      }
+
+      const dbName = `support-test-${Date.now()}`; // Уникальное имя
+      const request = indexedDB.open(dbName, 1);
+
+      let db;
+
+      request.onupgradeneeded = (event) => {
+        // База создаётся - это нормально
+        db = event.target.result;
+      };
+
+      request.onsuccess = (event) => {
+        db = event.target.result;
+        db.close();
+        // Удаляем тестовую базу
+        indexedDB.deleteDatabase(dbName);
+        resolve('IndexedDB полностью поддерживается');
+      };
+
+      request.onerror = (event) => {
+        reject(
+          new Error(`Ошибка при создании/открытии базы: ${event.target.error}`)
+        );
+      };
+
+      request.onblocked = (event) => {
+        reject(new Error('Операция с IndexedDB заблокирована'));
+      };
+
+      // Таймаут на случай зависания
+      setTimeout(() => {
+        if (db) db.close();
+        reject(new Error('Таймаут при проверке IndexedDB'));
+      }, 5000);
+    });
   }
 
   private addToWaitingQueue(cb: () => Promise<TTLMeta>) {

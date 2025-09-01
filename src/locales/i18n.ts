@@ -25,6 +25,7 @@ export const i18n: Record<string, any> = {
       localMode:
         'Failed to load data from server. \nUsing previously saved data',
       tryLoadData: 'Try to load data again',
+      noCacheMode: 'Data caching is not supported',
     },
   },
   ru: {
@@ -55,6 +56,7 @@ export const i18n: Record<string, any> = {
       localMode:
         'Не удалось загрузить данные с сервера. \nИспользуются ранее сохранённые данные',
       tryLoadData: 'Попробовать загрузить данные ещё раз',
+      noCacheMode: 'Кэширование данных не поддерживается',
     },
   },
 };
