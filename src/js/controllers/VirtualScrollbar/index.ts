@@ -194,40 +194,72 @@ export class Vsb {
       this.sizeOfScrollByOnePage * (this.currentPage - 1) +
       (outerScroll * this.scrollRatio) / this.totalPages;
 
-    let needToChangePage = false;
-
-    // TODO: размеры +1 и -1 в сравнении могут быть динамическими и использованы для плавного скролла
-    if (
-      direction === 'down' &&
-      outerScroll >= this.fillerHeight &&
-      this.currentPage < this.totalPages
-    ) {
-      console.log(
-        'Достигли конца списка — можно перелистнуть ВПЕРЁД',
-        outerScroll
-      );
-      needToChangePage = true;
-      this.currentPage++;
-    } else if (direction === 'up' && outerScroll <= 1 && this.currentPage > 1) {
-      console.log('Достигли начала списка — можно перелистнуть НАЗАД');
-      needToChangePage = true;
-      this.currentPage--;
-    }
+    const needToChangePage = this.checkAndHandlePageChange(
+      outerScroll,
+      direction
+    );
 
     this.scroll = vsbPagedScroll;
     this.elem.scrollTop = this.scroll;
     this.isLastPage = this.currentPage === this.totalPages;
 
     if (needToChangePage) {
-      this.setScrollPercent();
-      this.isPageChanged = true;
-      const isBackFromLastPage =
-        direction === 'up' && this.currentPage === this.totalPages - 1;
-      if (this.setHeight && isBackFromLastPage) {
-        this.setHeight();
-      }
-      this.setScrollToOrigScrollElem(direction, needToChangePage);
+      this.handlePageChangeComplete(direction);
     }
+  }
+
+  private checkAndHandlePageChange(
+    outerScroll: number,
+    direction: IScrollDirection
+  ): boolean {
+    if (this.shouldChangePageDown(outerScroll, direction)) {
+      console.log(
+        'Достигли конца списка — можно перелистнуть ВПЕРЁД',
+        outerScroll
+      );
+      this.currentPage++;
+      return true;
+    }
+
+    if (this.shouldChangePageUp(outerScroll, direction)) {
+      console.log('Достигли начала списка — можно перелистнуть НАЗАД');
+      this.currentPage--;
+      return true;
+    }
+
+    return false;
+  }
+
+  private shouldChangePageDown(
+    outerScroll: number,
+    direction: IScrollDirection
+  ): boolean {
+    return (
+      direction === 'down' &&
+      outerScroll >= this.fillerHeight &&
+      this.currentPage < this.totalPages
+    );
+  }
+
+  private shouldChangePageUp(
+    outerScroll: number,
+    direction: IScrollDirection
+  ): boolean {
+    return direction === 'up' && outerScroll <= 1 && this.currentPage > 1;
+  }
+
+  private handlePageChangeComplete(direction: IScrollDirection): void {
+    this.setScrollPercent();
+    this.isPageChanged = true;
+
+    const isBackFromLastPage =
+      direction === 'up' && this.currentPage === this.totalPages - 1;
+
+    if (this.setHeight && isBackFromLastPage) {
+      this.setHeight();
+    }
+
+    this.setScrollToOrigScrollElem(direction, true);
   }
 
   syncScrollState(direction?: IScrollDirection) {
