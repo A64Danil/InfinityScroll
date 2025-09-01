@@ -290,8 +290,7 @@ class InfinityScroll {
 
       this.dbmanager = await IndexedTTLStoreManager.build(this.selectorId);
 
-      const { storeName } = await this.setIndexedDb();
-      console.log(`xxxx storeName ${storeName} is setted`);
+      await this.setIndexedDb();
     }
 
     // TODO: использовать сохраненные даные, пока актуальные грузятся
@@ -995,6 +994,7 @@ class InfinityScroll {
   }
 
   saveListData(data: ListController['data']) {
+    if (!this.dbmanager) return;
     const indexedDBentries = this.list.data.map((value, index) => ({
       index,
       value,
@@ -1007,10 +1007,12 @@ class InfinityScroll {
   }
 
   saveListDataByIndex(dataObj: ListController['data'][number], index: number) {
+    if (!this.dbmanager) return;
     this.dbmanager.write(index, dataObj);
   }
 
   async getSavedListData() {
+    if (!this.dbmanager) return Promise.reject();
     const size = await this.dbmanager.getStoreSize();
 
     // TODO: change this
@@ -1225,6 +1227,7 @@ class InfinityScroll {
   }
 
   async getItemsFromDB(sequenceStart: number, sequenceEnd: number) {
+    if (!this.dbmanager) return;
     const result = await this.dbmanager.readRange(
       sequenceStart,
       sequenceEnd - 1
@@ -1322,6 +1325,7 @@ class InfinityScroll {
   }
 
   async setIndexedDb() {
+    if (!this.dbmanager) return;
     console.log('setIndexedDb');
 
     // Установка TTL на сутки
