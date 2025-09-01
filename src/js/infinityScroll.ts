@@ -224,6 +224,34 @@ class InfinityScroll {
     this.init(props);
   }
 
+  showHint(hintMsg: string, cb?: (warningHint: HTMLElement) => void) {
+    const warningHint = createElem({
+      tagName: 'div',
+      className: 'warningHint',
+      text: hintMsg,
+    });
+
+    const okBtn = createElem({
+      tagName: 'button',
+      className: 'warningHint__Btn',
+      text: 'OK!',
+    });
+    okBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      warningHint.classList.add('collapsed');
+      warningHint.textContent = '';
+      okBtn.remove();
+      if (!cb) {
+        warningHint.remove();
+      } else {
+        cb(warningHint);
+      }
+    });
+    warningHint.append(okBtn);
+
+    this.wrapperEl?.prepend(warningHint);
+  }
+
   showLocalModeHint() {
     const warningHint = createElem({
       tagName: 'div',
@@ -289,6 +317,10 @@ class InfinityScroll {
       this.dataUrl = props.data as DataURLType;
 
       this.dbmanager = await IndexedTTLStoreManager.build(this.selectorId);
+
+      if (!this.dbmanager) {
+        this.showHint(text.message.noCacheMode);
+      }
 
       await this.setIndexedDb();
     }
