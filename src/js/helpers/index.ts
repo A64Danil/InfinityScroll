@@ -100,52 +100,94 @@ export function checkDataUrl(dataUrl: DataURLType): boolean[] {
   return [isDataUrlString, isDataUrlReturnString];
 }
 
-export async function getListLength(dataUrl: DataUrlFunction, subDir?: string) {
-  const CHECK_AMOUNT = 4;
+function isBoundaryFound(leftIndex: number, rightIndex: number): boolean {
+  return leftIndex + 1 === rightIndex;
+}
 
-  let isRightLimitFounded = false;
+async function checkDataExists(data: any, subDir?: string): Promise<boolean> {
+  const result = Array.isArray(data) ? data : subDir && data[subDir];
+  return result && result.length > 0;
+}
+
+async function findRightBoundary(
+  dataUrl: DataUrlFunction,
+  subDir: string | undefined,
+  checkAmount: number
+): Promise<{ leftIndex: number; rightIndex: number }> {
   let fetchIndex = 1;
-
   let leftIndex = 0;
-  let rightIndex;
 
-  while (!isRightLimitFounded) {
+  while (true) {
     const start = fetchIndex;
-    const end = fetchIndex + CHECK_AMOUNT;
+    const end = fetchIndex + checkAmount;
+
     // eslint-disable-next-line no-await-in-loop
     const data = await getRemoteDataByRange(dataUrl, start, end);
-    const result = Array.isArray(data) ? data : subDir && data[subDir];
-    if (result && result.length > 0) {
+    // eslint-disable-next-line no-await-in-loop
+    const hasData = await checkDataExists(data, subDir);
+
+    if (hasData) {
       leftIndex = fetchIndex;
       fetchIndex *= 10;
     } else {
-      isRightLimitFounded = true;
+      return { leftIndex, rightIndex: fetchIndex };
     }
   }
+}
 
-  rightIndex = fetchIndex;
-  let isEndOfListFounded = false;
+async function binarySearchExactLength(
+  dataUrl: DataUrlFunction,
+  subDir: string | undefined,
+  initialLeft: number,
+  initialRight: number,
+  checkAmount: number,
+  maxIterations: number
+): Promise<number> {
+  let leftIndex = initialLeft;
+  let rightIndex = initialRight;
   let counter = 0;
-  while (counter < 100 && !isEndOfListFounded) {
+
+  while (counter < maxIterations && !isBoundaryFound(leftIndex, rightIndex)) {
     console.log(leftIndex, rightIndex);
+
     const mid = Math.ceil((leftIndex + rightIndex) / 2);
     console.log(mid);
+
     // eslint-disable-next-line no-await-in-loop
-    const data = await getRemoteDataByRange(dataUrl, mid, mid + CHECK_AMOUNT);
-    const result = Array.isArray(data) ? data : subDir && data[subDir];
-    if (result && result.length > 0) {
+    const data = await getRemoteDataByRange(dataUrl, mid, mid + checkAmount);
+    // eslint-disable-next-line no-await-in-loop
+    const hasData = await checkDataExists(data, subDir);
+
+    if (hasData) {
       leftIndex = mid;
     } else {
       rightIndex = mid;
     }
-    counter++;
 
-    if (leftIndex + 1 === rightIndex) {
-      isEndOfListFounded = true;
-    }
+    counter++;
   }
 
   return leftIndex;
+}
+
+export async function getListLength(
+  dataUrl: DataUrlFunction,
+  subDir?: string
+): Promise<number> {
+  const CHECK_AMOUNT = 4;
+  const MAX_BINARY_SEARCH_ITERATIONS = 100;
+
+  const rightBoundary = await findRightBoundary(dataUrl, subDir, CHECK_AMOUNT);
+  const exactLength = await binarySearchExactLength(
+    dataUrl,
+    subDir,
+    rightBoundary.leftIndex,
+    rightBoundary.rightIndex,
+    CHECK_AMOUNT,
+    MAX_BINARY_SEARCH_ITERATIONS
+  );
+
+  return exactLength;
 }
 
 export const wait = (time = 0) =>
