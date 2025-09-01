@@ -311,7 +311,7 @@ class InfinityScroll {
       this.getInitialListData(props.data),
     ]).then(async (results) => {
       const [savedData, initialData] = results;
-      // console.log(results);
+      console.log(results);
 
       if (
         initialData.status === 'rejected' &&

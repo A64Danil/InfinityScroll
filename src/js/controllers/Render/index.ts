@@ -82,36 +82,48 @@ export class RenderController {
     startRenderIndex: number,
     isLastPage: boolean
   ): boolean {
-    if (direction === 'down' && this.isBeginOfListFromTop(startRenderIndex)) {
+    const isDownDirection = direction === 'down';
+    const isUpDirection = direction === 'up';
+
+    if (isDownDirection) {
+      return this.checkDownDirectionRender(startRenderIndex, isLastPage);
+    }
+
+    if (isUpDirection) {
+      return this.checkUpDirectionRender(startRenderIndex, isLastPage);
+    }
+
+    return true;
+  }
+
+  private checkDownDirectionRender(
+    startRenderIndex: number,
+    isLastPage: boolean
+  ): boolean {
+    if (this.isBeginOfListFromTop(startRenderIndex)) {
       console.log('Пока рендерить не надо. Вы в самом верху списка.');
       return false;
     }
 
-    if (direction === 'down' && this.isEndOfListFromTop(startRenderIndex)) {
+    if (this.isEndOfListFromTop(startRenderIndex)) {
       console.log('УЖЕ рендерить не надо.  Вы в самом низу списка.');
       return false;
     }
 
-    if (
-      direction === 'down' &&
-      isLastPage &&
-      this.isEndOfListLastPageFromTop(startRenderIndex)
-    ) {
+    if (isLastPage && this.isEndOfListLastPageFromTop(startRenderIndex)) {
       console.log(
         'УЖЕ рендерить не надо.  Вы в самом низу последней страницы списка.'
       );
       return false;
     }
 
-    // if (
-    //   direction === 'down' &&
-    //   (this.isEndOfListFromTop(startRenderIndex) ||
-    //     this.isBeginOfListFromTop(startRenderIndex))
-    // ) {
-    //   console.log('двигались вниз от самого верха, но рендерить не надо');
-    //   return false;
-    // }
+    return true;
+  }
 
+  private checkUpDirectionRender(
+    startRenderIndex: number,
+    isLastPage: boolean
+  ): boolean {
     //
     // if (direction === 'up' && this.isBeginOfListFromBottom(startRenderIndex)) {
     //   console.log(
@@ -125,12 +137,12 @@ export class RenderController {
     //   return false;
     // }
 
-    if (
-      direction === 'up' &&
-      (this.isBeginOfListFromBottom(startRenderIndex) ||
-        this.isEndOfListFromBottom(startRenderIndex) ||
-        (isLastPage && this.isEndOfListLastPageFromBottom(startRenderIndex)))
-    ) {
+    const shouldNotRender =
+      this.isBeginOfListFromBottom(startRenderIndex) ||
+      this.isEndOfListFromBottom(startRenderIndex) ||
+      (isLastPage && this.isEndOfListLastPageFromBottom(startRenderIndex));
+
+    if (shouldNotRender) {
       console.log('Двигались наверх от самого низа - пока рендерить не надо');
       return false;
     }
