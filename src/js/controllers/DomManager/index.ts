@@ -223,49 +223,26 @@ export class DomManager {
     isGoingFromBottom: boolean,
     i: number,
     list: ListController,
-    // tailingElementsAmount: number,
-    // listLength: number
     vsb: Vsb
   ): boolean {
-    const isStartOfList = direction === 'up' && sequenceNumber === 0;
+    const currentPosition = i + sequenceNumber;
 
-    const tailingElementsAmount = !vsb.isLastPage
-      ? list.pageTailingElementsAmount
-      : list.lastPageTailingElementsAmount;
+    const isReachTopLimit = this.checkTopLimit(
+      direction,
+      sequenceNumber,
+      isGoingFromBottom,
+      currentPosition,
+      list,
+      vsb
+    );
 
-    const isReachTopLimit =
-      isGoingFromBottom &&
-      isStartOfList &&
-      tailingElementsAmount !== 0 &&
-      i + sequenceNumber >= tailingElementsAmount;
+    const isReachBottomLimit = this.checkBottomLimit(
+      direction,
+      currentPosition,
+      list,
+      vsb
+    );
 
-    let isReachBottomLimit = false;
-
-    if (direction === 'down' && i + sequenceNumber >= list.length) {
-      // console.log(i + sequenceNumber); // проблема не тут
-      isReachBottomLimit = true;
-    }
-
-    if (
-      direction === 'down' &&
-      vsb.currentPage !== 1 &&
-      vsb.currentPage === vsb.totalPages &&
-      i + sequenceNumber >= list.lastPageLength
-    ) {
-      console.log('last page case');
-      isReachBottomLimit = true;
-    }
-
-    // const isReachBottomLimit =
-    //   direction === 'down' && vsb.currentPage !== vsb.totalPages
-    //     ? i + sequenceNumber >= list.length
-    //     : i + sequenceNumber >= list.lastPageLength;
-
-    // const isReachBottomLimit =
-    //     direction === 'down' && i + sequenceNumber >= list.length;
-
-    // console.log(i + sequenceNumber, listLength);
-    // Это нужно чтобы мы не риисовали лишние элементы в начале И в конце списка
     const isAllowToChange = !isReachTopLimit && !isReachBottomLimit;
 
     if (process.env.NODE_ENV === 'development') {
@@ -278,6 +255,55 @@ export class DomManager {
     }
 
     return isAllowToChange;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private checkTopLimit(
+    direction: IScrollDirection,
+    sequenceNumber: number,
+    isGoingFromBottom: boolean,
+    currentPosition: number,
+    list: ListController,
+    vsb: Vsb
+  ): boolean {
+    const isStartOfList = direction === 'up' && sequenceNumber === 0;
+
+    if (!isGoingFromBottom || !isStartOfList) {
+      return false;
+    }
+
+    const tailingElementsAmount = vsb.isLastPage
+      ? list.lastPageTailingElementsAmount
+      : list.pageTailingElementsAmount;
+
+    return (
+      tailingElementsAmount !== 0 && currentPosition >= tailingElementsAmount
+    );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private checkBottomLimit(
+    direction: IScrollDirection,
+    currentPosition: number,
+    list: ListController,
+    vsb: Vsb
+  ): boolean {
+    if (direction !== 'down') {
+      return false;
+    }
+
+    // Проверяем общий лимит списка
+    if (currentPosition >= list.length) {
+      return true;
+    }
+
+    // Проверяем лимит для последней страницы
+    if (vsb.isLastPage && currentPosition >= list.lastPageLength) {
+      console.log('last page case');
+      return true;
+    }
+
+    return false;
   }
 
   prepareItems(
