@@ -918,84 +918,74 @@ class InfinityScroll {
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   refreshList(timerID?: number) {
-    if (this.render) {
-      const renderIndex = this.chunk.startRenderIndex;
+    if (!this.render) return;
+    const renderIndex = this.chunk.startRenderIndex;
 
-      // if (
-      //   this.vsb.currentPage === this.vsb.totalPages &&
-      //   renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
-      // ) {
-      //   renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
-      //   console.log('last page rendex index fixed', renderIndex);
-      // } else if (renderIndex > this.chunk.lastRenderIndex) {
-      //   renderIndex = this.chunk.lastRenderIndex;
-      // }
+    // if (
+    //   this.vsb.currentPage === this.vsb.totalPages &&
+    //   renderIndex > this.chunk.lastPageLastRenderIndex - this.chunk.amount
+    // ) {
+    //   renderIndex = this.chunk.lastPageLastRenderIndex - this.chunk.amount;
+    //   console.log('last page rendex index fixed', renderIndex);
+    // } else if (renderIndex > this.chunk.lastRenderIndex) {
+    //   renderIndex = this.chunk.lastRenderIndex;
+    // }
 
-      this.chunk.setRenderIndex(
-        renderIndex,
+    this.chunk.setRenderIndex(
+      renderIndex,
+      this.vsb.currentPage,
+      this.list.length,
+      this.vsb.isLastPage
+    );
+
+    if (this.vsb.currentPage === this.vsb.totalPages && !this.vsb.isLastPage) {
+      console.error(
         this.vsb.currentPage,
-        this.list.length,
+        this.vsb.currentPage === this.vsb.totalPages,
         this.vsb.isLastPage
       );
+    }
+    // itemIndex
+    const [sequenceStart, sequenceEnd] = this.getSequence(
+      this.chunk.itemIndex,
+      true,
+      this.vsb.isLastPage
+    );
 
-      if (
-        this.vsb.currentPage === this.vsb.totalPages &&
-        !this.vsb.isLastPage
-      ) {
-        console.error(
-          this.vsb.currentPage,
-          this.vsb.currentPage === this.vsb.totalPages,
-          this.vsb.isLastPage
-        );
-      }
-      // itemIndex
-      const [sequenceStart, sequenceEnd] = this.getSequence(
-        this.chunk.itemIndex,
-        true,
-        this.vsb.isLastPage
-      );
+    if (this.isLazy) {
+      const ranges: NumRange = [sequenceStart, sequenceEnd];
 
-      if (this.isLazy) {
-        if (
-          process.env.NODE_ENV === 'development' ||
-          Number(process.env.VERSION[0]) < 2
-        ) {
-          // For tests - 2
-          // await this.sleep(3000);
-        }
+      this.fetchUnfoundedRanges([ranges]);
+    }
 
-        const ranges: NumRange = [sequenceStart, sequenceEnd];
+    if (timerID && timerID !== this.timerIdRefreshList) {
+      return;
+    }
 
-        this.fetchUnfoundedRanges([ranges]);
-      }
-      if (timerID && timerID !== this.timerIdRefreshList) {
-        return;
-      }
+    this.domMngr.resetAllList(
+      this.chunk,
+      renderIndex,
+      sequenceStart,
+      this.list,
+      this.scroll.direction,
+      this.vsb
+    );
+    this.timerIdRefreshList = null;
 
-      this.domMngr.resetAllList(
-        this.chunk,
-        renderIndex,
-        sequenceStart,
-        this.list,
+    if (
+      process.env.NODE_ENV === 'development' ||
+      Number(process.env.VERSION[0]) < 2
+    ) {
+      // For tests - 3
+      // console.log('BEFORE checkIndexOrdering (reset list)');
+      this.checkIndexOrdering();
+      // console.clear();
+      console.log(
+        'AFTER checkIndexOrdering  (reset list)',
         this.scroll.direction,
-        this.vsb
+        timerID,
+        `renderIndex: ${renderIndex}`
       );
-      this.timerIdRefreshList = null;
-      if (
-        process.env.NODE_ENV === 'development' ||
-        Number(process.env.VERSION[0]) < 2
-      ) {
-        // For tests - 3
-        // console.log('BEFORE checkIndexOrdering (reset list)');
-        this.checkIndexOrdering();
-        // console.clear();
-        console.log(
-          'AFTER checkIndexOrdering  (reset list)',
-          this.scroll.direction,
-          timerID,
-          `renderIndex: ${renderIndex}`
-        );
-      }
     }
   }
 
