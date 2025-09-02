@@ -286,7 +286,7 @@ class InfinityScroll {
     });
   }
 
-  throwError(message: string): void {
+  throwError(message: string): never {
     this.status.setStatus(Status.Error);
     this.middleWrapper.dataset.error = message;
     throw new Error(message);
