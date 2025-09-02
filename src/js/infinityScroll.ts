@@ -770,22 +770,19 @@ class InfinityScroll {
   }
 
   async calcCurrentDOMRender(): Promise<void> {
-    const eventTarget = this.middleWrapper;
-    const scroll = eventTarget.scrollTop;
+    const scroll = this.middleWrapper.scrollTop;
 
     const [resultIndex, newRenderIndex] = this.calcRenderIndex(scroll);
 
     const newItemIndex =
       this.list.length * (this.vsb.currentPage - 1) + resultIndex;
 
-    // const renderIndexDiff = this.chunk.getRenderIndexDiff(newRenderIndex);
-    // const renderIndexDiff = this.chunk.getRenderIndexDiff(resultIndex);
     const renderIndexDiff = this.chunk.getRenderIndexDiff(newItemIndex);
 
     // Если скролл слишком большой - рисуем всё заново
     const isBigDiff = this.checkBigDiff(renderIndexDiff);
     if (isBigDiff || this.vsb.isPageChanged) {
-      console.log('isBigDiff', isBigDiff, renderIndexDiff);
+      // console.log('isBigDiff', isBigDiff, renderIndexDiff);
       clearTimeout(this.timerIdRefreshList);
       this.setTimerToRefreshList();
     }
@@ -799,72 +796,79 @@ class InfinityScroll {
         this.list.length,
         this.vsb.isLastPage
       );
+      await this.updateCurrentDOM(renderIndexDiff, oldIndex, isBigDiff);
+    }
+  }
 
-      if (!this.render) {
-        this.throwError(text.error.renderControllerIsUndefined);
+  async updateCurrentDOM(
+    renderIndexDiff: number,
+    oldIndex: number,
+    isBigDiff?: boolean
+  ): Promise<void> {
+    if (!this.render) {
+      this.throwError(text.error.renderControllerIsUndefined);
+    }
+    const isAllowRender = this.render.isAllowRenderNearBorder(
+      this.scroll.direction,
+      this.chunk.startRenderIndex,
+      this.vsb.currentPage !== 1 && this.vsb.isLastPage
+    );
+
+    // console.log(
+    //   ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
+    // );
+    if (isAllowRender && this.domMngr) {
+      let tempDirection: IScrollDirection;
+      // TODO: false убрать или всё убрать?
+      if (!this.timerIdRefreshList) {
+        if (this.chunk.startRenderIndex < oldIndex) {
+          tempDirection = 'up';
+        } else {
+          tempDirection = 'down';
+        }
+
+        if (tempDirection && tempDirection !== this.scroll.direction) {
+          console.warn('================ Направления не совпадают!');
+          this.scroll.direction = tempDirection;
+        }
       }
-      const isAllowRender = this.render.isAllowRenderNearBorder(
-        this.scroll.direction,
-        this.chunk.startRenderIndex,
-        this.vsb.currentPage !== 1 && this.vsb.isLastPage
+
+      console.log(
+        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isGoingFromBottom: ${this.scroll.isGoingFromBottom}, ${renderIndexDiff} ======`
       );
 
-      // console.log(
-      //   ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
-      // );
-      if (isAllowRender && this.domMngr) {
-        let tempDirection: IScrollDirection;
-        // TODO: false убрать или всё убрать?
-        if (!this.timerIdRefreshList) {
-          if (this.chunk.startRenderIndex < oldIndex) {
-            tempDirection = 'up';
-          } else {
-            tempDirection = 'down';
-          }
+      const mainChunkProps = {
+        itemIndex: this.chunk.itemIndex,
+        startRenderIndex: this.chunk.startRenderIndex,
+        amount: this.chunk.amount,
+        htmlHeight: this.chunk.htmlHeight,
+      };
 
-          if (tempDirection && tempDirection !== this.scroll.direction) {
-            console.warn('================ Направления не совпадают!');
-            this.scroll.direction = tempDirection;
-          }
-        }
-
-        console.log(
-          `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isGoingFromBottom: ${this.scroll.isGoingFromBottom}, ${renderIndexDiff} ======`
+      // Read from indexedDB or Fetch new DATA
+      if (this.isLazy && !isBigDiff) {
+        const [sequenceStart, sequenceEnd] = this.getSequence(
+          this.chunk.itemIndex
         );
 
-        const mainChunkProps = {
-          itemIndex: this.chunk.itemIndex,
-          startRenderIndex: this.chunk.startRenderIndex,
-          amount: this.chunk.amount,
-          htmlHeight: this.chunk.htmlHeight,
-        };
+        await this.loadDataFromSources(sequenceStart, sequenceEnd);
+      }
+      // END  Read from indexedDB or Fetch new DATA
 
-        // Read from indexedDB or Fetch new DATA
-        if (this.isLazy && !isBigDiff) {
-          const [sequenceStart, sequenceEnd] = this.getSequence(
-            this.chunk.itemIndex
-          );
+      this.domMngr.modifyCurrentDOM(
+        mainChunkProps,
+        this.list,
+        this.scroll.direction,
+        this.scroll.isGoingFromBottom,
+        this.vsb
+      );
 
-          await this.loadDataFromSources(sequenceStart, sequenceEnd);
-        }
-        // END  Read from indexedDB or Fetch new DATA
-
-        this.domMngr.modifyCurrentDOM(
-          mainChunkProps,
-          this.list,
-          this.scroll.direction,
-          this.scroll.isGoingFromBottom,
-          this.vsb
-        );
-
-        if (
-          process.env.NODE_ENV === 'development' ||
-          Number(process.env.VERSION[0]) < 2
-        ) {
-          // For tests - 1
-          if (!isBigDiff) {
-            this.checkIndexOrdering(this.scroll.isGoingFromBottom);
-          }
+      if (
+        process.env.NODE_ENV === 'development' ||
+        Number(process.env.VERSION[0]) < 2
+      ) {
+        // For tests - 1
+        if (!isBigDiff) {
+          this.checkIndexOrdering(this.scroll.isGoingFromBottom);
         }
       }
     }
@@ -980,12 +984,12 @@ class InfinityScroll {
       // console.log('BEFORE checkIndexOrdering (reset list)');
       this.checkIndexOrdering();
       // console.clear();
-      console.log(
-        'AFTER checkIndexOrdering  (reset list)',
-        this.scroll.direction,
-        timerID,
-        `renderIndex: ${renderIndex}`
-      );
+      // console.log(
+      //   'AFTER checkIndexOrdering  (reset list)',
+      //   this.scroll.direction,
+      //   timerID,
+      //   `renderIndex: ${renderIndex}`
+      // );
     }
   }
 
