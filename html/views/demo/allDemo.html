@@ -136,7 +136,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
     });
 
     async function sendReport({ testResults, estimatedTime }) {
-        const ENDPOINT = ("<%= _.template(require('html-loader!../../../../env_config.html'))() %>");
+        const ENDPOINT = ("<%= _.template(require('html-loader!../../../env_config.html'))() %>");
 
         const prepared = prepareReportData({ testResults, estimatedTime });
 

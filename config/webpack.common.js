@@ -68,7 +68,7 @@ function generateHtmlPlugins(templateDir) {
     })
 }
 
-const htmlPlugins = generateHtmlPlugins('./../src/html/views');
+const htmlPlugins = generateHtmlPlugins('./../html/views');
 
 module.exports = {
     entry: {
