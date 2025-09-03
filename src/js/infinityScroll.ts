@@ -21,6 +21,9 @@ import {
   getListLength,
 } from './helpers';
 
+import iScrollStyles from '../styles/iScroll.scss?raw';
+import vsbStyles from '../styles/vsb.scss?raw';
+
 import { iScrollTester } from './domTests';
 
 import { i18n } from '../locales/i18n';
@@ -293,6 +296,8 @@ class InfinityScroll {
   }
 
   async init(props) {
+    this.injectStyles();
+
     if (this.dataLoadPlace === 'remote') {
       this.dataUrl = props.data as DataURLType;
 
@@ -1372,6 +1377,21 @@ class InfinityScroll {
     // // Получение всех данных
     // const all = await this.dbmanager.readAll();
     // console.log('🧾 All companies:', all);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  injectStyles() {
+    if (document.querySelector('[data-infinity-scroll-styles]')) {
+      return;
+    }
+
+    const css = `${iScrollStyles} \n ${vsbStyles}`;
+    console.log(css);
+
+    const style = document.createElement('style');
+    style.setAttribute('data-infinity-scroll-styles', 'true');
+    style.textContent = css;
+    document.head.appendChild(style);
   }
 }
 
