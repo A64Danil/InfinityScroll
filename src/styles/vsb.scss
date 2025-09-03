@@ -1,4 +1,3 @@
-// TODO: это надо перенести в js
 .vSrcollbar {
   position: absolute;
   top: 0;
@@ -24,7 +23,6 @@
     min-width: 18px;
   }
 
-
   &_safari {
     min-width: 16px;
 
@@ -33,7 +31,6 @@
       //width: 16px; /* Всегда широкий как при наведении */
     }
   }
-
 
   // Специально для touch устройств
   @media (pointer: coarse) {
@@ -49,10 +46,7 @@
       border-radius: 10px;
     }
   }
-
 }
-
-
 
 .vScrollbarFiller {
   width: 100%;
