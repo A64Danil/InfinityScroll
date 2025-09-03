@@ -818,24 +818,12 @@ class InfinityScroll {
     //   ` startRenderIndex -> ${this.chunk.startRenderIndex}, был ${oldIndex}, resultIndex ${resultIndex}, itemIndex: ${this.chunk.itemIndex}, newItemIndex: ${newItemIndex}`
     // );
     if (isAllowRender && this.domMngr) {
-      let tempDirection: IScrollDirection;
-      // TODO: false убрать или всё убрать?
-      if (!this.timerIdRefreshList) {
-        if (this.chunk.startRenderIndex < oldIndex) {
-          tempDirection = 'up';
-        } else {
-          tempDirection = 'down';
-        }
+      const tempDirection = this.determineScrollDirection(oldIndex);
+      this.fixScrollDirection(tempDirection);
 
-        if (tempDirection && tempDirection !== this.scroll.direction) {
-          console.warn('================ Направления не совпадают!');
-          this.scroll.direction = tempDirection;
-        }
-      }
-
-      console.log(
-        `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isGoingFromBottom: ${this.scroll.isGoingFromBottom}, ${renderIndexDiff} ======`
-      );
+      // console.log(
+      //   `====== startRenderIndex -> ${this.chunk.startRenderIndex} (${this.chunk.itemIndex}), page ${this.vsb.currentPage}, (real: ${this.scroll.direction}, temp: ${tempDirection} ), isGoingFromBottom: ${this.scroll.isGoingFromBottom}, ${renderIndexDiff} ======`
+      // );
 
       const mainChunkProps = {
         itemIndex: this.chunk.itemIndex,
@@ -871,6 +859,23 @@ class InfinityScroll {
           this.checkIndexOrdering(this.scroll.isGoingFromBottom);
         }
       }
+    }
+  }
+
+  private determineScrollDirection(
+    oldIndex: number
+  ): IScrollDirection | undefined {
+    if (this.timerIdRefreshList) {
+      return undefined;
+    }
+
+    return this.chunk.startRenderIndex < oldIndex ? 'up' : 'down';
+  }
+
+  private fixScrollDirection(tempDirection?: IScrollDirection): void {
+    if (tempDirection && tempDirection !== this.scroll.direction) {
+      console.warn('================ Направления не совпадают!');
+      this.scroll.direction = tempDirection;
     }
   }
 
