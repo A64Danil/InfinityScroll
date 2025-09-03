@@ -21,7 +21,7 @@ console.log('Entry point');
   const loadDevStyles =
     process.env.NODE_ENV === 'development'
       ? // @ts-ignore
-        () => import('./styles/main.scss')
+        () => import('./../styles/main.scss')
       : () => Promise.resolve();
 
   await loadDevStyles();
