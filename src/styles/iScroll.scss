@@ -1,4 +1,15 @@
+// TODO: это надо перенести в js
 .middleWrapper {
+  position: relative;
+  overflow-y: scroll;
+  height: 100%;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
 
   &.showStatus {
 
