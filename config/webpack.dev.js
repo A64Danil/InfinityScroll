@@ -27,9 +27,15 @@ module.exports = merge(common, {
     ],
     module: {
         rules: [
+            {
+                test: /\.(scss|css)$/,
+                resourceQuery: /raw/,
+                use: ['raw-loader', 'postcss-loader', 'sass-loader'],
+            },
             // CSS, PostCSS, Sass
             {
                 test: /\.(scss|css)$/,
+                resourceQuery: { not: [/raw/] },
                 // use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
                 use: [
                     'style-loader',

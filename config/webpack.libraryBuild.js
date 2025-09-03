@@ -46,9 +46,15 @@ module.exports = {
     ],
     module: {
         rules: [
+            {
+                test: /\.(scss|css)$/,
+                resourceQuery: /raw/,
+                use: ['raw-loader', 'postcss-loader', 'sass-loader'],
+            },
             // TODO: remove this if you don't use SimpleBar
             {
                 test: /\.(scss|css)$/,
+                resourceQuery: { not: [/raw/] },
                 use: [
                     {
                         loader: 'css-loader',
