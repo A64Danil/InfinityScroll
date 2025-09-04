@@ -117,10 +117,6 @@ module.exports = {
             files: ['.', 'src', 'config'],
             formatter: 'table',
         }),
-
-        // Prettier configuration
-        // TODO: отключаем на время билда
-        // new PrettierPlugin(),
     ].concat(htmlPlugins),
     module: {
         rules: [
