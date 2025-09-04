@@ -346,7 +346,7 @@ export class IndexedTTLStoreManager {
     });
   }
 
-  public async getLastRecord(): Promise<IDBValidKey | undefined> {
+  public async getLastKey(): Promise<IDBValidKey | undefined> {
     const db = await this.openDatabase(this.storeName);
     const tx = db.transaction(this.storeName, 'readonly');
     const store = tx.objectStore(this.storeName);
