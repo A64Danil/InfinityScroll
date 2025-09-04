@@ -1127,31 +1127,29 @@ class InfinityScroll {
     this.setListData(shiftedArr);
   }
 
-  private setListFullLength(length: number): void {
-    if (this.forcedListLength) {
-      this.list.fullLength = this.forcedListLength;
-    } else {
-      this.list.fullLength = length;
-    }
-  }
-
   // Для установки длины из готовых данных
   private setListFullLengthFromData(data: Rec[]): void {
-    this.setListFullLength(data.length);
+    if (this.forcedListLength) {
+      this.list.fullLength = this.forcedListLength;
+      return;
+    }
+    this.list.fullLength = data.length;
   }
 
   // Для ленивой загрузки с URL
   private async setListFullLengthFromUrl(
     dataUrl: DataUrlFunction
   ): Promise<void> {
+    if (this.forcedListLength) {
+      this.list.fullLength = this.forcedListLength;
+      return;
+    }
     const length =
       (await getListLength(dataUrl, this.subDir)) + Number(!this.basedIndex);
-    this.setListFullLength(length);
+    this.list.fullLength = length;
   }
 
   setListLength() {
-    // TODO: не выбрасывать ошибку, если данные есть в indexedDB
-
     if (!Array.isArray(this.list.data)) {
       this.throwError(text.error.notArray);
     }
@@ -1391,7 +1389,6 @@ class InfinityScroll {
     }
 
     const css = `${iScrollStyles} \n ${vsbStyles}`;
-    console.log(css);
 
     const style = document.createElement('style');
     style.setAttribute('data-infinity-scroll-styles', 'true');
