@@ -14,7 +14,8 @@
     "lintall": "eslint ./src --format table && tsc --noEmit",
     "complexity": "eslint ./src --format ./complexity-formatter.js",
     "killLS": "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :8080') do taskkill /F /PID %a",
-    "jsonServer": "json-server --watch mocks/bigList10000.json"
+    "jsonServer": "json-server --watch mocks/bigList10000.json",
+    "check:html": "prettier --check **/*.html --loglevel debug 2>&1 | findstr /C:\"Error\" /C:\"error\" || echo \"No syntax errors found\""
   },
   "repository": {
     "type": "git",
