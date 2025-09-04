@@ -10,3 +10,8 @@ export enum Status {
   Ready = 'ready',
   Error = 'error',
 }
+
+export type DataWithCacheFlag = {
+  isFromCache: boolean;
+  value: Rec[];
+};
