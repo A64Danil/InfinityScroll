@@ -28,7 +28,7 @@ import { iScrollTester } from './domTests';
 
 import { i18n } from '../locales/i18n';
 
-import { NumRange, Rec, Status } from './types/utils';
+import { NumRange, Rec, Status, DataWithCacheFlag } from './types/utils';
 
 import { calcSequenceByDirection } from './helpers/calcSequence';
 
@@ -324,11 +324,8 @@ class InfinityScroll {
         this.throwError(text.error.cantFetchData);
       }
 
-      const data: {
-        isFromChache: boolean;
-        value: Rec[];
-      } = {
-        isFromChache: false,
+      const data: DataWithCacheFlag = {
+        isFromCache: false,
         value: [],
       };
 
@@ -336,7 +333,7 @@ class InfinityScroll {
         data.value = initialData.value;
       } else if (savedData.status === 'fulfilled' && savedData.value.length) {
         this.showLocalModeHint();
-        data.isFromChache = true;
+        data.isFromCache = true;
         data.value = savedData.value;
       }
 
@@ -1133,15 +1130,12 @@ class InfinityScroll {
   }
 
   private async setListFullLength(
-    data: {
-      isFromChache: boolean;
-      value: Rec[];
-    },
+    data: DataWithCacheFlag,
     urlFn: DataUrlFunction
   ) {
     if (this.forcedListLength) {
       this.list.fullLength = this.forcedListLength;
-    } else if (this.isLazy && !data.isFromChache) {
+    } else if (this.isLazy && !data.isFromCache) {
       await this.setListFullLengthFromUrl(urlFn);
     } else {
       await this.setListFullLengthFromData(data);
@@ -1150,13 +1144,9 @@ class InfinityScroll {
 
   private async setListFullLengthFromData({
     value,
-    isFromChache,
-  }: {
-    value: Rec[];
-    isFromChache: boolean;
-  }): Promise<void> {
-    if (isFromChache) {
-      console.log('isFromChache --------');
+    isFromCache,
+  }: DataWithCacheFlag): Promise<void> {
+    if (isFromCache) {
       this.list.fullLength =
         (await this.defineCachedDataLastIndex()) || value.length;
     } else {
