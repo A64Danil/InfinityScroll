@@ -346,6 +346,33 @@ export class IndexedTTLStoreManager {
     });
   }
 
+  public async getLastRecord(): Promise<IDBValidKey | undefined> {
+    const db = await this.openDatabase(this.storeName);
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
+
+    return new Promise((resolve, reject) => {
+      // Открываем курсор в обратном порядке ('prev')
+      const request = store.openCursor(null, 'prev');
+
+      request.onsuccess = () => {
+        const cursor = request.result;
+        db.close();
+
+        if (cursor) {
+          resolve(cursor.key);
+        } else {
+          resolve(undefined);
+        }
+      };
+
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+    });
+  }
+
   public async get(
     index: number | string
   ): Promise<Record<string, unknown> | undefined> {
