@@ -317,26 +317,31 @@ class InfinityScroll {
     ]).then(async (results) => {
       const [savedData, initialData] = results;
       console.log(results);
-
       if (
         initialData.status === 'rejected' &&
-        savedData.status === 'fulfilled' &&
-        savedData.value.length
+        savedData.status === 'rejected'
       ) {
-        console.log('get data from cache');
-        this.showLocalModeHint();
-        this.setInitialListData(savedData.value);
-        this.setListFullLengthFromData(savedData.value);
-      } else if (initialData.status === 'fulfilled') {
-        this.setInitialListData(initialData.value);
-        if (this.isLazy) {
-          await this.setListFullLengthFromUrl(props.data as DataUrlFunction);
-        } else {
-          this.setListFullLengthFromData(initialData.value);
-        }
-      } else if (initialData.status === 'rejected') {
         this.throwError(text.error.cantFetchData);
       }
+
+      const data: {
+        isFromChache: boolean;
+        value: Rec[];
+      } = {
+        isFromChache: false,
+        value: [],
+      };
+
+      if (initialData.status === 'fulfilled') {
+        data.value = initialData.value;
+      } else if (savedData.status === 'fulfilled' && savedData.value.length) {
+        this.showLocalModeHint();
+        data.isFromChache = true;
+        data.value = savedData.value;
+      }
+
+      this.setInitialListData(data.value);
+      await this.setListFullLength(data, props.data);
 
       this.setListLength();
       this.start();
@@ -1117,7 +1122,7 @@ class InfinityScroll {
     return this.extractResponse(fetchedData);
   }
 
-  async setInitialLazyRemoteData(): Promise<Rec[]> {
+  async setInitialLazyRemoteData(): Promise<void> {
     const startIdx = this.basedIndex + 1;
     const data = await this.getListDataLazy(
       startIdx,
@@ -1127,23 +1132,51 @@ class InfinityScroll {
     this.setListData(shiftedArr);
   }
 
-  // Для установки длины из готовых данных
-  private setListFullLengthFromData(data: Rec[]): void {
+  private async setListFullLength(
+    data: {
+      isFromChache: boolean;
+      value: Rec[];
+    },
+    urlFn: DataUrlFunction
+  ) {
     if (this.forcedListLength) {
       this.list.fullLength = this.forcedListLength;
-      return;
+    } else if (this.isLazy && !data.isFromChache) {
+      await this.setListFullLengthFromUrl(urlFn);
+    } else {
+      await this.setListFullLengthFromData(data);
     }
-    this.list.fullLength = data.length;
+  }
+
+  private async setListFullLengthFromData({
+    value,
+    isFromChache,
+  }: {
+    value: Rec[];
+    isFromChache: boolean;
+  }): Promise<void> {
+    if (isFromChache) {
+      console.log('isFromChache --------');
+      this.list.fullLength =
+        (await this.defineCachedDataLastIndex()) || value.length;
+    } else {
+      this.list.fullLength = value.length;
+    }
+  }
+
+  private async defineCachedDataLastIndex(): Promise<number | undefined> {
+    if (!this.dbmanager) return Promise.reject();
+    const lastDbKey = await this.dbmanager.getLastKey();
+    const lastDbIndex =
+      typeof lastDbKey === 'number' ? lastDbKey + 1 : undefined;
+    console.log('lastDbIndex', lastDbIndex);
+    return lastDbIndex;
   }
 
   // Для ленивой загрузки с URL
   private async setListFullLengthFromUrl(
     dataUrl: DataUrlFunction
   ): Promise<void> {
-    if (this.forcedListLength) {
-      this.list.fullLength = this.forcedListLength;
-      return;
-    }
     const length =
       (await getListLength(dataUrl, this.subDir)) + Number(!this.basedIndex);
     this.list.fullLength = length;
