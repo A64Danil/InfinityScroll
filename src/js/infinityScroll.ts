@@ -1053,14 +1053,9 @@ class InfinityScroll {
     if (!this.dbmanager) return Promise.reject();
     const size = await this.dbmanager.getStoreSize();
 
-    // TODO: change this
-    // const safeDataSize = 100000;
-    const safeDataSize = 10;
+    const safeDataSize = 500000;
     const dataSizeLimit = this.isLazy ? safeDataSize : size;
-    // const dataSizeLimit = 10; // for tests
 
-    // TODO: используется для определения длины списка - не факт что это правильно
-    console.log(size);
     let listData;
     if (size <= dataSizeLimit) {
       listData = await this.dbmanager.readAll();
