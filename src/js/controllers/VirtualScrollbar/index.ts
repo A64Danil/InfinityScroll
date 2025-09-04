@@ -131,9 +131,9 @@ export class Vsb {
 
     this.origScrollElem = origScrollElem;
     this.createFiller(realHeight);
-    this.countTotalPages(fullLength, listLength, totalHeight);
+    this.countTotalPages(fullLength, listLength);
 
-    this.setScrollRatio(fullLength, listLength, lastPageLength);
+    this.setScrollRatio(fullLength, listLength);
 
     this.sizeOfPercentByOnePage = (1 / this.totalPages) * this.scrollRatio;
 
@@ -153,19 +153,7 @@ export class Vsb {
     this.elem.append(vsbFillerHTML);
   }
 
-  countTotalPages(fullLength: number, listLength: number, totalHeight: number) {
-    // this.totalHeight = totalHeight;
-    const formattedTotalListHeight = new Intl.NumberFormat('ru-RU').format(
-      totalHeight
-    );
-    const standartLimit = new Intl.NumberFormat('ru-RU').format(33554400);
-    const formattedSafeLimit = new Intl.NumberFormat('ru-RU').format(
-      this.safeLimit
-    );
-
-    console.log('totalListHeight', formattedTotalListHeight);
-    console.log({ standartLimit, formattedSafeLimit });
-
+  countTotalPages(fullLength: number, listLength: number) {
     let onePageSize = listLength;
     if (onePageSize > fullLength) {
       onePageSize = fullLength;

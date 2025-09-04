@@ -8,8 +8,6 @@ const path = require('path')
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
-// TODO: жесть, почему из-за такого пути CleanWebpack плагин ругается????
-// const cssEntryPoints = glob.sync('./src/styles/demo/*.scss').reduce((acc, file) => {
 const cssEntryPoints = glob.sync('./styles/**/*.scss').reduce((acc, file) => {
     const name = path.basename(file, '.scss'); // Имя файла без расширения
     acc[name] = file; // Добавляем SCSS-файлы как entry points
