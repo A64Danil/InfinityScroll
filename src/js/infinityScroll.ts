@@ -326,13 +326,14 @@ class InfinityScroll {
         console.log('get data from cache');
         this.showLocalModeHint();
         this.setInitialListData(savedData.value);
-        this.setListFulLength(savedData.value);
+        this.setListFullLengthFromData(savedData.value);
       } else if (initialData.status === 'fulfilled') {
         this.setInitialListData(initialData.value);
-        await this.setListFulLength(
-          initialData.value,
-          props.data as DataUrlFunction
-        );
+        if (this.isLazy) {
+          await this.setListFullLengthFromUrl(props.data as DataUrlFunction);
+        } else {
+          this.setListFullLengthFromData(initialData.value);
+        }
       } else if (initialData.status === 'rejected') {
         this.throwError(text.error.cantFetchData);
       }
@@ -1082,8 +1083,6 @@ class InfinityScroll {
   }
 
   setInitialListData(data: Rec[]) {
-    // TODO: это всё надо жестко распиливать на отдельное получение данных и на инициализацию после получения из сети/бд
-    console.log('---- setInitialListData ----');
     if (this.dataLoadPlace === 'local') {
       this.setLocalData(data);
     } else {
@@ -1093,7 +1092,6 @@ class InfinityScroll {
 
   setLocalData(data: Rec[]) {
     this.list.data = data;
-    this.list.fullLength = this.forcedListLength || (data && data.length); // TODO: remove
   }
 
   async setRemoteDataSettings(dataUrl: DataURLType) {
@@ -1129,19 +1127,26 @@ class InfinityScroll {
     this.setListData(shiftedArr);
   }
 
-  // TODO: refactor this
-  async setListFulLength(data: Rec[], dataUrl?: DataUrlFunction) {
+  private setListFullLength(length: number): void {
     if (this.forcedListLength) {
       this.list.fullLength = this.forcedListLength;
-      return;
-    }
-
-    if (this.isLazy && dataUrl) {
-      this.list.fullLength =
-        (await getListLength(dataUrl, this.subDir)) + Number(!this.basedIndex);
     } else {
-      this.list.fullLength = data.length;
+      this.list.fullLength = length;
     }
+  }
+
+  // Для установки длины из готовых данных
+  private setListFullLengthFromData(data: Rec[]): void {
+    this.setListFullLength(data.length);
+  }
+
+  // Для ленивой загрузки с URL
+  private async setListFullLengthFromUrl(
+    dataUrl: DataUrlFunction
+  ): Promise<void> {
+    const length =
+      (await getListLength(dataUrl, this.subDir)) + Number(!this.basedIndex);
+    this.setListFullLength(length);
   }
 
   setListLength() {
