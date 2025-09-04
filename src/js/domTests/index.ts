@@ -7,9 +7,11 @@ import {
 
 import { DOMTest } from './testFunctions';
 
+import type { InfinityScroll } from '../infinityScroll';
+
 const reportLog = console.log;
 
-export async function iScrollTester(): Promise<object> {
+export async function iScrollTester(this: InfinityScroll): Promise<object> {
   this.testResults.errors.clear();
   this.testResults.listName = `${this.testResults.listName} (${this.vsb.deviceType} - ${this.vsb.browserName})`;
 
@@ -18,7 +20,7 @@ export async function iScrollTester(): Promise<object> {
   const t = new DOMTest({ context: this });
   console.log(t);
 
-  function showErrors() {
+  function showErrors(this: InfinityScroll) {
     reportLog('%c ☆ Тест завершен! ☆ ', grayLogStyle);
 
     const errorCounter = Array.from(this.testResults.errors).reduce(

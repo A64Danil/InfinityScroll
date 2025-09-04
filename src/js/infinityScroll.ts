@@ -116,7 +116,7 @@ class InfinityScroll {
 
   private readonly skeleton: Skeleton;
 
-  private readonly vsb: Vsb;
+  readonly vsb: Vsb;
 
   private dbmanager: IndexedTTLStoreManager | undefined;
 
