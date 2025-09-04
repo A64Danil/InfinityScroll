@@ -64,8 +64,10 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
   <% if (data.mode === 'production') {%>
   <h2>Для отладки</h2>
-  <input type="text" id="reportUrlInput" placeholder="Введите URL куда отправить отчет">
-  <button id="startTests">Start tests</button>
+  <form id="startTestsForm">
+    <input type="text" id="reportUrlInput" placeholder="Введите URL куда отправить отчет" disabled>
+    <button type="submit" id="startTests" disabled>Tests is loading...</button>
+  </form>
   <% } %>
 
 </section>
@@ -468,13 +470,21 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
 
 
         const reportUrlInput = document.getElementById('reportUrlInput');
+        const startTestsForm = document.getElementById('startTestsForm');
         const startTests = document.getElementById('startTests');
 
         console.log(reportUrlInput);
         console.log(startTests);
 
-        startTests.addEventListener('click', () => {
+        reportUrlInput.removeAttribute('disabled');
+        startTests.removeAttribute('disabled');
+        startTests.textContent = 'Start tests';
 
+        startTestsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+
+            startTests.textContent = 'Tests running...';
             const startTime = performance.now()
             console.log('Начало выполнения тестов:', new Date().toLocaleTimeString())
 
@@ -500,6 +510,7 @@ author: "Danil X", libVersion: htmlWebpackPlugin.options.libVersion }; %>
                     console.log(allTestsResult);
 
 
+                    startTests.textContent = 'Start tests';
 
                     if(reportUrlInput.value) {
                         sendReport({
