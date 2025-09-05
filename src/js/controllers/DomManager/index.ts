@@ -20,13 +20,12 @@ export class DomManager {
 
   private readonly skeleton: Skeleton;
 
-  offsetElem: HTMLElement | null;
+  offsetElem!: HTMLElement;
 
   constructor(props: { skeleton: Skeleton; targetElem: HTMLElement }) {
     // this.data = props.data;
     this.skeleton = props.skeleton;
     this.targetElem = props.targetElem;
-    this.offsetElem = null;
   }
 
   setHeightToList(list: ListPropsToModifyDom, vsb?: Vsb, offset = 0): void {
