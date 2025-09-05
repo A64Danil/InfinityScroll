@@ -108,7 +108,7 @@ class InfinityScroll {
 
   private scroll: ScrollDetector;
 
-  private readonly chunk: ChunkController;
+  readonly chunk: ChunkController;
 
   private readonly list: ListController;
 

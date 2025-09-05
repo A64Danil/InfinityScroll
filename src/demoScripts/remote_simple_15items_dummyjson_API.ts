@@ -25,7 +25,7 @@ export const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS: InfinityScrollPropTypes 
               </p>
               
               <div class="reviewList">
-              ${templateCb.reviewShower(reviews)}
+              ${templateCb?.reviewShower(reviews)}
               </div>
               
             </div>
@@ -35,7 +35,7 @@ export const REMOTE_SIMPLE_15ITEMS_DUMMYJSON_API_PROPS: InfinityScrollPropTypes 
     reviewShower(reviewsAray = [{}]) {
       return reviewsAray
         ?.map(
-          (el: Record<string, unknown>, i) => `<div class="review">
+          (el: Record<string, unknown>, i: number) => `<div class="review">
         <p>${el.reviewerName} <em>${el.reviewerEmail}</em> <strong>${el.rating} / 5</strong></p>
         <p>${el.comment}</p>
         <p><em>${el.date}</em></p>
