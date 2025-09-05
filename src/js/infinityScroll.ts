@@ -69,7 +69,7 @@ class InfinityScroll {
   private readonly wrapperEl: HTMLElement;
 
   // промежуточная обёртка
-  private middleWrapper: HTMLElement | undefined;
+  private middleWrapper!: HTMLElement;
 
   private readonly subDir: string | undefined;
 
@@ -262,6 +262,9 @@ class InfinityScroll {
         addFadedClass(warningHint, 'active');
 
         try {
+          if (!this.dataUrl) {
+            this.throwError(text.error.noDataUrl);
+          }
           const initialData = await this.getInitialListData(this.dataUrl);
           console.log(initialData);
           if (initialData) {
