@@ -88,7 +88,7 @@ class InfinityScroll {
   // Скорость загрузки при асинхронном типе (сразу всё или по частям)
   private isLazy: boolean;
 
-  private readonly dataUrl: DataURLType | undefined;
+  private dataUrl: DataURLType | undefined;
 
   private includeEnd: boolean;
 
@@ -298,7 +298,7 @@ class InfinityScroll {
     throw new Error(message);
   }
 
-  async init(props) {
+  async init(props: InfinityScrollPropTypes) {
     this.injectStyles();
 
     if (this.dataLoadPlace === 'remote') {
@@ -1073,8 +1073,9 @@ class InfinityScroll {
 
   async getInitialListData(data: Rec[] | DataURLType): Promise<Rec[]> {
     console.log('---- get Initial  Data ----');
-    if (this.dataLoadPlace === 'local') {
-      return Promise.resolve(data);
+
+    if (Array.isArray(data)) {
+      return data;
     }
 
     this.status.setStatus(Status.Loading);
@@ -1130,12 +1131,15 @@ class InfinityScroll {
 
   private async setListFullLength(
     data: DataWithCacheFlag,
-    urlFn: DataUrlFunction
+    url: Rec[] | DataURLType
   ) {
+    const isDataUrlFn = (u: Rec[] | DataURLType): u is DataUrlFunction =>
+      typeof u === 'function';
+
     if (this.forcedListLength) {
       this.list.fullLength = this.forcedListLength;
-    } else if (this.isLazy && !data.isFromCache) {
-      await this.setListFullLengthFromUrl(urlFn);
+    } else if (isDataUrlFn(url) && !data.isFromCache) {
+      await this.setListFullLengthFromUrl(url);
     } else {
       await this.setListFullLengthFromData(data);
     }
