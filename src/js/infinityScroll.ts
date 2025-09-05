@@ -723,10 +723,7 @@ class InfinityScroll {
     // Вычисляем позицию чанка
     const chunkOrderNumber: number = this.chunk.getOrderNumber(scroll);
 
-    if (
-      process.env.NODE_ENV === 'development' ||
-      Number(process.env.VERSION[0]) < 2
-    ) {
+    if (process.env.NODE_ENV === 'development') {
       checkChildrenAmount(
         this.listEl.childNodes.length,
         this.list.existingSizeInDOM
@@ -863,10 +860,7 @@ class InfinityScroll {
         this.vsb
       );
 
-      if (
-        process.env.NODE_ENV === 'development' ||
-        Number(process.env.VERSION[0]) < 2
-      ) {
+      if (process.env.NODE_ENV === 'development') {
         // For tests - 1
         if (!isBigDiff) {
           this.checkIndexOrdering(this.scroll.isGoingFromBottom);
@@ -992,15 +986,12 @@ class InfinityScroll {
       this.scroll.direction,
       this.vsb
     );
-    this.timerIdRefreshList = null;
+    this.timerIdRefreshList = undefined;
 
-    if (
-      process.env.NODE_ENV === 'development' ||
-      Number(process.env.VERSION[0]) < 2
-    ) {
+    if (process.env.NODE_ENV === 'development') {
       // For tests - 3
       // console.log('BEFORE checkIndexOrdering (reset list)');
-      this.checkIndexOrdering();
+      this.checkIndexOrdering(this.scroll.isGoingFromBottom);
       // console.clear();
       // console.log(
       //   'AFTER checkIndexOrdering  (reset list)',
@@ -1346,16 +1337,19 @@ class InfinityScroll {
           }), isGoingFromBottom - ${isGoingFromBottom}`;
           console.error(`${this.testResults.currentTestName} -- ${errorText})`);
 
-          if (
-            !Array.isArray(
-              this.testResults.errors.get(this.testResults.currentTestName)
-            )
-          ) {
-            this.testResults.errors.set(this.testResults.currentTestName, []);
+          let errors = this.testResults.errors.get(
+            this.testResults.currentTestName
+          );
+
+          if (!Array.isArray(errors)) {
+            errors = [];
+            this.testResults.errors.set(
+              this.testResults.currentTestName,
+              errors
+            );
           }
-          this.testResults.errors
-            .get(this.testResults.currentTestName)
-            .push(errorText);
+
+          errors.push(errorText);
           isGoodOrdering = false;
         }
         prevIndex = elemIndex;
