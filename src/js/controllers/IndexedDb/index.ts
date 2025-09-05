@@ -42,15 +42,16 @@ export class IndexedTTLStoreManager {
       const dbName = `support-test-${Date.now()}`; // Уникальное имя
       const request = indexedDB.open(dbName, 1);
 
-      let db;
+      let db: IDBDatabase;
 
       request.onupgradeneeded = (event) => {
-        // База создаётся - это нормально
-        db = event.target.result;
+        const target = event.target as IDBOpenDBRequest;
+        db = target.result;
       };
 
       request.onsuccess = (event) => {
-        db = event.target.result;
+        const target = event.target as IDBOpenDBRequest;
+        db = target.result;
         db.close();
         // Удаляем тестовую базу
         indexedDB.deleteDatabase(dbName);
@@ -58,9 +59,8 @@ export class IndexedTTLStoreManager {
       };
 
       request.onerror = (event) => {
-        reject(
-          new Error(`Ошибка при создании/открытии базы: ${event.target.error}`)
-        );
+        const target = event.target as IDBOpenDBRequest;
+        reject(new Error(`Ошибка при создании/открытии базы: ${target.error}`));
       };
 
       request.onblocked = (event) => {
@@ -376,7 +376,7 @@ export class IndexedTTLStoreManager {
   public async get(
     index: number | string
   ): Promise<Record<string, unknown> | undefined> {
-    await this.clearIfExpired(this.storeName);
+    await this.clearIfExpired();
 
     const db = await this.openDatabase(this.storeName);
     const tx = db.transaction(this.storeName, 'readonly');
