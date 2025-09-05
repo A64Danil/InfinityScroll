@@ -3,7 +3,7 @@ import './js/scripts';
 import BigDataList100 from '../mocks/bigList100.json'; // import mock data
 
 import { InfinityScroll } from './js/infinityScroll';
-import { InfinityScrollProps } from './js/types/InfinityScrollPropTypes';
+import { InfinityScrollPropTypes } from './js/types/InfinityScrollPropTypes';
 
 import { LOCAL_BASIC_10000ITEMS_PROPS } from './demoScripts/local_basic_10000items';
 import { LOCAL_SIMPLE_100ITEMS_PROPS } from './demoScripts/local_simple_100item';
@@ -17,6 +17,12 @@ import { REMOTE_LAZY_5KK_ITEMS_TABLE_ISCROLLAPI_PROPS } from './demoScripts/remo
 
 console.log('Entry point');
 
+interface InstanceResult {
+  success: boolean;
+  instance: InfinityScroll;
+  error?: string;
+}
+
 (async () => {
   const loadDevStyles =
     process.env.NODE_ENV === 'development'
@@ -26,7 +32,7 @@ console.log('Entry point');
 
   await loadDevStyles();
 
-  window.iScroll = [] as InfinityScroll[];
+  (window as { iScroll?: InfinityScroll[] }).iScroll = [] as InfinityScroll[];
 
   const listElements = [
     LOCAL_BASIC_10000ITEMS_PROPS,
@@ -47,10 +53,10 @@ console.log('Entry point');
       };
     }
     return null;
-  }).filter(Boolean);
+  }).filter((item): item is { props: InfinityScrollPropTypes; instance: InfinityScroll } => item !== null);
 
 
-  const allInstancePromises = listElements.map(({ props, instance }: { props: InfinityScrollProps ; instance: InfinityScroll }) => {
+  const allInstancePromises = listElements.map(({ props, instance }: { props: InfinityScrollPropTypes ; instance: InfinityScroll }) => {
     const name = props.selectorId.replaceAll('_', ' ').toLowerCase();
 
     return instance.status.whenReady()
@@ -67,13 +73,19 @@ console.log('Entry point');
 
   if (window.location.href.endsWith('allDemo.html')) {
     Promise.allSettled(allInstancePromises).then(results => {
-      const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
-      const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
+      const successful = results.filter((r): r is PromiseFulfilledResult<InstanceResult> => r.status === 'fulfilled' && r.value.success);
+      const failed = results.filter((r): r is PromiseRejectedResult |  PromiseFulfilledResult<InstanceResult> => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
 
       console.clear();
       console.log(`All instances processed! Success: ${successful.length}, Failed: ${failed.length}`);
       console.log('Successful instances:', successful.map(r => r.value?.instance));
-      console.log('Failed instances:', failed.map(r => r.value?.instance || r.reason));
+      console.log('Failed instances:', failed.map(r => {
+        if (r.status === 'fulfilled') {
+          return r.value.instance;
+        } else {
+          return r.reason;
+        }
+      }));
 
       if(successful.length > 0) {
         const allDemosIsReadyToTest = new Event("allDemosIsReadyToTest");
