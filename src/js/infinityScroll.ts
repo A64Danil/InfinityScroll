@@ -1294,7 +1294,7 @@ class InfinityScroll {
     this.list.data.splice(sequenceStart, this.chunk.amount, ...result);
   }
 
-  checkItemForLoad(sequenceStart: number, sequenceEnd: number): unknown[] {
+  checkItemForLoad(sequenceStart: number, sequenceEnd: number) {
     const unfoundedItems: NumRange[] = [];
     let isUndefined = false;
     const buffer: number[] = [];
