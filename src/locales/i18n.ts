@@ -12,13 +12,12 @@ export const i18n: Record<string, any> = {
         'RenderController (this.render) is not exist',
       dataIsUndefined: 'You does not have list.data',
       notValidUrl:
-        'Your dataUrl is not a valid URL; or returned value is not a  valid URL',
+        'Your dataUrl is not a valid URL; or returned value is not a valid URL',
       notArray: 'Your list does not have Array type',
       zeroListSize: 'Your list does not have length or length is 0',
       noTargetElem: 'You do not have HTML-element for your list',
-      noDataUrl: 'You try to call getListDataLazy, but you dont have dataUrl',
-      dataUrlNotAFn:
-        'You try to call getListDataLazy, but your dataUrl is a string type',
+      noDataUrl: 'You dont have dataUrl',
+      dataUrlNotAFn: 'Your dataUrl is a string type',
       fetchedIsNotArray: 'Your fetched data does not have Array type',
     },
     message: {
@@ -46,10 +45,8 @@ export const i18n: Record<string, any> = {
         'Ваш список не является массивом (Array). Проверьте, что вы передаёте внутрь InfinityScroll',
       zeroListSize: 'Ваш список пуст или его размер равен 0',
       noTargetElem: 'Вы не указали HTML-элемент для вашего списка',
-      noDataUrl:
-        'Вы пытаетесь вызвать getListDataLazy, но у вас нет dataUrl (ссылки)',
-      dataUrlNotAFn:
-        'Вы пытаетесь вызвать getListDataLazy, но ваш dataUrl является строкой',
+      noDataUrl: 'У вас нет dataUrl (ссылки)',
+      dataUrlNotAFn: 'Ваш dataUrl является строкой',
       fetchedIsNotArray: 'Ваши загруженные данные не являются Массивом (Array)',
     },
     message: {
