@@ -595,6 +595,7 @@ class InfinityScroll {
   }
 
   initializeBaseStyles() {
+    // TODO: перенести в css?
     const cssAnimationSkeletonText = `.loading .dots {
     width: 0.5em;
     animation: load 3s steps(4, end) infinite;
