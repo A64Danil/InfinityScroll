@@ -102,7 +102,7 @@ class InfinityScroll {
   private readonly onChangeStatus: (newStatus: Status) => void;
 
   // Содержит генерируемый элемент внутри корневого для задания искусственного отступа
-  private readonly offsetElem: HTMLElement | undefined;
+  private offsetElem: HTMLElement | undefined;
 
   private readonly domMngr: DomManager;
 
@@ -401,15 +401,16 @@ class InfinityScroll {
         // console.log('Отменяемmain scroll listener - 1.0');
         return;
       }
+      const t = this.middleWrapper;
       this.isSyncing = true;
       this.scroll.setScrollDirection(
         this.middleWrapper.scrollTop,
         this.vsb.isPageChanged,
         this.vsb.isLastPage
       );
-      this.vsb.setScrollFromOuterSrc(e.target.scrollTop, this.scroll.direction);
+      this.vsb.setScrollFromOuterSrc(t.scrollTop, this.scroll.direction);
       if (this.vsb.isPageChanged) {
-        const [resultIndex] = this.calcRenderIndex(e.target.scrollTop);
+        const [resultIndex] = this.calcRenderIndex(t.scrollTop);
         this.chunk.setRenderIndex(
           resultIndex,
           this.vsb.currentPage,
