@@ -32,7 +32,7 @@ interface InstanceResult {
 
   await loadDevStyles();
 
-  (window as { iScroll?: InfinityScroll[] }).iScroll = [] as InfinityScroll[];
+  window.iScroll = [];
 
   const listElements = [
     LOCAL_BASIC_10000ITEMS_PROPS,
