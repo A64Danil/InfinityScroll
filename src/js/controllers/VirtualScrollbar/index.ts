@@ -11,7 +11,7 @@ export class Vsb {
   public readonly elem;
 
   // Ссылка на элмент с оригинальным скроллом
-  public origScrollElem: HTMLElement | undefined;
+  public origScrollElem!: HTMLElement;
 
   // private readonly vsbFillerHTML;
 
