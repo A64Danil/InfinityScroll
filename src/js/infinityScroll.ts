@@ -706,6 +706,7 @@ class InfinityScroll {
     const totalHeight = this.list.getTotalListHeight();
     const realHeight = this.listEl.offsetHeight;
     console.log('realHeight', realHeight);
+    this.middleWrapper?.after(this.vsb.elem);
     this.vsb.init({
       totalHeight,
       realHeight,

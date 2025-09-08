@@ -80,8 +80,5 @@
       "npm run lint:fix",
       "git add"
     ]
-  },
-  "dependencies": {
-    "simplebar": "^6.3.2"
   }
 }

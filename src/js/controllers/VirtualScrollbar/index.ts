@@ -1,5 +1,7 @@
-import SimpleBar from 'simplebar';
-import 'simplebar/dist/simplebar.min.css';
+// import SimpleBar from 'simplebar';
+// import 'simplebar/dist/simplebar.min.css';
+
+import { CustomScrollbar } from '../CustomScrollbar';
 
 import { IScrollDirection } from '../../types/IScrollDirection';
 
@@ -96,14 +98,14 @@ export class Vsb {
     this.elem.classList.add(`vSrcollbar_${this.browserName}`);
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
-    if (this.deviceType !== 'desktop') {
-      const simpleBar = new SimpleBar(this.elem, {
-        autoHide: false, // Всегда показывать на iOS
-        scrollbarMinSize: 60,
-        forceVisible: 'y', // Принудительно показывать вертикальный скроллбар
-        clickOnTrack: true, // Клик по треку для скролла
-      });
-    }
+    // if (this.deviceType !== 'desktop') {
+    //   const simpleBar = new SimpleBar(this.elem, {
+    //     autoHide: false, // Всегда показывать на iOS
+    //     scrollbarMinSize: 60,
+    //     forceVisible: 'y', // Принудительно показывать вертикальный скроллбар
+    //     clickOnTrack: true, // Клик по треку для скролла
+    //   });
+    // }
 
     this.elem.addEventListener('scroll', scrollTrigger);
 
@@ -139,6 +141,16 @@ export class Vsb {
 
     this.sizeOfScrollByOnePage =
       (this.fillerHeight / this.totalPages) * this.scrollRatio;
+
+    // if (this.deviceType !== 'desktop') {
+    const scrollbar = new CustomScrollbar(this.elem, {
+      width: 30,
+      thumbColor: '#007acc',
+      hoverThumbColor: '#044673',
+      trackColor: '#f0f0f0',
+      autoHide: false,
+    });
+    // }
   }
 
   createFiller(realHeight: number) {
