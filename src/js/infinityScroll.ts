@@ -229,7 +229,7 @@ class InfinityScroll {
 
   showHint(hintMsg: string, cb?: (warningHint: HTMLElement) => void) {
     const warningHint = createElem({
-      tagName: 'div',
+      tagName: 'div', // TODO: убрать
       className: 'warningHint',
       text: hintMsg,
     });
@@ -354,6 +354,7 @@ class InfinityScroll {
     this.setDefaultStyles();
     this.getAllSizes();
 
+    // TODO: заменить на createElem
     this.offsetElem = document.createElement('div');
     this.offsetElem.classList.add('offsetElem');
     this.middleWrapper.prepend(this.offsetElem);
@@ -464,6 +465,7 @@ class InfinityScroll {
   createInnerList(): HTMLElement {
     // Create middle wrapper
 
+    // TODO: заменить на createElem
     this.middleWrapper = document.createElement('div');
     this.middleWrapper.classList.add('middleWrapper', 'showStatus');
     this.middleWrapper.dataset.status = Status.Initial;
@@ -717,7 +719,6 @@ class InfinityScroll {
     });
     // console.log(this.list.lengthByPage)
     // this.list.getPaginatedData(this.vsb.totalPages, this.vsb.safeLimit);
-    this.middleWrapper?.after(this.vsb.elem);
   }
 
   calcRenderIndex(scroll: number) {
@@ -861,12 +862,12 @@ class InfinityScroll {
         this.vsb
       );
 
-      if (process.env.NODE_ENV === 'development') {
-        // For tests - 1
-        if (!isBigDiff) {
-          this.checkIndexOrdering(this.scroll.isGoingFromBottom);
-        }
+      // if (process.env.NODE_ENV === 'development') {
+      // For tests - 1
+      if (!isBigDiff) {
+        this.checkIndexOrdering(this.scroll.isGoingFromBottom);
       }
+      // }
     }
   }
 
@@ -989,18 +990,18 @@ class InfinityScroll {
     );
     this.timerIdRefreshList = undefined;
 
-    if (process.env.NODE_ENV === 'development') {
-      // For tests - 3
-      // console.log('BEFORE checkIndexOrdering (reset list)');
-      this.checkIndexOrdering(this.scroll.isGoingFromBottom);
-      // console.clear();
-      // console.log(
-      //   'AFTER checkIndexOrdering  (reset list)',
-      //   this.scroll.direction,
-      //   timerID,
-      //   `renderIndex: ${renderIndex}`
-      // );
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    // For tests - 3
+    // console.log('BEFORE checkIndexOrdering (reset list)');
+    this.checkIndexOrdering(this.scroll.isGoingFromBottom);
+    // console.clear();
+    // console.log(
+    //   'AFTER checkIndexOrdering  (reset list)',
+    //   this.scroll.direction,
+    //   timerID,
+    //   `renderIndex: ${renderIndex}`
+    // );
+    // }
   }
 
   setTimerToRefreshList() {
