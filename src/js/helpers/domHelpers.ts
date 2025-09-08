@@ -27,13 +27,13 @@ export function setTdPlaceholder(item: HTMLElement): void {
 }
 
 type ElemProps = {
-  tagName: string;
+  tagName?: string;
   className?: string[] | string;
   text?: string;
 };
 
 export function createElem({
-  tagName,
+  tagName = 'div',
   className,
   text,
 }: ElemProps): HTMLElement {
