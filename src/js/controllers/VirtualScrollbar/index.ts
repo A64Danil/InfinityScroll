@@ -143,13 +143,7 @@ export class Vsb {
       (this.fillerHeight / this.totalPages) * this.scrollRatio;
 
     // if (this.deviceType !== 'desktop') {
-    const scrollbar = new MobileScrollbar(this.elem, {
-      width: 30,
-      thumbColor: '#007acc',
-      hoverThumbColor: '#044673',
-      trackColor: '#f0f0f0',
-      autoHide: false,
-    });
+    const scrollbar = new MobileScrollbar(this.elem);
     // }
   }
 
