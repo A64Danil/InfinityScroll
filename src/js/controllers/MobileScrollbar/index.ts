@@ -1,4 +1,4 @@
-export class CustomScrollbar {
+export class MobileScrollbar {
   private srcElement!: HTMLElement;
 
   private options: {
@@ -62,7 +62,7 @@ export class CustomScrollbar {
   createWrapper() {
     // Создаем обертку
     this.scrollBarWrp = document.createElement('div');
-    this.scrollBarWrp.className = 'iScrollBar-wrapper';
+    this.scrollBarWrp.className = 'mobileScrollbar-wrapper';
     // this.wrapper.style.cssText = `
     //   position: relative;
     //   overflow: hidden;
@@ -93,18 +93,18 @@ export class CustomScrollbar {
     // // Для webkit браузеров
     // const style = document.createElement('style');
     // style.textContent = `
-    //   .iScrollBar-wrapper .iScrollBar-srcElem::-webkit-scrollbar {
+    //   .mobileScrollbar-wrapper .mobileScrollbar-srcElem::-webkit-scrollbar {
     //     display: none;
     //   }
     // `;
     // document.head.appendChild(style);
-    this.srcElement.className += ' iScrollBar-srcElem';
+    this.srcElement.className += ' mobileScrollbar-srcElem';
   }
 
   createScrollbar() {
     // Создаем трек скроллбара
     this.track = document.createElement('div');
-    this.track.className = 'iScrollBar-track';
+    this.track.className = 'mobileScrollbar-track';
     this.track.style.cssText = `
       width: ${this.options.width}px;
       background: ${this.options.trackColor};
@@ -114,7 +114,7 @@ export class CustomScrollbar {
 
     // Создаем ползунок
     this.thumb = document.createElement('div');
-    this.thumb.className = 'iScrollBar-thumb';
+    this.thumb.className = 'mobileScrollbar-thumb';
     this.thumb.style.cssText = `
       background: ${this.options.thumbColor};
       border-radius: ${this.options.width / 2}px;

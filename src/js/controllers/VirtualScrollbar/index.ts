@@ -1,7 +1,7 @@
 // import SimpleBar from 'simplebar';
 // import 'simplebar/dist/simplebar.min.css';
 
-import { CustomScrollbar } from '../CustomScrollbar';
+import { MobileScrollbar } from '../MobileScrollbar';
 
 import { IScrollDirection } from '../../types/IScrollDirection';
 
@@ -143,7 +143,7 @@ export class Vsb {
       (this.fillerHeight / this.totalPages) * this.scrollRatio;
 
     // if (this.deviceType !== 'desktop') {
-    const scrollbar = new CustomScrollbar(this.elem, {
+    const scrollbar = new MobileScrollbar(this.elem, {
       width: 30,
       thumbColor: '#007acc',
       hoverThumbColor: '#044673',
