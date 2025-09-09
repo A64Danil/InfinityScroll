@@ -510,6 +510,7 @@ class InfinityScroll {
 
     this.calculateWrapperDimensions();
     const listItem = this.ensureListItemExists();
+    listItem.style.whiteSpace = 'nowrap'; // without this we will get wrong item height
     this.list.itemHeight = listItem?.offsetHeight || this.list.wrapperHeight;
 
     this.initializeBaseStyles();
@@ -538,7 +539,7 @@ class InfinityScroll {
     }
   }
 
-  private ensureListItemExists(): HTMLElement | null {
+  private ensureListItemExists(): HTMLElement {
     let listItem = this.listEl.firstChild as HTMLElement;
 
     if (!listItem) {
