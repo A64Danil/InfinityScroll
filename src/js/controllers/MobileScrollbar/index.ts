@@ -38,47 +38,16 @@ export class MobileScrollbar {
   }
 
   createWrapper() {
-    // Создаем обертку
     this.scrollBarWrp = createElem({
       className: 'mobileScrollbar-wrapper',
     });
-    // this.scrollBarWrp = document.createElement('div');
-    // this.scrollBarWrp.className = 'mobileScrollbar-wrapper';
-    // this.wrapper.style.cssText = `
-    //   position: relative;
-    //   overflow: hidden;
-    //   height: 100%;
-    //   width: 100%;
-    // `;
 
-    console.log(this.srcElement);
-    console.log(this.srcElement.parentNode);
     if (!this.srcElement.parentNode) {
       throw new Error('Element must be in the DOM and have a parent node');
     }
     // Оборачиваем оригинальный элемент
     this.srcElement.parentNode.insertBefore(this.scrollBarWrp, this.srcElement);
     this.scrollBarWrp.appendChild(this.srcElement);
-
-    // Скрываем нативный скроллбар
-    // this.srcElement.style.cssText += `
-    //   overflow-y: scroll;
-    //   overflow-x: hidden;
-    //   -webkit-overflow-scrolling: touch;
-    //   scrollbar-width: none;
-    //   -ms-overflow-style: none;
-    //   padding-right: 17px;
-    //   margin-right: -17px;
-    // `;
-    //
-    // // Для webkit браузеров
-    // const style = document.createElement('style');
-    // style.textContent = `
-    //   .mobileScrollbar-wrapper .mobileScrollbar-srcElem::-webkit-scrollbar {
-    //     display: none;
-    //   }
-    // `;
-    // document.head.appendChild(style);
     this.srcElement.className += ' mobileScrollbar-srcElem';
   }
 
@@ -87,15 +56,11 @@ export class MobileScrollbar {
     this.track = createElem({
       className: 'mobileScrollbar-track',
     });
-    // this.track = document.createElement('div');
-    // this.track.className = 'mobileScrollbar-track';
 
     // Создаем ползунок
     this.thumb = createElem({
       className: 'mobileScrollbar-thumb',
     });
-    // this.thumb = document.createElement('div');
-    // this.thumb.className = 'mobileScrollbar-thumb';
 
     this.track.appendChild(this.thumb);
     this.scrollBarWrp.appendChild(this.track);
@@ -131,14 +96,6 @@ export class MobileScrollbar {
 
     // Клик по треку
     this.track.addEventListener('click', (e) => this.onTrackClick(e));
-
-    // Hover эффект для ползунка
-    // this.thumb.addEventListener('mouseenter', () => {
-    //   this.thumb.style.backgroundColor = this.options.hoverThumbColor;
-    // });
-    // this.thumb.addEventListener('mouseleave', () => {
-    //   this.thumb.style.backgroundColor = this.options.thumbColor;
-    // });
   }
 
   updateScrollbar() {
@@ -170,7 +127,6 @@ export class MobileScrollbar {
     this.dragStartScrollTop = this.srcElement.scrollTop;
 
     document.body.style.userSelect = 'none';
-    // this.thumb.style.backgroundColor = this.options.hoverThumbColor;
   }
 
   onDrag(e) {
@@ -194,7 +150,6 @@ export class MobileScrollbar {
   endDrag() {
     this.isDragging = false;
     document.body.style.userSelect = '';
-    // this.thumb.style.backgroundColor = this.options.thumbColor;
   }
 
   onTrackClick(e) {
