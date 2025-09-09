@@ -121,7 +121,7 @@ export class MobileScrollbar {
     this.thumb.style.transform = `translateY(${thumbTop}px)`;
   }
 
-  startDrag(e) {
+  startDrag(e: Touch | MouseEvent) {
     this.isDragging = true;
     this.dragStartY = e.clientY || e.pageY;
     this.dragStartScrollTop = this.srcElement.scrollTop;
@@ -129,7 +129,7 @@ export class MobileScrollbar {
     document.body.style.userSelect = 'none';
   }
 
-  onDrag(e) {
+  onDrag(e: Touch | MouseEvent) {
     if (!this.isDragging) return;
 
     const deltaY = (e.clientY || e.pageY) - this.dragStartY;
@@ -152,7 +152,7 @@ export class MobileScrollbar {
     document.body.style.userSelect = '';
   }
 
-  onTrackClick(e) {
+  onTrackClick(e: MouseEvent) {
     if (e.target === this.thumb) return;
 
     const rect = this.track.getBoundingClientRect();
@@ -198,7 +198,7 @@ export class MobileScrollbar {
     this.updateScrollbar();
   }
 
-  scrollTo(position) {
+  scrollTo(position: number) {
     this.srcElement.scrollTop = position;
   }
 
