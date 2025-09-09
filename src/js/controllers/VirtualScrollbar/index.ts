@@ -1,11 +1,9 @@
-// import SimpleBar from 'simplebar';
-// import 'simplebar/dist/simplebar.min.css';
-
 import { MobileScrollbar } from '../MobileScrollbar';
 
 import { IScrollDirection } from '../../types/IScrollDirection';
 
 import { getBrowserName, getDeviceType } from '../../helpers/detectClient';
+import { createElem } from '../../helpers/domHelpers';
 
 // Virtual Scroll Bar
 export class Vsb {
@@ -93,10 +91,9 @@ export class Vsb {
 
     this.browserName = getBrowserName();
 
-    // TODO: change to createElem
-    this.elem = document.createElement('div');
-    this.elem.classList.add('vSrcollbar');
-    this.elem.classList.add(`vSrcollbar_${this.browserName}`);
+    this.elem = createElem({
+      className: ['vSrcollbar', `vSrcollbar_${this.browserName}`],
+    });
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
     // if (this.deviceType !== 'desktop') {
@@ -149,14 +146,12 @@ export class Vsb {
   }
 
   createFiller(realHeight: number) {
-    // TODO: change to createElem
-    const vsbFillerHTML = document.createElement('div');
-    vsbFillerHTML.classList.add('vScrollbarFiller');
+    const vsbFillerHTML = createElem({
+      className: 'vScrollbarFiller',
+    });
     vsbFillerHTML.style.height = `${realHeight}px`;
 
     this.fillerHeight = realHeight - this.origScrollElem?.clientHeight;
-    console.log(realHeight, this.origScrollElem?.clientHeight);
-    // this.fillerHeight = realHeight;
 
     this.elem.append(vsbFillerHTML);
   }

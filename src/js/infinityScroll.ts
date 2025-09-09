@@ -229,7 +229,6 @@ class InfinityScroll {
 
   showHint(hintMsg: string, cb?: (warningHint: HTMLElement) => void) {
     const warningHint = createElem({
-      tagName: 'div', // TODO: убрать
       className: 'warningHint',
       text: hintMsg,
     });
@@ -354,9 +353,9 @@ class InfinityScroll {
     this.setDefaultStyles();
     this.getAllSizes();
 
-    // TODO: заменить на createElem
-    this.offsetElem = document.createElement('div');
-    this.offsetElem.classList.add('offsetElem');
+    this.offsetElem = createElem({
+      className: 'offsetElem',
+    });
     this.middleWrapper.prepend(this.offsetElem);
     this.domMngr.offsetElem = this.offsetElem;
 
@@ -464,10 +463,9 @@ class InfinityScroll {
 
   createInnerList(): HTMLElement {
     // Create middle wrapper
-
-    // TODO: заменить на createElem
-    this.middleWrapper = document.createElement('div');
-    this.middleWrapper.classList.add('middleWrapper', 'showStatus');
+    this.middleWrapper = createElem({
+      className: ['middleWrapper', 'showStatus'],
+    });
     this.middleWrapper.dataset.status = Status.Initial;
 
     this.wrapperEl.append(this.middleWrapper);
