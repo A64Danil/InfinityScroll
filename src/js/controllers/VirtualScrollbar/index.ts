@@ -93,6 +93,7 @@ export class Vsb {
 
     this.browserName = getBrowserName();
 
+    // TODO: change to createElem
     this.elem = document.createElement('div');
     this.elem.classList.add('vSrcollbar');
     this.elem.classList.add(`vSrcollbar_${this.browserName}`);
@@ -148,6 +149,7 @@ export class Vsb {
   }
 
   createFiller(realHeight: number) {
+    // TODO: change to createElem
     const vsbFillerHTML = document.createElement('div');
     vsbFillerHTML.classList.add('vScrollbarFiller');
     vsbFillerHTML.style.height = `${realHeight}px`;
