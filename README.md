@@ -185,6 +185,10 @@ Visit the [demo page](https://iscroll.qoobeo.ru/demo/index.html) to see Infinity
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## 📄 License
+
+This project is licensed under the ISC License - see the [LICENSE](https://github.com/A64Danil/InfinityScroll?tab=ISC-1-ov-file#readme) file for details.
+
 
 ## Author
 
