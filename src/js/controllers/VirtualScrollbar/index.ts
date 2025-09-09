@@ -13,16 +13,12 @@ export class Vsb {
   // Ссылка на элмент с оригинальным скроллом
   public origScrollElem!: HTMLElement;
 
-  // private readonly vsbFillerHTML;
-
   currentPage: number;
 
   // Коэффициент расчета индекса с учётом пагинации
   totalPages: number;
 
   fillerHeight: number;
-
-  // private totalHeight: number;
 
   // Current scroll offset
   scroll: number;
@@ -36,14 +32,8 @@ export class Vsb {
   // Amount of percents (from 100%) by one page
   sizeOfPercentByOnePage: number;
 
-  // Amount of percents (from 100%) by last page
-  sizeOfPercentByLastPage = 0;
-
   // Amount of pixels (from 100% of fillerHeight) by one page
   sizeOfScrollByOnePage: number;
-
-  // Amount of pixels (from 100% of fillerHeight) by last page
-  sizeOfScrollByLastPage = 0;
 
   // True is new page number is not like previous
   isPageChanged = false;
@@ -96,20 +86,7 @@ export class Vsb {
     });
     if (isDebugMode) this.elem.classList.add('vSrcollbar_debugMode');
 
-    // if (this.deviceType !== 'desktop') {
-    //   const simpleBar = new SimpleBar(this.elem, {
-    //     autoHide: false, // Всегда показывать на iOS
-    //     scrollbarMinSize: 60,
-    //     forceVisible: 'y', // Принудительно показывать вертикальный скроллбар
-    //     clickOnTrack: true, // Клик по треку для скролла
-    //   });
-    // }
-
     this.elem.addEventListener('scroll', scrollTrigger);
-
-    // const totalHeight = this.listEl.offsetHeight;
-
-    // this.middleWrapper.after(this.elem);
   }
 
   init({
@@ -140,9 +117,9 @@ export class Vsb {
     this.sizeOfScrollByOnePage =
       (this.fillerHeight / this.totalPages) * this.scrollRatio;
 
-    // if (this.deviceType !== 'desktop') {
-    const scrollbar = new MobileScrollbar(this.elem);
-    // }
+    if (this.deviceType !== 'desktop') {
+      const scrollbar = new MobileScrollbar(this.elem);
+    }
   }
 
   createFiller(realHeight: number) {
