@@ -2,6 +2,12 @@
 
 A JavaScript library for creating truly infinite scroll lists of any size without browser limitations.
 
+[![Demo](https://img.shields.io/badge/Demo-Live-brightgreen)](https://iscroll.qoobeo.ru/demo/)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](https://iscroll.qoobeo.ru/download/)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![GitHub](https://img.shields.io/github/stars/A64Danil/InfinityScroll?style=social)](https://github.com/A64Danil/InfinityScroll)
+
+
 ## Description
 
 InfinityScroll solves a fundamental problem with web browsers that have a container height limit of 33,554,400px, which restricts scrollable list sizes. This library eliminates this limitation and enables working with lists containing millions of elements.
@@ -18,25 +24,20 @@ InfinityScroll solves a fundamental problem with web browsers that have a contai
 ### Via CDN
 
 ```html
-<script src="https://iscroll.qoobeo.ru/js/infinityScroll-1.9.1.js"></script>
+<script src="https://iscroll.qoobeo.ru/js/infinityScroll-2.0.0.js"></script>
 ```
 
-### Download Files
+**Download:**
+[Download the script](https://iscroll.qoobeo.ru/js/infinityScroll-2.0.0.js) and include it in your project.
 
-1. Download the library files from the [repository](https://github.com/A64Danil/InfinityScroll)
-2. Include the script in your page:
-
-```html
-<script src="path/to/infinity-scroll.js"></script>
-```
-
-## Quick Start
+### Basic Example
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Infinity Scroll Example</title>
+    <title>InfinityScroll Demo</title>
+    <script src="https://iscroll.qoobeo.ru/js/infinityScroll-2.0.0.js"></script>
 </head>
 <body>
     <div id="my-list"></div>
@@ -79,11 +80,27 @@ interface InfinityScrollConfig {
     listWrapperHeight?: string;
     forcedListLength?: number;
     listType?: 'list' | 'table' | 'div';
+    tHeadNames?: string[];
     subDir?: string;
+    templateCb?: Record<string, (arg: any) => any>;
 }
 ```
 
 ### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `data` | `Array \| string \| Function` | ✅ | Data source - array, URL string, or function returning URL |
+| `selectorId` | `string` | ✅ | ID of the container element |
+| `templateString` | `function` | ✅ | Function returning HTML template for each item |
+| `listWrapperHeight` | `string` | ❌ | Height of scrollable container (e.g., '350px') |
+| `forcedListLength` | `number` | ❌ | Manually set list length to limit or accelerate initialization |
+| `listType` | `'list' \| 'table' \| 'div'` | ❌ | Container type (default: 'list') |
+| `tHeadNames` | `string[]` | ❌ | Column headers for table mode |
+| `subDir` | `string` | ❌ | Property name for nested array in API response |
+| `templateCb` | `object` | ❌ | Custom template callback functions |
+| `isDebugMode` | `boolean` | ❌ | Enable debug mode (feature in progress) |
+
 
 - **`data`** (required): Data source - can be an array of objects, URL template function, or DataURL type
 - **`selectorId`** (required): ID of the container element
@@ -98,12 +115,11 @@ interface InfinityScrollConfig {
 The `templateString` function receives three parameters:
 
 ```javascript
-templateString: (element, listLength, elemNum) => {
-    // element: Current data item
-    // listLength: Total length of the list
-    // elemNum: Current element number
-    return `<li>${element.name}</li>`;
-}
+templateString: ({item, listLength, templateCb, idx}) => `
+    <li class="list-item">
+        <strong>${item.name}</strong>
+        <span>Item ${idx} of ${listLength}</span>
+    </li>
 ```
 
 ## Examples
@@ -177,7 +193,19 @@ new InfinityScroll(TABLE_CONFIG);
 Visit the [demo page](https://iscroll.qoobeo.ru/demo/index.html) to see InfinityScroll in action.
 
 
-## Contributing
+## 🌐 Browser Support
+
+| Browser | Supported Versions |
+|---------|-------------------|
+| Chrome | ✅ 60+ |
+| Firefox | ✅ 55+ |
+| Safari | ✅ 12+ |
+| Edge | ✅ 79+ |
+| IE | ❌ Not supported |
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
